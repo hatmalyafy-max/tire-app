@@ -122,6 +122,16 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
 .quick-restock-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .quick-restock-meta{font-size:12px;color:var(--muted);margin-top:4px;}
 .qty-pill{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:4px 10px;border-radius:999px;background:var(--accent-dim);color:var(--accent);font-weight:700;}
+.lang-switch{display:flex;align-items:center;gap:6px;padding:4px;border:1px solid var(--border);border-radius:999px;background:var(--glass);}
+.lang-btn{border:none;background:transparent;color:var(--muted);padding:7px 12px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;}
+.lang-btn.active{background:var(--accent);color:#07090c;}
+.table-select{width:100%;background:var(--glass2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;outline:none;min-width:150px;}
+.table-select:focus{border-color:var(--accent);}
+.inventory-note-cell{min-width:220px;max-width:320px;}
+.inventory-action-stack{display:flex;flex-direction:column;gap:8px;min-width:220px;}
+.table-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.print-option-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.print-summary{font-size:12px;color:var(--muted);margin-top:8px;}
 @media (max-width: 768px){
   body{font-size:14px;}
   .auth-card{padding:28px 20px;margin-top:5vh;width:min(100%,420px);}
@@ -138,7 +148,7 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
   .search-bar > *, .row > *, .ctrl-grid > *, .employee-toolbar > *, .service-card-actions > *, .report-actions > *, .admin-employee-actions > *{width:100%;}
   .service-card{min-width:240px;}
   .service-card-header,.service-card-row{gap:8px;align-items:flex-start;flex-wrap:wrap;}
-  .table-wrap table{min-width:720px;}
+  .table-wrap table{min-width:980px;}
   .modal{padding:20px;width:calc(100% - 16px);max-width:calc(100% - 16px);border-radius:14px;}
   .btn{min-height:44px;}
 }
@@ -174,14 +184,14 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
 <div id="app-screen">
   <div class="topbar">
     <div><div class="topbar-brand">Quality Part X</div><div class="topbar-sub">TYRE SERVICES · DUNSTABLE</div></div>
-    <div class="topbar-right"><span class="operator-badge" id="operator-name"></span><button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button></div>
+    <div class="topbar-right"><span class="operator-badge" id="operator-name"></span><div class="lang-switch"><button class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">English</button><button class="lang-btn" id="lang-btn-ar" onclick="setLanguage('ar')">العربية</button></div><button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()">Logout</button></div>
   </div>
 
   <div class="nav-tabs">
-    <button class="nav-tab active" data-page="service" onclick="showPage('service')">🔧 Services</button>
-    <button class="nav-tab" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="nav-tab" data-page="inventory" onclick="showPage('inventory')">📦 Inventory</button>
-    <button class="nav-tab" data-page="report" onclick="showPage('report')">📋 Reports</button>
+    <button class="nav-tab active" data-page="service" id="nav-service" onclick="showPage('service')">🔧 Services</button>
+    <button class="nav-tab" data-page="dashboard" id="nav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="nav-tab" data-page="inventory" id="nav-inventory" onclick="showPage('inventory')">📦 Inventory</button>
+    <button class="nav-tab" data-page="report" id="nav-report" onclick="showPage('report')">📋 Reports</button>
   </div>
 
   <div class="main-content">
@@ -231,7 +241,7 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
         <div class="stat-card"><div class="stat-value" id="stat-today">–</div><div class="stat-label">Today's Services</div></div>
         <div class="stat-card"><div class="stat-value" id="stat-sizes">–</div><div class="stat-label">Tyre Sizes</div></div>
       </div>
-      <div class="card"><div class="card-header"><div><div class="card-title">⚡ Control Panel</div></div></div><div class="ctrl-grid"><button class="btn btn-info btn-sm" onclick="printDailyReport()">🖨️ Print Daily Report</button><button class="btn btn-info btn-sm" onclick="printInventoryStock()">📦 Print Full Stock Report</button><div class="admin-employee-actions" id="admin-employee-actions" style="display:none;"><button class="btn btn-success btn-sm" id="add-employee-btn" onclick="showAddEmployee()">👤 Add Employee</button><button class="btn btn-ghost btn-sm" id="view-employees-btn" onclick="toggleEmployeeList()">عرض الموظفين</button></div></div></div>
+      <div class="card"><div class="card-header"><div><div class="card-title">⚡ Control Panel</div></div></div><div class="ctrl-grid"><button class="btn btn-info btn-sm" onclick="printDailyReport()">🖨️ Print Daily Report</button><button class="btn btn-info btn-sm" onclick="printInventoryStock()">📦 Print Full Stock Report</button><div class="admin-employee-actions" id="admin-employee-actions" style="display:none;"><button class="btn btn-success btn-sm" id="add-employee-btn" onclick="showAddEmployee()">👤 Add Employee</button><button class="btn btn-ghost btn-sm" id="view-employees-btn" onclick="toggleEmployeeList()">View Employees</button></div></div></div>
       <div class="card" id="employee-card" style="display:none;">
         <div class="card-header">
           <div><div class="card-title">👥 Employees</div></div>
@@ -243,10 +253,10 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
 
     <!-- INVENTORY PAGE -->
     <div class="page" id="page-inventory">
-      <div class="card"><div class="card-header"><div><div class="card-title">Inventory Management</div></div><div class="ctrl-grid"><button class="btn btn-success btn-sm" id="restock-toggle-btn" onclick="toggleRestockMode()">📥 إعادة تعبئة / إدخال بضاعة</button><button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Tyre</button><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Stock Report</button></div></div>
-        <div class="search-bar"><div class="form-group"><input type="text" id="inv-search" placeholder="Search size or location..." oninput="formatInventorySearch(this)"></div><button class="btn btn-ghost btn-sm" onclick="loadInventory()">🔄</button></div>
-        <div class="card" id="quick-restock-panel" style="display:none;"><div class="card-header"><div><div class="card-title">Quick Restock Mode</div><div class="panel-subtitle">اختر المخزن مرة واحدة، ثم ابحث بالمقاس واستخدم + و - بسرعة.</div></div><button class="btn btn-ghost btn-sm" onclick="toggleRestockMode(false)">✕ إغلاق</button></div><div class="quick-restock-grid"><div class="form-group"><label>Warehouse / Location</label><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div><div class="form-group"><label>إضافة مخزن / موقع</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="مثال: مخزن 1"><button class="btn btn-primary btn-sm" onclick="saveQuickLocation()">حفظ</button></div></div></div><div class="quick-restock-last" id="quick-location-last">آخر مخزن مستخدم: -</div><div class="search-bar" style="margin-bottom:12px;"><div class="form-group"><input type="text" id="quick-restock-search" inputmode="numeric" maxlength="9" placeholder="ابحث بالمقاس بدون / مثال 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" onclick="focusQuickRestock()">🔎 تركيز</button></div><div id="quick-restock-results"><div class="empty-state">اختر المخزن ثم ابحث عن المقاس.</div></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Size</th><th>Location</th><th>Qty</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="inv-table"><tr><td colspan="5"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
+      <div class="card"><div class="card-header"><div><div class="card-title" id="inventory-title">Inventory Management</div></div><div class="ctrl-grid"><button class="btn btn-success btn-sm" id="restock-toggle-btn" onclick="toggleRestockMode()">📥 Quick Restock / Receive Stock</button><button class="btn btn-primary btn-sm" id="inventory-add-btn" onclick="openAddModal()">+ Add Tyre</button><button class="btn btn-info btn-sm" id="inventory-print-btn" onclick="openInventoryPrintModal()">🖨 Inventory Print Options</button><button class="btn btn-ghost btn-sm" id="inventory-print-available-btn" onclick="printInventoryStock({ stockFilter: 'available' })">✅ Print Available Only</button><button class="btn btn-ghost btn-sm" id="inventory-print-out-btn" onclick="printInventoryStock({ stockFilter: 'out' })">❌ Print Out of Stock</button></div></div>
+        <div class="search-bar"><div class="form-group"><input type="text" id="inv-search" placeholder="Search size or warehouse..." oninput="formatInventorySearch(this)"></div><button class="btn btn-ghost btn-sm" onclick="loadInventory()">🔄</button></div>
+        <div class="card" id="quick-restock-panel" style="display:none;"><div class="card-header"><div><div class="card-title" id="quick-restock-title">Quick Restock Mode</div><div class="panel-subtitle" id="quick-restock-subtitle">Choose a warehouse once, search by size, then use + and - quickly.</div></div><button class="btn btn-ghost btn-sm" id="quick-restock-close-btn" onclick="toggleRestockMode(false)">✕ Close</button></div><div class="quick-restock-grid"><div class="form-group"><label id="quick-location-label">Warehouse / Location</label><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div><div class="form-group"><label id="quick-location-add-label">Add Warehouse / Location</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="Example: Warehouse 1"><button class="btn btn-primary btn-sm" id="quick-location-save-btn" onclick="saveQuickLocation()">Save</button></div></div></div><div class="quick-restock-last" id="quick-location-last">Last selected warehouse: -</div><div class="search-bar" style="margin-bottom:12px;"><div class="form-group"><input type="text" id="quick-restock-search" inputmode="numeric" maxlength="9" placeholder="Search by size without / e.g. 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" id="quick-restock-focus-btn" onclick="focusQuickRestock()">🔎 Focus</button></div><div id="quick-restock-results"><div class="empty-state">Choose a warehouse, then search for a tyre size.</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th id="inv-head-size">Size</th><th id="inv-head-qty">Qty</th><th id="inv-head-location">Warehouse</th><th id="inv-head-plus">+1</th><th id="inv-head-notes">Notes</th><th id="inv-head-actions">Actions</th></tr></thead><tbody id="inv-table"><tr><td colspan="6"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
       </div>
     </div>
 
@@ -270,6 +280,8 @@ td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
 <div class="modal-overlay" id="restock-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Add Stock</div><button class="modal-close" onclick="closeModal('restock-modal')">✕</button></div><div id="restock-info"></div><div class="form-group"><input type="number" id="restock-qty" value="1" min="1"></div><input type="hidden" id="restock-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('restock-modal')">Cancel</button><button class="btn btn-success" style="flex:2" onclick="confirmRestock()">Add Stock</button></div></div></div>
 
 <div class="modal-overlay" id="emp-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Add Employee</div><button class="modal-close" onclick="closeModal('emp-modal')">✕</button></div><div class="form-group"><label>Worker Name</label><input type="text" id="emp-username" placeholder="Enter worker name"></div><div class="form-group"><label>Access Code</label><input type="password" id="emp-password" placeholder="Enter code / password"></div><div class="form-group"><label>Role</label><select id="emp-role"><option value="worker">Worker</option><option value="admin">Admin</option></select></div><input type="hidden" id="emp-edit-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('emp-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" onclick="saveEmployee()">Save</button></div></div></div>
+
+<div class="modal-overlay" id="inventory-print-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inventory-print-modal-title">Inventory Print Options</div><button class="modal-close" onclick="closeModal('inventory-print-modal')">✕</button></div><div class="print-option-grid"><div class="form-group"><label id="print-mode-label">Report Type</label><select id="print-mode"><option value="stock">Stock Report</option><option value="usage">Usage Report</option></select></div><div class="form-group"><label id="print-stock-filter-label">Stock Filter</label><select id="print-stock-filter"><option value="all">All Stock</option><option value="available">Available Only</option><option value="out">Out of Stock Only</option></select></div><div class="form-group"><label id="print-usage-mode-label">Usage Focus</label><select id="print-usage-mode"><option value="most">Most Used</option><option value="least">Least Used</option></select></div><div class="form-group"><label id="print-sort-direction-label">Sort Direction</label><select id="print-sort-direction"><option value="desc">Descending</option><option value="asc">Ascending</option></select></div></div><div class="print-summary" id="inventory-print-summary">Choose how you want the inventory report to be printed.</div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inventory-print-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" id="inventory-print-run-btn" onclick="applyInventoryPrint()">Print</button></div></div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -295,6 +307,79 @@ const LOCAL_META_STORE = 'serviceMeta';
 const PHOTO_TTL_MS = 24 * 60 * 60 * 1000;
 const QUICK_LOCATION_KEY = 'quality-part-x-saved-locations';
 const QUICK_LAST_LOCATION_KEY = 'quality-part-x-last-location';
+const APP_LANG_KEY = 'quality-part-x-language';
+let currentLang = localStorage.getItem(APP_LANG_KEY) || 'en';
+const I18N = {
+  en: {
+    logout: 'Logout', serviceNav: '🔧 Services', dashboardNav: '📊 Dashboard', inventoryNav: '📦 Inventory', reportNav: '📋 Reports', viewEmployees: 'View Employees', hideEmployees: 'Hide Employees',
+    inventoryTitle: 'Inventory Management', quickRestockOpen: '📥 Quick Restock / Receive Stock', quickRestockClose: '✕ Close Quick Restock', addTyre: '+ Add Tyre', printOptions: '🖨 Inventory Print Options', printAvailableOnly: '✅ Print Available Only', printOutOnly: '❌ Print Out of Stock',
+    quickRestockTitle: 'Quick Restock Mode', quickRestockSubtitle: 'Choose a warehouse once, search by size, then use + and - quickly.', warehouseLabel: 'Warehouse / Location', addWarehouseLabel: 'Add Warehouse / Location', save: 'Save', focus: '🔎 Focus',
+    chooseWarehouse: 'Choose warehouse', lastWarehouse: 'Last selected warehouse: {value}', warehouseRequired: 'Choose a warehouse first', sizeRequiredFirst: 'Enter the tyre size first', noWarehouseForSize: 'This size is not available in the selected warehouse', qtyBelowZero: 'Quantity cannot go below zero', warehouseSaved: 'Warehouse saved',
+    typeWarehouseFirst: 'Type the warehouse name first', writeSizeThenQuick: 'Type the tyre size, then use + or - quickly.', chooseWarehouseThenSearch: 'Choose a warehouse, then search for a tyre size.', warehouseCurrentQty: 'Warehouse: {warehouse} · Current quantity: {qty}',
+    qtyIncreased: '{size} · Quantity increased', qtyDecreased: '{size} · Quantity decreased', locationUpdated: 'Warehouse updated', noInventory: 'No tyres in inventory', noServicesToday: 'No services today',
+    share: '📲 Share', deleteLabel: 'Delete', stockReportTitle: 'Full Stock Report', printNoData: 'No inventory data', printChooseOptions: 'Choose how you want the inventory report to be printed.',
+    printTypeStock: 'Stock Report', printTypeUsage: 'Usage Report', allStock: 'All Stock', availableOnly: 'Available Only', outOfStockOnly: 'Out of Stock Only', mostUsed: 'Most Used', leastUsed: 'Least Used', descending: 'Descending', ascending: 'Ascending',
+    printModalTitle: 'Inventory Print Options', reportType: 'Report Type', stockFilter: 'Stock Filter', usageFocus: 'Usage Focus', sortDirection: 'Sort Direction', print: 'Print', none: '-', usageCount: 'Usage Count', warehouse: 'Warehouse', qty: 'Qty', notes: 'Notes', actions: 'Actions', size: 'Size'
+  },
+  ar: {
+    logout: 'تسجيل الخروج', serviceNav: '🔧 الخدمات', dashboardNav: '📊 لوحة التحكم', inventoryNav: '📦 المخزون', reportNav: '📋 التقارير', viewEmployees: 'View Employees', hideEmployees: 'Hide Employees',
+    inventoryTitle: 'إدارة المخزون', quickRestockOpen: '📥 تعبئة سريعة / إدخال بضاعة', quickRestockClose: '✕ إغلاق التعبئة السريعة', addTyre: '+ إضافة مقاس', printOptions: '🖨 خيارات طباعة المخزون', printAvailableOnly: '✅ طباعة المتوفر فقط', printOutOnly: '❌ طباعة غير المتوفر',
+    quickRestockTitle: 'وضع التعبئة السريعة', quickRestockSubtitle: 'Choose warehouse مرة واحدة ثم ابحث بالمقاس واستخدم + و - بسرعة.', warehouseLabel: 'المخزن / الموقع', addWarehouseLabel: 'إضافة مخزن / موقع', save: 'حفظ', focus: '🔎 تركيز',
+    chooseWarehouse: 'Choose warehouse', lastWarehouse: 'آخر مخزن مختار: {value}', warehouseRequired: 'Choose warehouse أولاً', sizeRequiredFirst: 'اكتب المقاس أولاً', noWarehouseForSize: 'هذا المقاس غير موجود في المخزن المختار', qtyBelowZero: 'لا يمكن أن تصبح الكمية أقل من صفر', warehouseSaved: 'تم حفظ المخزن',
+    typeWarehouseFirst: 'اكتب اسم المخزن أولاً', writeSizeThenQuick: 'اكتب المقاس ثم استخدم + أو - بسرعة.', chooseWarehouseThenSearch: 'Choose warehouse ثم ابحث عن المقاس.', warehouseCurrentQty: 'المخزن: {warehouse} · الكمية الحالية: {qty}',
+    qtyIncreased: '{size} · تمت زيادة الكمية', qtyDecreased: '{size} · تم إنقاص الكمية', locationUpdated: 'تم تحديث المخزن', noInventory: 'لا توجد مقاسات في المخزون', noServicesToday: 'لا توجد خدمات اليوم',
+    share: '📲 Share', deleteLabel: 'حذف', stockReportTitle: 'تقرير المخزون الكامل', printNoData: 'لا توجد بيانات مخزون', printChooseOptions: 'اختر طريقة طباعة تقرير المخزون.',
+    printTypeStock: 'تقرير مخزون', printTypeUsage: 'تقرير استخدام', allStock: 'كل المخزون', availableOnly: 'المتوفر فقط', outOfStockOnly: 'غير المتوفر فقط', mostUsed: 'الأكثر استخداماً', leastUsed: 'الأقل استخداماً', descending: 'تنازلي', ascending: 'تصاعدي',
+    printModalTitle: 'خيارات طباعة المخزون', reportType: 'نوع التقرير', stockFilter: 'تصفية المخزون', usageFocus: 'ترتيب الاستخدام', sortDirection: 'اتجاه الترتيب', print: 'طباعة', none: '-', usageCount: 'عدد الاستخدام', warehouse: 'المخزن', qty: 'العدد', notes: 'ملاحظة', actions: 'الإجراءات', size: 'المقاس'
+  }
+};
+
+function tr(key, vars = {}) {
+  const dict = I18N[currentLang] || I18N.en;
+  let value = dict[key] ?? I18N.en[key] ?? key;
+  Object.entries(vars).forEach(([k, v]) => { value = value.replaceAll(`{${k}}`, String(v)); });
+  return value;
+}
+
+function updateLangButtons() {
+  document.getElementById('lang-btn-en')?.classList.toggle('active', currentLang === 'en');
+  document.getElementById('lang-btn-ar')?.classList.toggle('active', currentLang === 'ar');
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  const map = {
+    'logout-btn':'logout','nav-service':'serviceNav','nav-dashboard':'dashboardNav','nav-inventory':'inventoryNav','nav-report':'reportNav','inventory-title':'inventoryTitle','inventory-add-btn':'addTyre',
+    'inventory-print-btn':'printOptions','inventory-print-available-btn':'printAvailableOnly','inventory-print-out-btn':'printOutOnly','quick-restock-title':'quickRestockTitle','quick-restock-subtitle':'quickRestockSubtitle',
+    'quick-location-label':'warehouseLabel','quick-location-add-label':'addWarehouseLabel','quick-location-save-btn':'save','quick-restock-focus-btn':'focus','view-employees-btn': document.getElementById('employee-card')?.style.display === 'block' ? 'hideEmployees' : 'viewEmployees',
+    'inventory-print-modal-title':'printModalTitle','print-mode-label':'reportType','print-stock-filter-label':'stockFilter','print-usage-mode-label':'usageFocus','print-sort-direction-label':'sortDirection','inventory-print-run-btn':'print'
+  };
+  Object.entries(map).forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.textContent = tr(key); });
+  const restockBtn = document.getElementById('restock-toggle-btn');
+  if (restockBtn) restockBtn.textContent = document.getElementById('quick-restock-panel')?.style.display === 'block' ? tr('quickRestockClose') : tr('quickRestockOpen');
+  const locLast = document.getElementById('quick-location-last');
+  if (locLast) updateQuickLocationLastLabel();
+  const search = document.getElementById('inv-search'); if (search) search.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس أو المخزن...' : 'Search size or warehouse...';
+  const newLoc = document.getElementById('quick-new-location'); if (newLoc) newLoc.placeholder = currentLang === 'ar' ? 'مثال: مخزن 1' : 'Example: Warehouse 1';
+  const quickSearch = document.getElementById('quick-restock-search'); if (quickSearch) quickSearch.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس بدون / مثال 2155517' : 'Search by size without / e.g. 2155517';
+  document.getElementById('inventory-print-summary')?.replaceChildren(document.createTextNode(tr('printChooseOptions')));
+  const pm = document.getElementById('print-mode'); if (pm) { pm.options[0].text = tr('printTypeStock'); pm.options[1].text = tr('printTypeUsage'); }
+  const pf = document.getElementById('print-stock-filter'); if (pf) { pf.options[0].text = tr('allStock'); pf.options[1].text = tr('availableOnly'); pf.options[2].text = tr('outOfStockOnly'); }
+  const pu = document.getElementById('print-usage-mode'); if (pu) { pu.options[0].text = tr('mostUsed'); pu.options[1].text = tr('leastUsed'); }
+  const ps = document.getElementById('print-sort-direction'); if (ps) { ps.options[0].text = tr('descending'); ps.options[1].text = tr('ascending'); }
+  updateLangButtons();
+}
+
+function setLanguage(lang) {
+  currentLang = lang === 'ar' ? 'ar' : 'en';
+  localStorage.setItem(APP_LANG_KEY, currentLang);
+  applyLanguage();
+  if (document.getElementById('page-inventory')?.classList.contains('active')) renderInv(allInv);
+  if (document.getElementById('quick-restock-panel')?.style.display === 'block') renderQuickRestockResults();
+  if (document.getElementById('page-service')?.classList.contains('active')) loadTodayCards();
+  if (document.getElementById('page-report')?.classList.contains('active')) loadReport();
+}
 
 function normalizeTyreKey(value) {
   return String(value || '').replace(/\D/g, '');
@@ -380,8 +465,8 @@ function updateQuickLocationLastLabel() {
   const label = document.getElementById('quick-location-last');
   if (!label) return;
   const selected = document.getElementById('quick-location-select')?.value?.trim();
-  const last = selected || getLastQuickLocation();
-  label.textContent = last ? `آخر مخزن مستخدم: ${last}` : 'آخر مخزن مستخدم: -';
+  const last = selected || getLastQuickLocation() || tr('none');
+  label.textContent = tr('lastWarehouse', { value: last });
 }
 
 function populateQuickLocationSelect(preferredLocation = '') {
@@ -389,7 +474,7 @@ function populateQuickLocationSelect(preferredLocation = '') {
   if (!select) return;
   const locations = getAllKnownLocations();
   const preferred = preferredLocation || select.value || getLastQuickLocation() || locations[0] || '';
-  select.innerHTML = ['<option value="">اختر المخزن</option>', ...locations.map(loc => `<option value="${esc(loc)}">${esc(loc)}</option>`)].join('');
+  select.innerHTML = ['<option value="">' + esc(tr('chooseWarehouse')) + '</option>', ...locations.map(loc => `<option value="${esc(loc)}">${esc(loc)}</option>`)].join('');
   if (preferred && locations.some(loc => loc.toLowerCase() === preferred.toLowerCase())) {
     const exact = locations.find(loc => loc.toLowerCase() === preferred.toLowerCase()) || preferred;
     select.value = exact;
@@ -409,7 +494,7 @@ function saveQuickLocation() {
   const input = document.getElementById('quick-new-location');
   const location = String(input?.value || '').trim();
   if (!location) {
-    showToast('اكتب اسم المخزن أولاً', 'error');
+    showToast(tr('typeWarehouseFirst'), 'error');
     return;
   }
   addSavedLocation(location);
@@ -419,7 +504,7 @@ function saveQuickLocation() {
   setLastQuickLocation(location);
   if (input) input.value = '';
   renderQuickRestockResults();
-  showToast('تم حفظ المخزن', 'success');
+  showToast(tr('warehouseSaved'), 'success');
 }
 
 function toggleRestockMode(forceOpen) {
@@ -429,7 +514,7 @@ function toggleRestockMode(forceOpen) {
   const isHidden = panel.style.display === 'none' || !panel.style.display;
   const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : isHidden;
   panel.style.display = shouldOpen ? 'block' : 'none';
-  if (btn) btn.textContent = shouldOpen ? '✕ إغلاق إعادة التعبئة' : '📥 إعادة تعبئة / إدخال بضاعة';
+  if (btn) btn.textContent = shouldOpen ? tr('quickRestockClose') : tr('quickRestockOpen');
   if (shouldOpen) {
     populateQuickLocationSelect();
     renderQuickRestockResults();
@@ -457,13 +542,13 @@ function renderQuickRestockResults() {
   const query = String(document.getElementById('quick-restock-search')?.value || '').trim();
   if (!container) return;
   if (!location) {
-    container.innerHTML = '<div class="empty-state">اختر المخزن أولاً.</div>';
+    container.innerHTML = `<div class="empty-state">${esc(tr('warehouseRequired'))}</div>`;
     updateQuickLocationLastLabel();
     return;
   }
   updateQuickLocationLastLabel();
   if (!query) {
-    container.innerHTML = '<div class="empty-state">اكتب المقاس ثم استخدم + أو - بسرعة.</div>';
+    container.innerHTML = `<div class="empty-state">${esc(tr('writeSizeThenQuick'))}</div>`;
     return;
   }
   const queryKey = normalizeTyreKey(query);
@@ -489,7 +574,7 @@ function renderQuickRestockResults() {
     <div class="quick-restock-result">
       <div>
         <div class="tyre-result-size">${esc(item.size)}</div>
-        <div class="quick-restock-meta">المخزن: ${esc(location)} · الكمية الحالية: <span class="qty-pill">${item.quantity}</span></div>
+        <div class="quick-restock-meta">${esc(tr('warehouseCurrentQty', { warehouse: location, qty: item.quantity }))}</div>
       </div>
       <div class="quick-restock-actions">
         <button class="btn btn-danger btn-sm" onclick="changeQuickStock('${item.key}',-1)">−1</button>
@@ -504,11 +589,11 @@ async function changeQuickStock(sizeKey, delta) {
   const normalizedSize = normalizeTyreKey(sizeKey);
   const formattedSize = formatTyreSizeValue(normalizedSize);
   if (!location) {
-    showToast('اختر المخزن أولاً', 'error');
+    showToast(tr('warehouseRequired'), 'error');
     return;
   }
   if (!formattedSize) {
-    showToast('اكتب المقاس أولاً', 'error');
+    showToast(tr('sizeRequiredFirst'), 'error');
     return;
   }
 
@@ -516,7 +601,7 @@ async function changeQuickStock(sizeKey, delta) {
 
   if (!matchingRows.length) {
     if (delta < 0) {
-      showToast('لا يوجد هذا المقاس في هذا المخزن', 'error');
+      showToast(tr('noWarehouseForSize'), 'error');
       return;
     }
     const { error } = await db.from('inventory').insert({ size: formattedSize, location, quantity: delta, notes: 'Quick restock' });
@@ -525,7 +610,7 @@ async function changeQuickStock(sizeKey, delta) {
     const target = matchingRows[0];
     const nextQty = (Number(target.quantity) || 0) + delta;
     if (nextQty < 0) {
-      showToast('لا يمكن أن تصبح الكمية أقل من صفر', 'error');
+      showToast(tr('qtyBelowZero'), 'error');
       return;
     }
     const { error } = await db.from('inventory').update({ quantity: nextQty }).eq('id', target.id);
@@ -533,7 +618,7 @@ async function changeQuickStock(sizeKey, delta) {
   }
 
   setLastQuickLocation(location);
-  showToast(`${formattedSize} · ${delta > 0 ? 'تمت زيادة الكمية' : 'تم إنقاص الكمية'}`, 'success');
+  showToast(tr(delta > 0 ? 'qtyIncreased' : 'qtyDecreased', { size: formattedSize }), 'success');
   await loadInventory();
   renderQuickRestockResults();
   if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
@@ -720,7 +805,7 @@ function updateAdminUI() {
   if (addBtn) addBtn.style.display = isAdmin ? 'inline-flex' : 'none';
   if (viewBtn) viewBtn.style.display = isAdmin ? 'inline-flex' : 'none';
   if (employeeCard && !isAdmin) employeeCard.style.display = 'none';
-  if (viewBtn && !isAdmin) viewBtn.textContent = 'عرض الموظفين';
+  if (viewBtn && !isAdmin) viewBtn.textContent = tr('viewEmployees');
 }
 
 async function toggleEmployeeList(forceOpen) {
@@ -730,7 +815,7 @@ async function toggleEmployeeList(forceOpen) {
   if (!card) return;
   const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : card.style.display !== 'block';
   card.style.display = shouldOpen ? 'block' : 'none';
-  if (btn) btn.textContent = shouldOpen ? 'إخفاء الموظفين' : 'عرض الموظفين';
+  if (btn) btn.textContent = shouldOpen ? tr('hideEmployees') : tr('viewEmployees');
   if (shouldOpen) await loadEmployees();
 }
 
@@ -757,6 +842,7 @@ async function login() {
   document.getElementById('operator-name').textContent = '👤 ' + data.username + (data.role ? ` (${data.role})` : '');
 
   await Promise.all([loadDashboard(), loadInventory(), loadEmployees(), loadTodayStats(), loadTodayCards()]);
+  applyLanguage();
   showPage('service');
 }
 
@@ -783,6 +869,7 @@ function showPage(name) {
     loadTodayStats();
     loadTodayCards();
   }
+  applyLanguage();
 }
 
 
@@ -1041,11 +1128,11 @@ async function loadTodayCards() {
   const today = new Date().toISOString().split('T')[0];
   const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
   const container = document.getElementById('today-cards');
-  if (!data?.length) { container.innerHTML = '<div class="empty-state">No services today</div>'; return; }
+  if (!data?.length) { container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`; return; }
   container.innerHTML = data.map(t => {
     const time = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const noteText = getTransactionNoteText(t);
-    return `<div class="service-card"><div class="service-card-header"><div class="service-card-size">${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</div><div class="service-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">📲 مشاركة</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></div><div class="service-card-body"><div class="service-card-row"><span>🚗 ${esc(t.plate_number)}</span><span>⏰ ${time}</span></div><div class="service-card-row"><span>${t.tyre_condition === 'new' ? '✨ New' : t.tyre_condition === 'old' ? '🔄 Used' : '—'}</span><span>Qty: ${Number(t.quantity) || 1}</span></div>${formatServiceNoteHtml(noteText)}${t.repair_type ? `<div class="service-card-row"><span>🔩 ${esc(t.repair_type)}</span></div>` : ''}<div class="service-card-row"><span>👤 ${esc(t.operator)}</span></div></div></div>`;
+    return `<div class="service-card"><div class="service-card-header"><div class="service-card-size">${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</div><div class="service-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></div><div class="service-card-body"><div class="service-card-row"><span>🚗 ${esc(t.plate_number)}</span><span>⏰ ${time}</span></div><div class="service-card-row"><span>${t.tyre_condition === 'new' ? '✨ New' : t.tyre_condition === 'old' ? '🔄 Used' : '—'}</span><span>Qty: ${Number(t.quantity) || 1}</span></div>${formatServiceNoteHtml(noteText)}${t.repair_type ? `<div class="service-card-row"><span>🔩 ${esc(t.repair_type)}</span></div>` : ''}<div class="service-card-row"><span>👤 ${esc(t.operator)}</span></div></div></div>`;
   }).join('');
 }
 
@@ -1073,18 +1160,87 @@ async function loadInventory() {
   if (document.getElementById('quick-restock-panel')?.style.display === 'block') renderQuickRestockResults();
 }
 
+function buildLocationOptions(selected = '', includeEmpty = false) {
+  const locations = getAllKnownLocations().slice();
+  const normalizedSelected = String(selected || '').trim();
+  if (normalizedSelected && !locations.some(loc => loc.toLowerCase() === normalizedSelected.toLowerCase())) locations.unshift(normalizedSelected);
+  const options = [];
+  if (includeEmpty) options.push(`<option value="">${esc(tr('chooseWarehouse'))}</option>`);
+  locations.forEach(loc => {
+    const isSelected = loc.toLowerCase() === normalizedSelected.toLowerCase();
+    options.push(`<option value="${esc(loc)}" ${isSelected ? 'selected' : ''}>${esc(loc)}</option>`);
+  });
+  return options.join('');
+}
+
+function getPreferredRowLocation(item) {
+  return String(item?.location || '').trim() || getLastQuickLocation() || '';
+}
+
+function syncRowLocationSelects(id, value) {
+  document.querySelectorAll(`.row-location-select[data-id="${id}"]`).forEach(select => {
+    select.value = value || '';
+  });
+}
+
+async function handleRowLocationChange(id, value) {
+  const clean = String(value || '').trim();
+  if (!clean) return;
+  const item = (allInv || []).find(entry => entry.id === id);
+  if (!item) return;
+  if (clean.toLowerCase() === String(item.location || '').trim().toLowerCase()) {
+    syncRowLocationSelects(id, clean);
+    setLastQuickLocation(clean);
+    return;
+  }
+  addSavedLocation(clean);
+  syncRowLocationSelects(id, clean);
+  const { error } = await db.from('inventory').update({ location: clean }).eq('id', id);
+  if (error) { showToast(error.message, 'error'); return; }
+  setLastQuickLocation(clean);
+  showToast(tr('locationUpdated'), 'success');
+  await loadInventory();
+}
+
+async function changeInventoryQty(id, delta) {
+  const item = (allInv || []).find(entry => entry.id === id);
+  if (!item) return;
+  const selectedLocation = String(document.querySelector(`.row-location-select[data-id="${id}"]`)?.value || item.location || '').trim();
+  const nextQty = (Number(item.quantity) || 0) + delta;
+  if (nextQty < 0) {
+    showToast(tr('qtyBelowZero'), 'error');
+    return;
+  }
+  const payload = { quantity: nextQty };
+  if (selectedLocation) {
+    payload.location = selectedLocation;
+    addSavedLocation(selectedLocation);
+    setLastQuickLocation(selectedLocation);
+  }
+  const { error } = await db.from('inventory').update(payload).eq('id', id);
+  if (error) { showToast(error.message, 'error'); return; }
+  showToast(tr(delta > 0 ? 'qtyIncreased' : 'qtyDecreased', { size: formatTyreSizeValue(item.size) || item.size }), 'success');
+  await loadInventory();
+  if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+}
+
 function renderInv(items) {
   const tbody = document.getElementById('inv-table');
-  if (!items.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">No tyres in inventory</div></td></tr>'; return; }
-  tbody.innerHTML = items.map(i => `<tr>
-      <td><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td>
-      <td>${esc(i.location || '-')}</td>
-      <td><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity}</span></td>
-      <td>${esc(i.notes || '-')}</td>
-      <td><button class="btn btn-success btn-sm" onclick="openRestock('${i.id}','${esc(i.size)}',${i.quantity})">+</button>
-          <button class="btn btn-ghost btn-sm" onclick="openEditModal('${i.id}')">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteInv('${i.id}','${esc(i.size)}')">🗑</button></td>
-      </tr>`).join('');
+  if (!items.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">${esc(tr('noInventory'))}</div></td></tr>`; return; }
+  tbody.innerHTML = items.map(i => {
+      const selectedLocation = getPreferredRowLocation(i);
+      const sizeLabel = esc(formatTyreSizeValue(i.size) || i.size);
+      const noteLabel = esc(i.notes || tr('none'));
+      const locationOptions = buildLocationOptions(selectedLocation, true);
+      return `<tr>
+        <td><b>${sizeLabel}</b></td>
+        <td><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity}</span></td>
+        <td><select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select></td>
+        <td><button class="btn btn-success btn-sm" onclick="changeInventoryQty('${i.id}',1)">+1</button></td>
+        <td class="inventory-note-cell">${noteLabel}</td>
+        <td><div class="inventory-action-stack"><select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="openEditModal('${i.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteInv('${i.id}','${esc(i.size)}')">🗑 ${esc(tr('deleteLabel'))}</button></div></div></td>
+      </tr>`;
+  }).join('');
 }
 
 
@@ -1202,7 +1358,7 @@ async function loadReport() {
       <td>${esc(getTransactionNoteText(t))}</td>
       <td>${esc(t.repair_type || '-')}</td>
       <td>${esc(t.operator || '-')}</td>
-      <td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">📲 مشاركة</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></td>
+      <td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></td>
     </tr>`;
   }).join('');
 
@@ -1333,24 +1489,103 @@ async function getInvoicePhotoFile(tx) {
   return null;
 }
 
+function wrapCanvasText(ctx, text, maxWidth) {
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = '';
+  words.forEach(word => {
+    const test = line ? `${line} ${word}` : word;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+async function createInvoiceShareCard(tx) {
+  const photoFile = await getInvoicePhotoFile(tx);
+  let bitmap = null;
+  if (photoFile && 'createImageBitmap' in window) {
+    try { bitmap = await createImageBitmap(photoFile); } catch (err) { bitmap = null; }
+  }
+
+  const width = 1080;
+  const padding = 40;
+  const contentWidth = width - padding * 2;
+  const headerHeight = 130;
+  const photoHeight = bitmap ? Math.round(contentWidth * (bitmap.height / bitmap.width)) : 260;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = '36px sans-serif';
+  const infoLines = [
+    `Plate: ${tx?.plate_number || '-'}`,
+    `Tyre Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+    `Condition: ${tx?.tyre_condition === 'new' ? 'New' : tx?.tyre_condition === 'old' ? 'Used' : '-'}`,
+    `Quantity: ${Number(tx?.quantity) || 1}`,
+    `Repair: ${tx?.repair_type || '-'}`,
+    `Operator: ${tx?.operator || '-'}`,
+    `Time: ${tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString()}`,
+    `Note: ${getTransactionNoteText(tx)}`
+  ].flatMap(line => wrapCanvasText(ctx, line, contentWidth));
+  const lineHeight = 44;
+  const footerHeight = 50;
+  canvas.width = width;
+  canvas.height = headerHeight + photoHeight + 30 + (infoLines.length * lineHeight) + footerHeight;
+
+  ctx.fillStyle = '#0b0f16';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f0a500';
+  ctx.fillRect(0, 0, canvas.width, 12);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 56px sans-serif';
+  ctx.fillText('QUALITY PART X', padding, 76);
+  ctx.font = '28px sans-serif';
+  ctx.fillStyle = '#c8d0df';
+  ctx.fillText('Tyre Service Invoice Card', padding, 112);
+
+  const photoY = headerHeight;
+  if (bitmap) {
+    ctx.drawImage(bitmap, padding, photoY, contentWidth, photoHeight);
+  } else {
+    ctx.fillStyle = '#151c26';
+    ctx.fillRect(padding, photoY, contentWidth, photoHeight);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '32px sans-serif';
+    ctx.fillText('No car photo available', padding + 30, photoY + 80);
+  }
+
+  let y = headerHeight + photoHeight + 50;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '34px sans-serif';
+  infoLines.forEach(line => {
+    ctx.fillText(line, padding, y);
+    y += lineHeight;
+  });
+
+  return await new Promise(resolve => canvas.toBlob(blob => resolve(blob ? new File([blob], `invoice_${tx.id}.png`, { type: 'image/png' }) : null), 'image/png'));
+}
+
 async function shareInvoiceToWhatsApp(txId) {
   if (!txId) return;
   const { data: tx, error } = await db.from('transactions').select('*').eq('id', txId).maybeSingle();
   if (error || !tx) { showToast('Unable to load invoice data', 'error'); return; }
 
   const shareText = formatInvoiceShareText(tx);
-  const photoFile = await getInvoicePhotoFile(tx);
+  const shareCard = await createInvoiceShareCard(tx);
 
-  if (navigator.share && photoFile) {
+  if (navigator.share && shareCard) {
     try {
-      const sharePayload = {
-        title: `Invoice ${tx.plate_number || ''}`.trim() || 'Invoice',
-        text: shareText,
-        files: [photoFile]
-      };
-      if (!navigator.canShare || navigator.canShare({ files: [photoFile] })) {
-        await navigator.share(sharePayload);
-        showToast('تم فتح نافذة المشاركة. اختر واتساب للمشاركة المباشرة.', 'success');
+      if (!navigator.canShare || navigator.canShare({ files: [shareCard] })) {
+        await navigator.share({
+          title: `Invoice ${tx.plate_number || ''}`.trim() || 'Invoice',
+          text: 'Open WhatsApp and send this invoice card image.',
+          files: [shareCard]
+        });
+        showToast('Share sheet opened. Choose WhatsApp to send the invoice image card.', 'success');
         return;
       }
     } catch (err) {
@@ -1359,9 +1594,8 @@ async function shareInvoiceToWhatsApp(txId) {
     }
   }
 
-  const fallbackText = tx.photo_url ? `${shareText}\n\nPhoto: ${tx.photo_url}` : shareText;
-  window.open(`https://wa.me/?text=${encodeURIComponent(fallbackText)}`, '_blank');
-  showToast(photoFile ? 'تم فتح واتساب. إذا لم تُرفق الصورة تلقائياً استخدم متصفح الهاتف للمشاركة المباشرة.' : 'تم فتح واتساب لمشاركة بيانات الفاتورة.', 'success');
+  window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+  showToast('WhatsApp opened with invoice details. On mobile, use the Share button to send the invoice image card.', 'success');
 }
 
 async function loadStockRep() {
@@ -1423,14 +1657,66 @@ async function printDailyReport() {
   setTimeout(() => { win.print(); }, 500);
 }
 
-async function printInventoryStock() { 
-  const { data } = await db.from('inventory').select('*').order('size'); 
-  if (!data?.length) { showToast('No inventory data', 'error'); return; } 
-  
+function openInventoryPrintModal() {
+  document.getElementById('inventory-print-modal').classList.add('open');
+  applyLanguage();
+}
+
+function applyInventoryPrint() {
+  const reportMode = document.getElementById('print-mode')?.value || 'stock';
+  const stockFilter = document.getElementById('print-stock-filter')?.value || 'all';
+  const usageMode = document.getElementById('print-usage-mode')?.value || 'most';
+  const sortDirection = document.getElementById('print-sort-direction')?.value || 'desc';
+  closeModal('inventory-print-modal');
+  printInventoryStock({ reportMode, stockFilter, usageMode, sortDirection });
+}
+
+function getUsageCountMap(transactions = []) {
+  return transactions.reduce((acc, tx) => {
+    const key = normalizeTyreKey(tx?.tyre_size || '');
+    if (!key) return acc;
+    acc[key] = (acc[key] || 0) + Number(tx?.quantity || 1);
+    return acc;
+  }, {});
+}
+
+async function printInventoryStock(options = {}) {
+  const settings = { reportMode: 'stock', stockFilter: 'all', usageMode: 'most', sortDirection: 'desc', ...options };
+  const [{ data: inventory }, { data: transactions }] = await Promise.all([
+    db.from('inventory').select('*'),
+    db.from('transactions').select('tyre_size,quantity')
+  ]);
+  const data = inventory || [];
+  if (!data.length) { showToast(tr('printNoData'), 'error'); return; }
+
+  const usageMap = getUsageCountMap(transactions || []);
+  let rows = data.map(item => ({ ...item, usage_count: usageMap[normalizeTyreKey(item.size)] || 0 }));
+
+  if (settings.stockFilter === 'available') rows = rows.filter(item => Number(item.quantity) > 0);
+  if (settings.stockFilter === 'out') rows = rows.filter(item => Number(item.quantity) <= 0);
+
+  const dir = settings.sortDirection === 'asc' ? 1 : -1;
+  if (settings.reportMode === 'usage') {
+    rows.sort((a, b) => {
+      const usageDiff = (Number(a.usage_count) - Number(b.usage_count)) * dir;
+      if (usageDiff !== 0) return usageDiff;
+      return String(a.size || '').localeCompare(String(b.size || ''));
+    });
+    if (settings.usageMode === 'most' && settings.sortDirection === 'asc') rows.reverse();
+    if (settings.usageMode === 'least' && settings.sortDirection === 'desc') rows.reverse();
+  } else {
+    rows.sort((a, b) => String(a.size || '').localeCompare(String(b.size || '')) * dir);
+  }
+
+  const modeTitle = settings.reportMode === 'usage'
+    ? (settings.usageMode === 'most' ? tr('mostUsed') : tr('leastUsed'))
+    : tr('stockReportTitle');
+  const filterTitle = settings.stockFilter === 'available' ? tr('availableOnly') : settings.stockFilter === 'out' ? tr('outOfStockOnly') : tr('allStock');
+
   let html = `<!DOCTYPE html>
   <html>
   <head>
-    <title>Full Stock Report - Quality Part X</title>
+    <title>${modeTitle} - Quality Part X</title>
     <style>
       body { font-family: 'DM Sans', sans-serif; padding: 30px; }
       h1 { color: #f0a500; font-family: 'Bebas Neue', sans-serif; }
@@ -1446,22 +1732,22 @@ async function printInventoryStock() {
     <div class="header">
       <div class="company">QUALITY PART X</div>
       <div>TYRE SERVICES · DUNSTABLE</div>
-      <div>Full Stock Report - ${new Date().toLocaleString()}</div>
-      <div>Operator: ${currentUser?.username}</div>
+      <div>${modeTitle} · ${filterTitle}</div>
+      <div>${new Date().toLocaleString()}</div>
+      <div>Operator: ${currentUser?.username || '-'}</div>
     </div>
     <table>
-      <thead><tr><th>Size</th><th>Location</th><th>Quantity</th><th>Status</th><th>Notes</th></tr></thead>
+      <thead><tr><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${tr('usageCount')}</th><th>${tr('notes')}</th></tr></thead>
       <tbody>`;
-  
-  data.forEach(i => { 
-    let status = i.quantity === 0 ? 'Out of Stock' : i.quantity <= 4 ? 'Low Stock' : 'In Stock'; 
-    html += `<tr><td><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td><td>${esc(i.location || '-')}</td><td>${i.quantity}</td><td>${esc(status)}</td><td>${esc(i.notes || '-')}</td></tr>`; 
-  }); 
-  
-  const totalTyres = data.reduce((s,i) => s + i.quantity, 0);
-  html += `</tbody></table><div class="total">Total Tyres in Stock: ${totalTyres} | Total Sizes: ${data.length}</div></body></html>`; 
-  const win = window.open(); 
-  win.document.write(html); 
+
+  rows.forEach(i => {
+    html += `<tr><td><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td><td>${Number(i.quantity) || 0}</td><td>${esc(i.location || '-')}</td><td>${Number(i.usage_count) || 0}</td><td>${esc(i.notes || '-')}</td></tr>`;
+  });
+
+  const totalTyres = rows.reduce((s, i) => s + Number(i.quantity || 0), 0);
+  html += `</tbody></table><div class="total">Total Qty: ${totalTyres} | Total Rows: ${rows.length}</div></body></html>`;
+  const win = window.open();
+  win.document.write(html);
   win.document.close();
   setTimeout(() => { win.print(); }, 500);
 }
@@ -1563,7 +1849,9 @@ function showToast(msg, type) {
 document.getElementById('login-pass').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
 document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }); });
 cleanupExpiredLocalData().catch(() => {});
+applyLanguage();
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
