@@ -498,7 +498,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .scroll-hint i{font-size:12px;}
 .services-scroll{display:flex;gap:12px;overflow-x:auto;padding-top:0;padding-bottom:6px;scrollbar-width:none;} .services-scroll::-webkit-scrollbar{display:none;}
 .svc-card{min-width:270px;max-width:270px;background:var(--bg-card);border:1px solid var(--stroke);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-card);} .svc-card-hd{background:var(--teal-dim);padding:11px 13px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;align-items:center;gap:8px;} .svc-card-size{font-family:'DM Mono',monospace;font-size:14px;color:var(--teal);font-weight:600;} .time-chip{font-size:10px;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.25);border:1px solid var(--stroke);color:var(--text-muted);} .svc-photo-btn{position:relative;display:block;width:100%;padding:0;border:none;background:#09101c;cursor:pointer;} .svc-photo{display:block;width:100%;height:190px;object-fit:cover;background:#09101c;} .svc-photo-zoom{position:absolute;inset-inline-end:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(5,12,24,.76);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:700;backdrop-filter:blur(10px);} .svc-photo-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;height:160px;background:rgba(255,255,255,.03);color:var(--text-muted);font-size:11px;padding:16px;text-align:center;} .svc-card-body{padding:12px 13px;} .svc-card-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:7px;} .svc-card-row .label{color:var(--text-muted);} .svc-card-row .val{color:var(--text);font-weight:600;text-align:end;} .svc-card-note{padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.45;} .svc-card-note strong{color:var(--text);} .svc-card-plate{display:inline-block;background:rgba(0,0,0,.3);border:1px solid var(--stroke);border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;color:var(--gold);margin-top:4px;} .svc-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;} .image-lightbox{z-index:220;padding:18px;background:rgba(0,0,0,.88);} .image-lightbox-inner{position:relative;width:min(100%,430px);margin:auto;} .image-lightbox-img{display:block;width:100%;max-height:82vh;object-fit:contain;border-radius:18px;background:#000;} .image-lightbox-close{position:absolute;top:10px;inset-inline-end:10px;background:rgba(5,12,24,.75);backdrop-filter:blur(10px);}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(5,12,24,.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--stroke);display:flex;align-items:stretch;z-index:70;padding-bottom:env(safe-area-inset-bottom,0px);} .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;transition:.2s;border:none;background:transparent;position:relative;gap:3px;} .nav-item i{font-size:18px;color:var(--text-faint);transition:.2s;} .nav-item span{font-size:9px;font-weight:500;color:var(--text-faint);transition:.2s;letter-spacing:.03em;} .nav-item.active i{color:var(--teal);} .nav-item.active span{color:var(--teal);font-weight:700;} .nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:2px;background:var(--teal);border-radius:0 0 var(--r-pill) var(--r-pill);} .nav-item.nav-center{position:relative;margin-top:-16px;} .nav-center-orb{width:52px;height:52px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(94,236,208,.35),0 0 0 4px rgba(5,12,24,.9),0 0 0 5px var(--stroke);transition:.2s;} .nav-center-orb i{font-size:20px;color:var(--bg-base) !important;} .nav-item.nav-center span{margin-top:4px;color:var(--text);} .nav-tabs{display:none !important;}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(5,12,24,.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--stroke);display:flex;align-items:stretch;justify-content:space-between;z-index:70;padding-bottom:env(safe-area-inset-bottom,0px);overflow:visible;} .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;transition:.2s;border:none;background:transparent;position:relative;gap:3px;min-width:0;z-index:2;touch-action:manipulation;-webkit-tap-highlight-color:transparent;} .nav-item i{font-size:18px;color:var(--text-faint);transition:.2s;} .nav-item span{font-size:9px;font-weight:500;color:var(--text-faint);transition:.2s;letter-spacing:.03em;} .nav-item.active i{color:var(--teal);} .nav-item.active span{color:var(--teal);font-weight:700;} .nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:2px;background:var(--teal);border-radius:0 0 var(--r-pill) var(--r-pill);} .nav-item.nav-center{position:relative;flex:0 0 76px;margin:-16px 6px 0;padding-inline:0;z-index:1;} .nav-center-orb{width:52px;height:52px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(94,236,208,.35),0 0 0 4px rgba(5,12,24,.9),0 0 0 5px var(--stroke);transition:.2s;pointer-events:none;} .nav-center-orb i{font-size:20px;color:var(--bg-base) !important;} .nav-item.nav-center span{margin-top:4px;color:var(--text);} .nav-tabs{display:none !important;}
 .search-hub-sheet{max-width:420px;width:calc(100% - 24px);border-radius:24px;padding:0;overflow:hidden;} .search-hub-body{padding:16px 18px 18px;max-height:70vh;overflow:auto;} .search-hub-results{margin-top:14px;}
 .scroll-top-btn{position:fixed;right:18px;bottom:104px;width:42px;height:42px;border:none;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));color:#04111d;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-btn);cursor:pointer;z-index:85;opacity:0;pointer-events:none;transform:translateY(14px);transition:.25s;} .scroll-top-btn.show{opacity:1;pointer-events:auto;transform:translateY(0);}
 @media (max-width:480px){.form-row,.quick-actions,.pos-grid{grid-template-columns:1fr 1fr;}.repair-group{display:grid;grid-template-columns:1fr;}.svc-card{min-width:88%;max-width:88%;}.svc-photo{height:200px;}}
@@ -784,6 +784,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
               <button class="btn btn-primary btn-sm" id="inventory-add-btn" onclick="openAddModal()">+ Add Tyre</button>
               <button class="btn btn-ghost btn-sm" onclick="openWarehouseManager()">🏬 Warehouses / المخازن</button>
               <button class="btn btn-info btn-sm" onclick="openTransferModal()">🔁 Transfer Stock / نقل</button>
+              <button class="btn btn-warning btn-sm" id="inventory-audit-btn" onclick="printInventoryAudit()">📋 عمل جرد</button>
               <button class="btn btn-info btn-sm" id="inventory-print-btn" onclick="openInventoryPrintModal()">🖨 Inventory Print Options</button>
               <button class="btn btn-ghost btn-sm" id="inventory-print-available-btn" onclick="printInventoryStock({ stockFilter: 'available' })">✅ Print Available Only</button>
               <button class="btn btn-ghost btn-sm" id="inventory-print-out-btn" onclick="printInventoryStock({ stockFilter: 'out' })">❌ Print Out of Stock</button>
@@ -854,32 +855,32 @@ tr:hover td{background:rgba(255,255,255,.02);}
           <div class="table-wrap"><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Position</th><th>Note</th><th>Repair</th><th>Operator</th><th>Actions</th></tr></thead><tbody id="rep-table"><tr><td colspan="9"><div class="empty-state">Select date range and click Load</div></td></tr></tbody></table></div>
         </div>
         <div class="card">
-          <div class="card-header"><div><div class="card-title">Full Stock Report (All Locations)</div><div class="panel-subtitle">ملخص كامل للمخزون في جميع المواقع.</div></div><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Full Stock</button></div>
+          <div class="card-header"><div><div class="card-title">Full Stock Report (All Locations)</div><div class="panel-subtitle">ملخص كامل للمخزون في جميع المواقع.</div></div><div class="report-actions"><button class="btn btn-warning btn-sm" onclick="printInventoryAudit()">📋 عمل جرد</button><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Full Stock</button></div></div>
           <div class="table-wrap"><table><thead><tr><th>Size</th><th>Location</th><th>Quantity</th><th>Status</th><th>Notes</th></tr></thead><tbody id="stock-rep-table"><tr><td colspan="5"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
         </div>
       </div>
     </div>
 
         <nav class="bottom-nav">
-      <button class="nav-item active" data-page="service" id="nav-service" onclick="showPage('service')">
+      <button type="button" class="nav-item active" data-page="service" id="nav-service" onclick="showPage('service')">
         <i class="fas fa-wrench"></i>
         <span id="nav-service-label">Services</span>
       </button>
-      <button class="nav-item" data-page="dashboard" id="nav-dashboard" onclick="showPage('dashboard')">
+      <button type="button" class="nav-item" data-page="dashboard" id="nav-dashboard" onclick="showPage('dashboard')">
         <i class="fas fa-chart-pie"></i>
         <span id="nav-dashboard-label">Dashboard</span>
       </button>
-      <button class="nav-item nav-center" id="nav-search-center" onclick="openSearchHub()">
+      <button type="button" class="nav-item nav-center" id="nav-search-center" onclick="openSearchHub()">
         <div class="nav-center-orb">
           <i class="fas fa-search"></i>
         </div>
         <span id="nav-search-label">Search</span>
       </button>
-      <button class="nav-item" data-page="inventory" id="nav-inventory" onclick="showPage('inventory')">
+      <button type="button" class="nav-item" data-page="inventory" id="nav-inventory" onclick="showPage('inventory')">
         <i class="fas fa-boxes"></i>
         <span id="nav-inventory-label">Inventory</span>
       </button>
-      <button class="nav-item" data-page="report" id="nav-report" onclick="showPage('report')">
+      <button type="button" class="nav-item" data-page="report" id="nav-report" onclick="showPage('report')">
         <i class="fas fa-file-alt"></i>
         <span id="nav-report-label">Reports</span>
       </button>
@@ -893,7 +894,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 
 <div class="modal-overlay" id="emp-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Add Employee</div><button class="modal-close" onclick="closeModal('emp-modal')">✕</button></div><div class="form-group"><label>Worker Name</label><input type="text" id="emp-username" placeholder="Enter worker name"></div><div class="form-group"><label>Access Code</label><input type="password" id="emp-password" placeholder="Enter code / password"></div><div class="form-group"><label>Role</label><select id="emp-role"><option value="worker">Worker</option><option value="admin">Admin</option></select></div><input type="hidden" id="emp-edit-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('emp-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" onclick="saveEmployee()">Save</button></div></div></div>
 
-<div class="modal-overlay" id="inventory-print-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inventory-print-modal-title">Inventory Print Options</div><button class="modal-close" onclick="closeModal('inventory-print-modal')">✕</button></div><div class="print-option-grid"><div class="form-group"><label id="print-mode-label">Report Type</label><select id="print-mode"><option value="stock">Stock Report</option><option value="usage">Usage Report</option></select></div><div class="form-group"><label id="print-stock-filter-label">Stock Filter</label><select id="print-stock-filter"><option value="all">All Stock</option><option value="available">Available Only</option><option value="out">Out of Stock Only</option></select></div><div class="form-group"><label id="print-usage-mode-label">Usage Focus</label><select id="print-usage-mode"><option value="most">Most Used</option><option value="least">Least Used</option></select></div><div class="form-group"><label id="print-sort-direction-label">Sort Direction</label><select id="print-sort-direction"><option value="desc">Descending</option><option value="asc">Ascending</option></select></div></div><div class="print-summary" id="inventory-print-summary">Choose how you want the inventory report to be printed.</div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inventory-print-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" id="inventory-print-run-btn" onclick="applyInventoryPrint()">Print</button></div></div></div>
+<div class="modal-overlay" id="inventory-print-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inventory-print-modal-title">Inventory Print Options</div><button class="modal-close" onclick="closeModal('inventory-print-modal')">✕</button></div><div class="print-option-grid"><div class="form-group"><label id="print-mode-label">Report Type</label><select id="print-mode"><option value="stock">Stock Report</option><option value="usage">Usage Report</option><option value="audit">Inventory Audit</option></select></div><div class="form-group"><label id="print-stock-filter-label">Stock Filter</label><select id="print-stock-filter"><option value="all">All Stock</option><option value="available">Available Only</option><option value="out">Out of Stock Only</option></select></div><div class="form-group"><label id="print-usage-mode-label">Usage Focus</label><select id="print-usage-mode"><option value="most">Most Used</option><option value="least">Least Used</option></select></div><div class="form-group"><label id="print-sort-direction-label">Sort By</label><select id="print-sort-direction"><option value="size_asc">Size: Small to Large</option><option value="size_desc">Size: Large to Small</option><option value="qty_desc">Quantity: High to Low</option><option value="qty_asc">Quantity: Low to High</option></select></div></div><div class="print-summary" id="inventory-print-summary">Choose how you want the inventory report to be printed.</div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inventory-print-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" id="inventory-print-run-btn" onclick="applyInventoryPrint()">Print</button></div></div></div>
 
 <div class="modal-overlay" id="warehouse-manager-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Warehouses / المخازن</div><button class="modal-close" onclick="closeModal('warehouse-manager-modal')">✕</button></div><div class="form-group"><label>New warehouse / مخزن جديد</label><div class="quick-location-add"><input type="text" id="warehouse-manager-new-input" placeholder="Warehouse name / اسم المخزن"><button class="btn btn-primary btn-sm" onclick="addWarehouseFromManager()">Save / حفظ</button></div></div><div id="warehouse-manager-list" class="warehouse-manager-list"></div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('warehouse-manager-modal')">Close / إغلاق</button></div></div></div>
 
@@ -1042,6 +1043,39 @@ Object.assign(I18N.ar, {
   quickRestockClose: '✕ إغلاق التعبئة السريعة'
 });
 
+Object.assign(I18N.en, {
+  inventoryAuditBtn: '📋 Inventory Audit',
+  printTypeAudit: 'Inventory Audit',
+  sortDirection: 'Sort By',
+  sortSizeAsc: 'Size: Small to Large',
+  sortSizeDesc: 'Size: Large to Small',
+  sortQtyDesc: 'Quantity: High to Low',
+  sortQtyAsc: 'Quantity: Low to High',
+  inventoryAuditTitle: 'Inventory Audit',
+  warehousesCount: 'Warehouses',
+  warehousesCovered: 'Warehouses Covered',
+  uniqueSizesTotal: 'Unique Sizes',
+  stockAuditDescription: 'Grouped by size without repeating warehouses',
+  stockFullDescription: 'Detailed stock rows by warehouse',
+  stockUsageDescription: 'Usage ranking with tyre-size sorting when equal'
+});
+Object.assign(I18N.ar, {
+  inventoryAuditBtn: '📋 عمل جرد',
+  printTypeAudit: 'عمل جرد',
+  sortDirection: 'فرز حسب',
+  sortSizeAsc: 'المقاس: من الأصغر إلى الأكبر',
+  sortSizeDesc: 'المقاس: من الأكبر إلى الأصغر',
+  sortQtyDesc: 'الكمية: من الأعلى إلى الأقل',
+  sortQtyAsc: 'الكمية: من الأقل إلى الأعلى',
+  inventoryAuditTitle: 'عمل جرد',
+  warehousesCount: 'عدد المخازن',
+  warehousesCovered: 'المخازن المشمولة',
+  uniqueSizesTotal: 'إجمالي المقاسات',
+  stockAuditDescription: 'تجميع حسب المقاس بدون تكرار المخازن',
+  stockFullDescription: 'عرض تفصيلي لكل صف حسب المخزن',
+  stockUsageDescription: 'ترتيب حسب الاستخدام مع فرز المقاس عند التساوي'
+});
+
 function tr(key, vars = {}) {
   const dict = I18N[currentLang] || I18N.en;
   let value = dict[key] ?? I18N.en[key] ?? key;
@@ -1059,7 +1093,7 @@ function applyLanguage() {
   document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
   const map = {
     'logout-btn':'logout','nav-service-label':'serviceNav','nav-dashboard-label':'dashboardNav','nav-search-label':'searchNav','nav-inventory-label':'inventoryNav','nav-report-label':'reportNav','inventory-title':'inventoryTitle','inventory-add-btn':'addTyre',
-    'inventory-print-btn':'printOptions','inventory-print-available-btn':'printAvailableOnly','inventory-print-out-btn':'printOutOnly','quick-restock-title':'quickRestockTitle','quick-restock-subtitle':'quickRestockSubtitle',
+    'inventory-print-btn':'printOptions','inventory-print-available-btn':'printAvailableOnly','inventory-print-out-btn':'printOutOnly','inventory-audit-btn':'inventoryAuditBtn','quick-restock-title':'quickRestockTitle','quick-restock-subtitle':'quickRestockSubtitle',
     'quick-location-label':'warehouseLabel','quick-location-add-label':'addWarehouseLabel','quick-location-save-btn':'save','quick-restock-focus-btn':'focus','view-employees-btn': document.getElementById('employee-card')?.style.display === 'block' ? 'hideEmployees' : 'viewEmployees',
     'inventory-print-modal-title':'printModalTitle','print-mode-label':'reportType','print-stock-filter-label':'stockFilter','print-usage-mode-label':'usageFocus','print-sort-direction-label':'sortDirection','inventory-print-run-btn':'print',
     'service-search-title':'serviceSearchTitle','service-clear-btn':'clear','service-overview-label':'serviceOverview','service-shift-label':'todaysShift','svc-stat-today-label':'servicesTodayLabel','svc-stat-stock-label':'totalStockLabel','svc-stat-out-label':'outOfStockLabel',
@@ -1081,10 +1115,10 @@ function applyLanguage() {
   const svcPlate = document.getElementById('svc-plate'); if (svcPlate) svcPlate.placeholder = currentLang === 'ar' ? 'مثال: ١٢٣٤٥' : 'AB12 CDE';
   const svcNotes = document.getElementById('svc-notes'); if (svcNotes) svcNotes.placeholder = tr('notesPlaceholder');
   document.getElementById('inventory-print-summary')?.replaceChildren(document.createTextNode(tr('printChooseOptions')));
-  const pm = document.getElementById('print-mode'); if (pm) { pm.options[0].text = tr('printTypeStock'); pm.options[1].text = tr('printTypeUsage'); }
+  const pm = document.getElementById('print-mode'); if (pm) { pm.options[0].text = tr('printTypeStock'); pm.options[1].text = tr('printTypeUsage'); pm.options[2].text = tr('printTypeAudit'); }
   const pf = document.getElementById('print-stock-filter'); if (pf) { pf.options[0].text = tr('allStock'); pf.options[1].text = tr('availableOnly'); pf.options[2].text = tr('outOfStockOnly'); }
   const pu = document.getElementById('print-usage-mode'); if (pu) { pu.options[0].text = tr('mostUsed'); pu.options[1].text = tr('leastUsed'); }
-  const ps = document.getElementById('print-sort-direction'); if (ps) { ps.options[0].text = tr('descending'); ps.options[1].text = tr('ascending'); }
+  const ps = document.getElementById('print-sort-direction'); if (ps) { ps.options[0].text = tr('sortSizeAsc'); ps.options[1].text = tr('sortSizeDesc'); ps.options[2].text = tr('sortQtyDesc'); ps.options[3].text = tr('sortQtyAsc'); }
   updateLangButtons();
   if (document.getElementById('quick-restock-panel')?.style.display === 'block') {
     syncQuickWarehousePanel();
@@ -1134,6 +1168,84 @@ function formatInventorySearch(input) {
   input.value = formatted || raw.replace(/[^\d/]/g, '').slice(0, 9);
   filterInv();
   return input.value;
+}
+
+function getTyreSizeParts(value) {
+  const digits = normalizeTyreKey(value).slice(0, 7);
+  const width = Number(digits.slice(0, 3) || 0);
+  const profile = Number(digits.slice(3, 5) || 0);
+  const rim = Number(digits.slice(5, 7) || 0);
+  return {
+    raw: value || '',
+    key: digits,
+    width,
+    profile,
+    rim,
+    formatted: formatTyreSizeValue(digits || value) || String(value || '')
+  };
+}
+
+function compareTyreSizeValues(a, b, direction = 'asc') {
+  const first = getTyreSizeParts(a);
+  const second = getTyreSizeParts(b);
+  const dir = direction === 'desc' ? -1 : 1;
+  for (const field of ['rim', 'width', 'profile']) {
+    const diff = (Number(first[field]) || 0) - (Number(second[field]) || 0);
+    if (diff !== 0) return diff * dir;
+  }
+  return String(first.formatted || '').localeCompare(String(second.formatted || ''), undefined, { numeric: true, sensitivity: 'base' }) * dir;
+}
+
+function sortInventoryRows(rows = [], sortMode = 'size_asc') {
+  const sorted = [...(rows || [])];
+  if (sortMode === 'qty_desc' || sortMode === 'qty_asc') {
+    const dir = sortMode === 'qty_desc' ? -1 : 1;
+    sorted.sort((a, b) => {
+      const qtyDiff = ((Number(a.quantity) || 0) - (Number(b.quantity) || 0)) * dir;
+      if (qtyDiff !== 0) return qtyDiff;
+      return compareTyreSizeValues(a.size, b.size, 'asc');
+    });
+    return sorted;
+  }
+  return sorted.sort((a, b) => compareTyreSizeValues(a.size, b.size, sortMode === 'size_desc' ? 'desc' : 'asc'));
+}
+
+function aggregateInventoryBySize(rows = []) {
+  const grouped = new Map();
+  rows.forEach(item => {
+    const key = normalizeTyreKey(item?.size || '');
+    if (!key) return;
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        size: formatTyreSizeValue(item.size) || item.size,
+        quantity: 0,
+        usage_count: 0,
+        locations: [],
+        _locationMap: new Map()
+      });
+    }
+    const entry = grouped.get(key);
+    entry.quantity += Number(item?.quantity) || 0;
+    entry.usage_count += Number(item?.usage_count) || 0;
+    const cleanLocation = String(item?.location || '').trim();
+    if (cleanLocation && !entry._locationMap.has(cleanLocation.toLowerCase())) {
+      entry._locationMap.set(cleanLocation.toLowerCase(), cleanLocation);
+      entry.locations.push(cleanLocation);
+    }
+  });
+  return Array.from(grouped.values()).map(entry => ({
+    size: entry.size,
+    quantity: entry.quantity,
+    usage_count: entry.usage_count,
+    locations: entry.locations,
+    warehouses_count: entry.locations.length
+  }));
+}
+
+function getStockModeDescription(mode) {
+  if (mode === 'audit') return tr('stockAuditDescription');
+  if (mode === 'usage') return tr('stockUsageDescription');
+  return tr('stockFullDescription');
 }
 
 function getSavedLocations() {
@@ -2043,8 +2155,8 @@ async function loadDashboard() {
 
 // ==================== INVENTORY ====================
 async function loadInventory() { 
-  const { data } = await db.from('inventory').select('*').order('size'); 
-  allInv = data || []; 
+  const { data } = await db.from('inventory').select('*'); 
+  allInv = sortInventoryRows(data || [], 'size_asc'); 
   renderInv(allInv); 
   populateQuickLocationSelect(document.getElementById('quick-location-select')?.value || getLastQuickLocation());
   if (document.getElementById('quick-restock-panel')?.style.display === 'block') renderQuickRestockResults();
@@ -2517,10 +2629,11 @@ async function shareInvoiceToWhatsApp(txId) {
 }
 
 async function loadStockRep() {
-  const { data } = await db.from('inventory').select('*').order('size');
+  const { data } = await db.from('inventory').select('*');
   const tbody = document.getElementById('stock-rep-table');
   if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">No inventory data</div></td></tr>'; return; }
-  tbody.innerHTML = data.map(i => `<tr>
+  const sortedRows = sortInventoryRows(data || [], 'size_asc');
+  tbody.innerHTML = sortedRows.map(i => `<tr>
       <td data-label="${esc(tr('size'))}"><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td>
       <td data-label="${esc(tr('warehouse'))}">${esc(i.location || '-')}</td>
       <td data-label="${esc(tr('qty'))}"><b>${i.quantity}</b></td>
@@ -2584,9 +2697,9 @@ function applyInventoryPrint() {
   const reportMode = document.getElementById('print-mode')?.value || 'stock';
   const stockFilter = document.getElementById('print-stock-filter')?.value || 'all';
   const usageMode = document.getElementById('print-usage-mode')?.value || 'most';
-  const sortDirection = document.getElementById('print-sort-direction')?.value || 'desc';
+  const sortMode = document.getElementById('print-sort-direction')?.value || 'size_asc';
   closeModal('inventory-print-modal');
-  printInventoryStock({ reportMode, stockFilter, usageMode, sortDirection });
+  printInventoryStock({ reportMode, stockFilter, usageMode, sortMode });
 }
 
 function getUsageCountMap(transactions = []) {
@@ -2598,8 +2711,12 @@ function getUsageCountMap(transactions = []) {
   }, {});
 }
 
+function printInventoryAudit() {
+  return printInventoryStock({ reportMode: 'audit', stockFilter: 'all', sortMode: 'size_asc' });
+}
+
 async function printInventoryStock(options = {}) {
-  const settings = { reportMode: 'stock', stockFilter: 'all', usageMode: 'most', sortDirection: 'desc', ...options };
+  const settings = { reportMode: 'stock', stockFilter: 'all', usageMode: 'most', sortMode: 'size_asc', ...options };
   const [{ data: inventory }, { data: transactions }] = await Promise.all([
     db.from('inventory').select('*'),
     db.from('transactions').select('tyre_size,quantity')
@@ -2608,40 +2725,75 @@ async function printInventoryStock(options = {}) {
   if (!data.length) { showToast(tr('printNoData'), 'error'); return; }
 
   const usageMap = getUsageCountMap(transactions || []);
-  let rows = data.map(item => ({ ...item, usage_count: usageMap[normalizeTyreKey(item.size)] || 0 }));
+  const detailedRows = data.map(item => ({ ...item, usage_count: usageMap[normalizeTyreKey(item.size)] || 0 }));
+  let rows = [];
 
-  if (settings.stockFilter === 'available') rows = rows.filter(item => Number(item.quantity) > 0);
-  if (settings.stockFilter === 'out') rows = rows.filter(item => Number(item.quantity) <= 0);
-
-  const dir = settings.sortDirection === 'asc' ? 1 : -1;
-  if (settings.reportMode === 'usage') {
+  if (settings.reportMode === 'audit') {
+    rows = aggregateInventoryBySize(detailedRows);
+    if (settings.stockFilter === 'available') rows = rows.filter(item => Number(item.quantity) > 0);
+    if (settings.stockFilter === 'out') rows = rows.filter(item => Number(item.quantity) <= 0);
+    rows = sortInventoryRows(rows, settings.sortMode);
+  } else if (settings.reportMode === 'usage') {
+    rows = aggregateInventoryBySize(detailedRows);
+    if (settings.stockFilter === 'available') rows = rows.filter(item => Number(item.quantity) > 0);
+    if (settings.stockFilter === 'out') rows = rows.filter(item => Number(item.quantity) <= 0);
     rows.sort((a, b) => {
-      const usageDiff = (Number(a.usage_count) - Number(b.usage_count)) * dir;
+      const usageDiff = settings.usageMode === 'least'
+        ? (Number(a.usage_count) || 0) - (Number(b.usage_count) || 0)
+        : (Number(b.usage_count) || 0) - (Number(a.usage_count) || 0);
       if (usageDiff !== 0) return usageDiff;
-      return String(a.size || '').localeCompare(String(b.size || ''));
+      return compareTyreSizeValues(a.size, b.size, 'asc');
     });
-    if (settings.usageMode === 'most' && settings.sortDirection === 'asc') rows.reverse();
-    if (settings.usageMode === 'least' && settings.sortDirection === 'desc') rows.reverse();
   } else {
-    rows.sort((a, b) => String(a.size || '').localeCompare(String(b.size || '')) * dir);
+    rows = detailedRows;
+    if (settings.stockFilter === 'available') rows = rows.filter(item => Number(item.quantity) > 0);
+    if (settings.stockFilter === 'out') rows = rows.filter(item => Number(item.quantity) <= 0);
+    rows = sortInventoryRows(rows, settings.sortMode);
   }
 
-  const modeTitle = settings.reportMode === 'usage'
-    ? (settings.usageMode === 'most' ? tr('mostUsed') : tr('leastUsed'))
-    : tr('stockReportTitle');
+  const modeTitle = settings.reportMode === 'audit'
+    ? tr('inventoryAuditTitle')
+    : settings.reportMode === 'usage'
+      ? (settings.usageMode === 'most' ? tr('mostUsed') : tr('leastUsed'))
+      : tr('stockReportTitle');
   const filterTitle = settings.stockFilter === 'available' ? tr('availableOnly') : settings.stockFilter === 'out' ? tr('outOfStockOnly') : tr('allStock');
 
-  let html = `<!DOCTYPE html>
+  const tableHead = settings.reportMode === 'audit'
+    ? `<tr><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehousesCount')}</th><th>${tr('warehouse')}</th></tr>`
+    : settings.reportMode === 'usage'
+      ? `<tr><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('usageCount')}</th><th>${tr('warehousesCount')}</th><th>${tr('warehouse')}</th></tr>`
+      : `<tr><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${tr('usageCount')}</th><th>${tr('notes')}</th></tr>`;
+
+  const tableBody = rows.map(item => {
+    if (settings.reportMode === 'audit') {
+      return `<tr><td><b>${esc(formatTyreSizeValue(item.size) || item.size)}</b></td><td>${Number(item.quantity) || 0}</td><td>${Number(item.warehouses_count) || 0}</td><td>${esc((item.locations || []).join('، ') || '-')}</td></tr>`;
+    }
+    if (settings.reportMode === 'usage') {
+      return `<tr><td><b>${esc(formatTyreSizeValue(item.size) || item.size)}</b></td><td>${Number(item.quantity) || 0}</td><td>${Number(item.usage_count) || 0}</td><td>${Number(item.warehouses_count) || 0}</td><td>${esc((item.locations || []).join('، ') || '-')}</td></tr>`;
+    }
+    return `<tr><td><b>${esc(formatTyreSizeValue(item.size) || item.size)}</b></td><td>${Number(item.quantity) || 0}</td><td>${esc(item.location || '-')}</td><td>${Number(item.usage_count) || 0}</td><td>${esc(item.notes || '-')}</td></tr>`;
+  }).join('');
+
+  const totalTyres = rows.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+  const warehouseMetric = settings.reportMode === 'stock'
+    ? new Set(rows.map(item => String(item.location || '').trim()).filter(Boolean)).size
+    : new Set(rows.flatMap(item => item.locations || []).map(loc => String(loc || '').trim()).filter(Boolean)).size;
+
+  const footerSummary = settings.reportMode === 'audit'
+    ? `${tr('qty')}: ${totalTyres} | ${tr('uniqueSizesTotal')}: ${rows.length} | ${tr('warehousesCovered')}: ${warehouseMetric}`
+    : `${tr('qty')}: ${totalTyres} | Total Rows: ${rows.length}`;
+
+  const html = `<!DOCTYPE html>
   <html>
   <head>
     <title>${modeTitle} - Quality Part X</title>
     <style>
-      body { font-family: 'DM Sans', sans-serif; padding: 30px; }
-      h1 { color: #f0a500; font-family: 'Bebas Neue', sans-serif; }
+      body { font-family: 'DM Sans', sans-serif; padding: 30px; color:#0f172a; }
       .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f0a500; padding-bottom: 15px; }
       .company { font-size: 28px; font-weight: bold; color: #f0a500; }
+      .subtitle { color:#475569; margin-top:8px; }
       table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-      th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+      th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
       th { background: #f0a500; color: #000; }
       .total { margin-top: 20px; font-weight: bold; text-align: right; }
     </style>
@@ -2651,20 +2803,20 @@ async function printInventoryStock(options = {}) {
       <div class="company">QUALITY PART X</div>
       <div>TYRE SERVICES · DUNSTABLE</div>
       <div>${modeTitle} · ${filterTitle}</div>
+      <div class="subtitle">${getStockModeDescription(settings.reportMode)}</div>
       <div>${new Date().toLocaleString()}</div>
       <div>Operator: ${currentUser?.username || '-'}</div>
     </div>
     <table>
-      <thead><tr><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${tr('usageCount')}</th><th>${tr('notes')}</th></tr></thead>
-      <tbody>`;
+      <thead>${tableHead}</thead>
+      <tbody>${tableBody}</tbody>
+    </table>
+    <div class="total">${footerSummary}</div>
+  </body>
+  </html>`;
 
-  rows.forEach(i => {
-    html += `<tr><td><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td><td>${Number(i.quantity) || 0}</td><td>${esc(i.location || '-')}</td><td>${Number(i.usage_count) || 0}</td><td>${esc(i.notes || '-')}</td></tr>`;
-  });
-
-  const totalTyres = rows.reduce((s, i) => s + Number(i.quantity || 0), 0);
-  html += `</tbody></table><div class="total">Total Qty: ${totalTyres} | Total Rows: ${rows.length}</div></body></html>`;
-  const win = window.open();
+  const win = window.open('', '_blank');
+  if (!win) return;
   win.document.write(html);
   win.document.close();
   setTimeout(() => { win.print(); }, 500);
@@ -3563,6 +3715,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
