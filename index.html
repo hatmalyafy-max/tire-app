@@ -2,286 +2,839 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Quality Part X – Tyre Services</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#07090c;
-  --glass:rgba(255,255,255,0.04);
-  --glass2:rgba(255,255,255,0.07);
-  --glass3:rgba(255,255,255,0.10);
-  --border:rgba(255,255,255,0.08);
-  --border2:rgba(240,165,0,0.35);
-  --accent:#f0a500;
-  --accent-dim:rgba(240,165,0,0.12);
-  --accent2:#e05c1a;
-  --text:#e8edf5;
-  --muted:#6b7a99;
-  --danger:#ef4444;
-  --success:#22c55e;
-  --info:#3b82f6;
-  --radius:12px;
-  --blur:blur(20px);
+  --bg-base:#050c18;
+  --bg-mid:#071428;
+  --bg-card:rgba(255,255,255,0.06);
+  --bg-card-hover:rgba(255,255,255,0.10);
+  --bg-input:rgba(255,255,255,0.07);
+  --stroke:rgba(255,255,255,0.10);
+  --stroke-strong:rgba(255,255,255,0.15);
+  --stroke-accent:rgba(94,234,212,0.35);
+  --stroke-gold:rgba(248,210,110,0.30);
+  --text:#e8f4ff;
+  --text-muted:#7a9bc2;
+  --text-faint:#426182;
+  --teal:#5eecd0;
+  --teal-dim:rgba(94,236,208,0.12);
+  --teal-glow:rgba(94,236,208,0.18);
+  --blue:#60a5fa;
+  --blue-dim:rgba(96,165,250,0.14);
+  --gold:#f8d26e;
+  --gold-dim:rgba(248,210,110,0.12);
+  --danger:#fb7185;
+  --danger-dim:rgba(251,113,133,0.14);
+  --success:#4ade80;
+  --success-dim:rgba(74,222,128,0.14);
+  --radius-xl:28px;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --radius-pill:999px;
+  --shadow-card:0 8px 32px rgba(0,0,0,0.42),0 2px 8px rgba(0,0,0,0.28);
+  --shadow-glow:0 0 30px rgba(94,236,208,0.14);
+  --shadow-btn:0 8px 24px rgba(94,236,208,0.28);
+  --blur-card:blur(24px);
+  --blur-lite:blur(14px);
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
-.auth-card{background:var(--glass);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:400px;max-width:95vw;margin:auto;margin-top:10vh;}
-.brand{font-family:'Bebas Neue';font-size:30px;letter-spacing:4px;color:var(--accent);text-align:center;}
-.auth-location{font-size:11px;color:var(--muted);text-align:center;}
-.auth-division{font-size:11px;color:var(--accent2);text-align:center;}
-.auth-divider{width:48px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin:14px auto;}
-.auth-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:28px;}
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;}
-.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--glass2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-size:14px;outline:none;}
-.form-group input:focus{border-color:var(--accent);}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:var(--radius);border:none;cursor:pointer;font-weight:600;transition:all .2s;}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#e09000);color:#07090c;}
-.btn-primary:hover{transform:translateY(-1px);}
-.btn-danger{background:var(--danger);color:#fff;}
-.btn-success{background:var(--success);color:#07090c;}
-.btn-info{background:var(--info);color:#fff;}
-.btn-ghost{background:var(--glass);color:var(--muted);border:1px solid var(--border);}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-sm{padding:7px 14px;font-size:12px;}
+html,body{height:100%;}
+body{
+  background:var(--bg-base);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 58% 40% at 18% 0%, rgba(94,236,208,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 44% 36% at 82% 10%, rgba(96,165,250,0.15) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 45% at 50% 100%, rgba(248,210,110,0.08) 0%, transparent 60%),
+    linear-gradient(160deg,#050c18 0%,#071428 52%,#061121 100%);
+  pointer-events:none;
+  z-index:0;
+}
+button,input,select,textarea{font:inherit;}
+button{border:none;background:none;}
+a{color:inherit;text-decoration:none;}
+#auth-screen,#app-screen{position:relative;z-index:1;}
+
+.auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-card{
+  width:min(100%,420px);
+  background:var(--bg-card);
+  border:1px solid var(--stroke);
+  border-radius:32px;
+  backdrop-filter:var(--blur-card);
+  -webkit-backdrop-filter:var(--blur-card);
+  box-shadow:var(--shadow-card);
+  padding:30px 22px;
+}
+.brand{font-size:29px;font-weight:800;letter-spacing:.04em;text-align:center;background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-location,.auth-division,.auth-title{text-align:center;}
+.auth-location{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.12em;margin-top:8px;}
+.auth-division{font-size:12px;color:var(--gold);margin-top:4px;}
+.auth-divider{width:58px;height:2px;border-radius:999px;margin:16px auto;background:linear-gradient(90deg,var(--teal),var(--blue),var(--gold));}
+.auth-title{font-size:13px;color:var(--text-muted);margin-bottom:24px;}
+
+.mobile-shell{
+  position:relative;
+  z-index:1;
+  max-width:430px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:60;
+  padding:14px 16px 12px;
+  background:rgba(5,12,24,0.78);
+  backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);
+  border-bottom:1px solid var(--stroke);
+}
+.topbar-main{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.topbar-brand{font-size:18px;font-weight:800;letter-spacing:.04em;background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.topbar-sub{font-size:9px;color:var(--text-muted);letter-spacing:.14em;text-transform:uppercase;margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.operator-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  min-height:34px;padding:6px 12px;border-radius:999px;
+  background:var(--teal-dim);color:var(--teal);
+  border:1px solid var(--stroke-accent);font-size:11px;font-weight:700;
+}
+.lang-switch{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--stroke);border-radius:999px;background:rgba(255,255,255,.04);}
+.lang-btn{color:var(--text-muted);padding:7px 12px;border-radius:999px;cursor:pointer;font-size:11px;font-weight:700;transition:.2s;}
+.lang-btn.active{background:linear-gradient(135deg,var(--teal),var(--blue));color:#04111d;}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:42px;padding:11px 16px;border-radius:14px;
+  cursor:pointer;transition:.2s;font-weight:700;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-primary{background:linear-gradient(135deg,var(--teal),#3dd4b8 50%,var(--blue));color:#04111d;box-shadow:var(--shadow-btn);}
+.btn-success{background:linear-gradient(135deg,var(--success),#9ef8b8);color:#06210f;}
+.btn-info{background:linear-gradient(135deg,var(--blue),#93c5fd);color:#07111d;}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#fda4af);color:#260811;}
+.btn-ghost{background:var(--bg-card);color:var(--text-muted);border:1px solid var(--stroke);backdrop-filter:var(--blur-lite);}
+.btn-ghost:hover{border-color:var(--stroke-accent);color:var(--teal);}
+.btn-sm{min-height:38px;padding:9px 12px;font-size:12px;border-radius:12px;}
 .btn-block{width:100%;}
-#app-screen{display:none;}
-.topbar{background:rgba(7,9,12,0.85);backdrop-filter:var(--blur);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-brand{font-family:'Bebas Neue';font-size:20px;color:var(--accent);}
-.topbar-sub{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.operator-badge{background:var(--accent-dim);border:1px solid rgba(240,165,0,0.2);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:12px;}
-.nav-tabs{background:rgba(7,9,12,0.7);backdrop-filter:var(--blur);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:2px;}
-.nav-tab{padding:13px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;}
-.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.main-content{padding:20px;max-width:1300px;margin:0 auto;}
-.card{background:var(--glass);backdrop-filter:var(--blur);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px;}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
-.card-title{font-family:'Bebas Neue';font-size:19px;color:var(--text);}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:20px;}
-.stat-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;}
-.stat-value{font-family:'Bebas Neue';font-size:38px;color:var(--accent);}
-.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:4px;}
-.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
-table{width:100%;border-collapse:collapse;}
-th{padding:11px 14px;text-align:left;font-size:10px;color:var(--muted);}
-td{padding:11px 14px;font-size:13px;border-top:1px solid var(--border);}
-.badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge-green{background:rgba(34,197,94,0.12);color:var(--success);}
-.badge-orange{background:rgba(240,165,0,0.12);color:var(--accent);}
-.badge-red{background:rgba(239,68,68,0.12);color:var(--danger);}
-.search-bar{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;}
-.search-bar .form-group{flex:1;margin:0;}
-.tyre-result{background:var(--glass2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
-.tyre-result-size{font-family:'DM Mono';font-size:20px;color:var(--accent);}
-.position-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;}
-.pos-btn{background:var(--glass2);border:2px solid var(--border);color:var(--muted);padding:14px 8px;border-radius:10px;cursor:pointer;font-weight:600;text-align:center;transition:all .2s;}
-.pos-btn.active{background:rgba(240,165,0,0.4);border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 2px rgba(240,165,0,0.3);}
-.repair-btns{display:flex;gap:8px;margin:8px 0;}
-.repair-btn{flex:1;background:var(--glass2);border:2px solid var(--border);color:var(--muted);padding:10px;border-radius:10px;cursor:pointer;font-weight:600;text-align:center;transition:all .2s;}
-.repair-btn.active{background:rgba(59,130,246,0.4);border-color:var(--info);color:var(--info);box-shadow:0 0 0 2px rgba(59,130,246,0.3);}
-.tyre-type-btns{display:flex;gap:8px;margin:8px 0;}
-.tyre-type-btn{flex:1;background:var(--glass2);border:2px solid var(--border);color:var(--muted);padding:10px;border-radius:10px;cursor:pointer;font-weight:600;text-align:center;transition:all .2s;}
-.tyre-type-btn.active-new{background:rgba(34,197,94,0.4);border-color:var(--success);color:var(--success);box-shadow:0 0 0 2px rgba(34,197,94,0.3);}
-.tyre-type-btn.active-old{background:rgba(107,114,153,0.4);border-color:var(--muted);color:var(--text);box-shadow:0 0 0 2px rgba(107,114,153,0.3);}
-.photo-area{border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;cursor:pointer;}
-.photo-area.has-photo{border-style:solid;border-color:var(--accent);}
-.photo-preview{width:100%;max-height:200px;object-fit:cover;border-radius:8px;display:none;}
-.services-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:12px;}
-.service-card{min-width:280px;background:var(--glass2);border:1px solid var(--border);border-radius:14px;flex-shrink:0;}
-.service-card-header{background:rgba(240,165,0,0.08);padding:12px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
-.service-card-size{font-family:'DM Mono';font-size:16px;color:var(--accent);}
-.service-card-body{padding:12px 14px;}
-.service-card-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal{background:#0f111a;border:1px solid var(--border);border-radius:18px;padding:26px;width:500px;max-width:95%;max-height:90vh;overflow-y:auto;}
-.modal-header{display:flex;justify-content:space-between;margin-bottom:22px;}
-.modal-title{font-family:'Bebas Neue';font-size:22px;}
-.toast{position:fixed;bottom:24px;right:24px;background:#0f111a;border:1px solid var(--border);border-radius:12px;padding:14px 20px;z-index:999;transform:translateY(100px);opacity:0;transition:all .3s;}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.success{border-color:var(--success);color:var(--success);}
-.toast.error{border-color:var(--danger);color:var(--danger);}
-.loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(240,165,0,0.3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.page{display:none;}.page.active{display:block;}
-.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
-.row{display:flex;gap:12px;flex-wrap:wrap;}
+
+.nav-tabs{
+  position:fixed;
+  left:50%;bottom:0;transform:translateX(-50%);
+  z-index:70;width:100%;max-width:430px;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;background:rgba(5,12,24,.88);backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);border-top:1px solid var(--stroke);
+  padding-bottom:max(8px, env(safe-area-inset-bottom));
+}
+.nav-tab{
+  position:relative;padding:12px 6px 13px;color:var(--text-faint);font-size:10px;
+  font-weight:700;letter-spacing:.03em;cursor:pointer;transition:.2s;text-align:center;
+}
+.nav-tab.active{color:var(--teal);}
+.nav-tab.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:30px;height:2px;border-radius:999px;background:var(--teal);}
+
+.main-content{flex:1;display:flex;flex-direction:column;gap:16px;padding:16px 16px 104px;overflow-x:hidden;}
+.page{display:none;width:100%;animation:fadeIn .25s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.page-intro{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  margin-bottom:14px;
+}
+.page-kicker{font-size:11px;color:var(--text-muted);}
+.page-title{font-size:23px;font-weight:800;line-height:1.15;margin-top:2px;}
+.date-badge{
+  flex-shrink:0;background:var(--gold-dim);border:1px solid var(--stroke-gold);
+  border-radius:12px;padding:7px 10px;text-align:end;color:var(--gold);font-size:11px;font-weight:700;
+}
+.date-badge span{display:block;font-size:9px;color:rgba(248,210,110,.68);text-transform:uppercase;letter-spacing:.1em;font-weight:500;}
+
+.hero-note{
+  display:flex;gap:10px;align-items:flex-start;background:linear-gradient(135deg, rgba(248,210,110,.11), rgba(96,165,250,.09));
+  border:1px solid var(--stroke-gold);border-radius:16px;padding:11px 13px;margin-bottom:14px;color:var(--gold);font-size:11px;
+}
+.hero-note i{font-size:15px;line-height:1.2;}
+.hero-note p{color:var(--text-muted);font-size:10px;margin-top:2px;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{
+  background:var(--bg-card);border:1px solid var(--stroke);border-radius:20px;padding:14px 10px;text-align:center;
+  backdrop-filter:var(--blur-card);-webkit-backdrop-filter:var(--blur-card);box-shadow:var(--shadow-card);
+}
+.stat-card:hover{border-color:var(--stroke-accent);background:var(--bg-card-hover);}
+.stat-value{font-size:27px;font-weight:800;line-height:1;color:var(--teal);}
+.stat-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.11em;margin-top:5px;}
+
+.card{
+  background:var(--bg-card);
+  backdrop-filter:var(--blur-card);
+  -webkit-backdrop-filter:var(--blur-card);
+  border:1px solid var(--stroke);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:var(--shadow-card);
+  margin-bottom:16px;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:16px 18px 12px;border-bottom:1px solid var(--stroke);
+}
+.card-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:var(--text);}
+.card-title::before{
+  content:'';width:30px;height:30px;border-radius:10px;display:inline-block;flex-shrink:0;
+  background:linear-gradient(135deg, rgba(94,236,208,.18), rgba(96,165,250,.16));
+  box-shadow:inset 0 0 0 1px rgba(94,236,208,.18);
+}
+.card-header > div:first-child > .card-title{display:flex;align-items:center;}
+.card-header > div:first-child > .card-title::before{margin-inline-end:8px;}
+.card-header > div:first-child > .panel-subtitle{margin-top:4px;}
+.card > :not(.card-header){padding-inline:18px;}
+.card > .search-bar,.card > .row,.card > #sale-results,.card > #today-cards,.card > #emp-list,.card > .table-wrap,.card > .quick-restock-last,.card > #quick-restock-results,.card > .print-summary,.card > #restock-info{padding-bottom:18px;}
+.card > .stats-grid{padding:0 18px 18px;}
+.card > .ctrl-grid,.card > .quick-restock-grid,.card > .print-option-grid{padding:0 18px 18px;}
+.card > .table-wrap:last-child,.card > #emp-list:last-child,.card > #today-cards:last-child,.card > #sale-results:last-child,.card > .row:last-child{padding-bottom:18px;}
+
+.form-group{margin-bottom:12px;}
+.form-group label,.field-label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea,.table-select{
+  width:100%;background:var(--bg-input);border:1px solid var(--stroke);color:var(--text);
+  padding:12px 13px;border-radius:14px;outline:none;transition:.2s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus,.table-select:focus{
+  border-color:var(--teal);background:rgba(94,236,208,.06);box-shadow:0 0 0 3px rgba(94,236,208,.08);
+}
+.form-group textarea{resize:vertical;min-height:90px;}
+.form-group input::placeholder,.form-group textarea::placeholder{color:var(--text-faint);}
+
+.search-bar{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;padding-top:16px;}
+.search-bar .form-group{flex:1;margin:0;min-width:0;position:relative;}
+#sale-search,.mono-input{font-family:'DM Mono',monospace;letter-spacing:.03em;}
+.search-bar .form-group::before{
+  content:'002';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--text-muted);font-size:13px;pointer-events:none;z-index:1;
+}
+.search-bar .form-group input{padding-left:40px;min-height:46px;}
+
+.row{display:flex;gap:12px;flex-wrap:wrap;padding-top:16px;}
 .row .form-group{flex:1;min-width:140px;}
-.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
-.ctrl-grid{display:flex;gap:10px;flex-wrap:wrap;}
-.service-card-actions,.report-actions,.admin-employee-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.employee-toolbar{display:flex;gap:8px;flex-wrap:wrap;}
-.panel-subtitle{font-size:12px;color:var(--muted);margin-top:4px;}
-.quick-restock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:8px;}
+.ctrl-grid,.employee-toolbar,.service-card-actions,.report-actions,.admin-employee-actions,.table-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.panel-subtitle{font-size:12px;color:var(--text-muted);}
+
+.tyre-result{
+  background:rgba(94,236,208,.05);border:1px solid var(--stroke-accent);border-radius:20px;padding:14px;margin-bottom:10px;
+  box-shadow:var(--shadow-card);transition:.2s;
+}
+.tyre-result:hover{background:rgba(94,236,208,.09);border-color:rgba(94,236,208,.48);box-shadow:var(--shadow-glow);}
+.tyre-result-size{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--teal);letter-spacing:.04em;}
+.tyre-result .btn,.tyre-result button{margin-top:10px;}
+
+.tyre-type-btns,.repair-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.tyre-type-btn,.repair-btn,.pos-btn{
+  background:var(--bg-input);border:1px solid var(--stroke);color:var(--text-muted);padding:11px 10px;border-radius:14px;cursor:pointer;font-weight:700;text-align:center;transition:.2s;
+}
+.tyre-type-btn,.repair-btn{flex:1;}
+.tyre-type-btn.active-new{background:var(--teal-dim);border-color:rgba(94,236,208,.45);color:var(--teal);box-shadow:0 0 0 1px rgba(94,236,208,.18);}
+.tyre-type-btn.active-old{background:rgba(122,155,194,.12);border-color:rgba(122,155,194,.34);color:var(--text);}
+.repair-btn.active{background:var(--blue-dim);border-color:rgba(96,165,250,.48);color:var(--blue);}
+.position-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:8px 0 12px;}
+.pos-btn.active{background:var(--gold-dim);border-color:rgba(248,210,110,.55);color:var(--gold);}
+
+.photo-area{
+  border:1.5px dashed var(--stroke);border-radius:16px;padding:18px;text-align:center;cursor:pointer;background:var(--bg-input);transition:.2s;
+}
+.photo-area:hover,.photo-area.has-photo{border-color:var(--teal);background:rgba(94,236,208,.05);}
+.photo-preview{width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:none;}
+#photo-placeholder{color:var(--text-muted);font-size:12px;}
+
+.services-scroll{display:flex;gap:12px;overflow-x:auto;padding-top:14px;padding-bottom:18px;scrollbar-width:none;}
+.services-scroll::-webkit-scrollbar{display:none;}
+.service-card{
+  min-width:220px;background:var(--bg-card);border:1px solid var(--stroke);border-radius:20px;overflow:hidden;flex-shrink:0;transition:.2s;
+}
+.service-card:hover{border-color:var(--stroke-accent);box-shadow:var(--shadow-glow);transform:translateY(-2px);}
+.service-card-header{background:var(--teal-dim);padding:11px 13px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.service-card-size{font-family:'DM Mono',monospace;font-size:14px;color:var(--teal);font-weight:600;}
+.service-card-body{padding:12px 13px;}
+.service-card-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:5px;}
+.service-card-row span:first-child{color:var(--text-muted);}
+.service-card-row span:last-child{font-weight:700;}
+
+.quick-restock-grid,.print-option-grid{display:grid;grid-template-columns:1fr;gap:12px;padding-top:16px;}
 .quick-location-add{display:flex;gap:8px;flex-wrap:wrap;}
-.quick-location-add input{flex:1;min-width:160px;}
-.quick-restock-last{font-size:12px;color:var(--accent);margin:-2px 0 14px;}
-.quick-restock-result{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--glass2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.quick-location-add input{flex:1;min-width:150px;}
+.quick-restock-last,.print-summary,.quick-restock-meta{font-size:12px;color:var(--text-muted);}
+.quick-restock-last{padding-top:0;padding-bottom:12px;color:var(--gold);}
+.quick-restock-result{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-input);
+  border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-bottom:10px;
+}
 .quick-restock-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.quick-restock-meta{font-size:12px;color:var(--muted);margin-top:4px;}
-.qty-pill{display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:4px 10px;border-radius:999px;background:var(--accent-dim);color:var(--accent);font-weight:700;}
-.lang-switch{display:flex;align-items:center;gap:6px;padding:4px;border:1px solid var(--border);border-radius:999px;background:var(--glass);}
-.lang-btn{border:none;background:transparent;color:var(--muted);padding:7px 12px;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;}
-.lang-btn.active{background:var(--accent);color:#07090c;}
-.table-select{width:100%;background:var(--glass2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:10px;font-size:12px;outline:none;min-width:150px;}
-.table-select:focus{border-color:var(--accent);}
+.qty-pill{display:inline-flex;align-items:center;justify-content:center;min-width:38px;padding:5px 10px;border-radius:999px;background:var(--teal-dim);color:var(--teal);font-weight:800;}
+
+.table-wrap{overflow-x:auto;border-top:1px solid var(--stroke);}
+table{width:100%;border-collapse:collapse;min-width:860px;}
+th{padding:13px 14px;text-align:left;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;background:rgba(255,255,255,.02);}
+td{padding:13px 14px;font-size:13px;border-top:1px solid rgba(255,255,255,.06);vertical-align:top;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;}
+.badge-green{background:var(--success-dim);color:var(--success);}
+.badge-orange{background:var(--gold-dim);color:var(--gold);}
+.badge-red{background:var(--danger-dim);color:var(--danger);}
 .inventory-note-cell{min-width:220px;max-width:320px;}
 .inventory-action-stack{display:flex;flex-direction:column;gap:8px;min-width:220px;}
-.table-actions{display:flex;gap:8px;flex-wrap:wrap;}
-.print-option-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-.print-summary{font-size:12px;color:var(--muted);margin-top:8px;}
-@media (max-width: 768px){
-  body{font-size:14px;}
-  .auth-card{padding:28px 20px;margin-top:5vh;width:min(100%,420px);}
-  .topbar{padding:10px 12px;height:auto;align-items:flex-start;gap:10px;flex-wrap:wrap;}
-  .topbar-right{width:100%;justify-content:space-between;}
-  .nav-tabs{padding:0 10px;overflow-x:auto;white-space:nowrap;}
-  .nav-tab{flex:0 0 auto;padding:13px 12px;}
-  .main-content{padding:12px;}
-  .card{padding:14px;margin-bottom:14px;}
-  .card-header{align-items:flex-start;}
-  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-  .stat-value{font-size:30px;}
-  .search-bar,.row,.ctrl-grid,.employee-toolbar,.service-card-actions,.report-actions,.admin-employee-actions{flex-direction:column;}
-  .search-bar > *, .row > *, .ctrl-grid > *, .employee-toolbar > *, .service-card-actions > *, .report-actions > *, .admin-employee-actions > *{width:100%;}
-  .service-card{min-width:240px;}
-  .service-card-header,.service-card-row{gap:8px;align-items:flex-start;flex-wrap:wrap;}
-  .table-wrap table{min-width:980px;}
-  .modal{padding:20px;width:calc(100% - 16px);max-width:calc(100% - 16px);border-radius:14px;}
-  .btn{min-height:44px;}
+.empty-state{text-align:center;padding:28px 12px;color:var(--text-muted);}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);z-index:120;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{
+  width:min(100%,520px);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg, rgba(10,20,35,.98), rgba(6,13,25,.98));
+  border:1px solid var(--stroke);border-radius:24px;box-shadow:var(--shadow-card);padding:22px;
 }
-@media (max-width: 480px){
+.modal-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;}
+.modal-title{font-size:20px;font-weight:800;}
+.modal-close{
+  width:36px;height:36px;border-radius:12px;background:var(--bg-input);border:1px solid var(--stroke);color:var(--text-muted);cursor:pointer;
+}
+
+.toast{position:fixed;left:50%;bottom:94px;transform:translate(-50%,100px);opacity:0;background:#0d1627;border:1px solid var(--stroke);border-radius:16px;padding:14px 18px;z-index:150;transition:.3s;box-shadow:var(--shadow-card);max-width:min(92vw,380px);}
+.toast.show{transform:translate(-50%,0);opacity:1;}
+.toast.success{border-color:rgba(74,222,128,.45);color:var(--success);}
+.toast.error{border-color:rgba(251,113,133,.45);color:var(--danger);}
+.loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(94,236,208,.2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media (min-width:600px){
+  .mobile-shell{
+    margin:18px auto;min-height:860px;max-height:860px;overflow:hidden;border-radius:40px;border:1px solid var(--stroke);
+    box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);
+  }
+  .main-content{overflow-y:auto;}
+}
+@media (max-width:560px){
+  .topbar{padding:12px 14px 10px;}
+  .main-content{padding:14px 14px 102px;}
+  .page-title{font-size:21px;}
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .stat-value{font-size:22px;}
+  .card,.auth-card{border-radius:24px;}
+  .card-header{padding:14px 16px 12px;}
+  .card > :not(.card-header){padding-inline:16px;}
+  .search-bar,.row,.ctrl-grid,.employee-toolbar,.service-card-actions,.report-actions,.admin-employee-actions,.table-actions,.quick-location-add{flex-direction:column;}
+  .search-bar > *, .row > *, .ctrl-grid > *, .employee-toolbar > *, .service-card-actions > *, .report-actions > *, .admin-employee-actions > *, .table-actions > *, .quick-location-add > *{width:100%;}
+  .btn,.btn-sm{width:100%;}
+  .service-card{min-width:86%;}
+  table{min-width:980px;}
+}
+@media (max-width:390px){
   .stats-grid{grid-template-columns:1fr;}
-  .brand{font-size:26px;}
-  .topbar-brand{font-size:18px;}
+  .topbar-main{flex-direction:column;align-items:stretch;}
+  .topbar-right{justify-content:space-between;}
+  .nav-tab{font-size:9px;padding-inline:4px;}
 }
+
+/* === SMALL PREVIEW DESIGN OVERRIDES === */
+:root{
+  --r-xl:28px;
+  --r-lg:20px;
+  --r-md:14px;
+  --r-sm:10px;
+  --r-pill:999px;
+  --blur-light:blur(12px);
+}
+.main-content{gap:18px;padding:16px 16px 110px;}
+#page-service{flex-direction:column;gap:16px;}
+.page.active#page-service{display:flex;}
+.hero-note{display:none !important;}
+.card,.card:hover{border-color:var(--stroke);}
+.glass-card{background:var(--bg-card);backdrop-filter:var(--blur-card);-webkit-backdrop-filter:var(--blur-card);border:1px solid var(--stroke);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-card);transition:border-color .2s;}
+.glass-card:hover{border-color:rgba(255,255,255,.15);}
+.card-hd{padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--stroke);}
+.card-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);}
+.card-title::before{display:none !important;}
+.card-icon{width:30px;height:30px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.ci-teal{background:var(--teal-dim);color:var(--teal);}
+.ci-blue{background:var(--blue-dim);color:var(--blue);}
+.ci-gold{background:var(--gold-dim);color:var(--gold);}
+.card-body{padding:16px 18px;}
+.btn-sec{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 10px;border-radius:12px;border:1px solid var(--stroke);background:var(--bg-card);backdrop-filter:var(--blur-light);color:var(--text-muted);cursor:pointer;font-size:11px;font-weight:700;transition:.2s;}
+.btn-sec:hover{border-color:var(--stroke-accent);color:var(--teal);}
+.btn-sec-teal{background:var(--teal-dim);border-color:var(--stroke-accent);color:var(--teal);}
+.search-wrap{position:relative;}
+.search-input{width:100%;background:var(--bg-input);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:13px 46px 13px 44px;font-size:14px;font-family:'DM Mono',monospace;color:var(--text);outline:none;transition:.2s;letter-spacing:.05em;}
+.search-input::placeholder{color:var(--text-faint);font-family:'Inter',sans-serif;letter-spacing:0;}
+.search-input:focus{border-color:var(--teal);background:rgba(94,236,208,.06);box-shadow:0 0 0 3px rgba(94,236,208,.1);}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;}
+.search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;background:var(--stroke);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--text-muted);transition:.2s;}
+.search-clear:hover{background:var(--danger-dim);color:var(--danger);}
+.search-card-main .card-body{padding-bottom:18px;}
+.greeting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.greeting-text{font-size:12px;color:var(--text-muted);}
+.greeting-text strong{display:block;font-size:18px;font-weight:700;color:var(--text);margin-top:2px;}
+#service-date-badge{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding:7px 12px;min-width:92px;}
+#service-date-badge strong{font-size:11px;font-weight:700;color:var(--gold);line-height:1.2;}
+#service-date-badge span{display:block;font-size:9px;font-weight:400;color:rgba(248,210,110,.6);letter-spacing:.08em;text-transform:uppercase;}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stat-pill{background:var(--bg-card);backdrop-filter:var(--blur-card);-webkit-backdrop-filter:var(--blur-card);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:14px 10px;text-align:center;transition:.2s;}
+.stat-pill:hover{border-color:var(--stroke-accent);background:var(--bg-card-hover);}
+.stat-pill .sv{font-size:26px;font-weight:800;line-height:1;margin-bottom:4px;}
+.stat-pill .sl{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+.sv-teal{color:var(--teal);} .sv-gold{color:var(--gold);} .sv-danger{color:var(--danger);}
+.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);margin-bottom:10px;padding-left:2px;}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.qa-btn{background:var(--bg-card);border:1px solid var(--stroke);border-radius:var(--r-lg);padding:14px 12px;text-align:left;cursor:pointer;transition:.2s;backdrop-filter:var(--blur-light);}
+.qa-btn:hover{border-color:var(--stroke-accent);background:var(--bg-card-hover);transform:translateY(-2px);}
+.qa-btn-icon{width:34px;height:34px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:8px;}
+.qa-btn-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.qa-btn-sub{font-size:10px;color:var(--text-muted);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-label{display:block;font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.service-sub-label{margin-bottom:6px;}
+.field-input{background:var(--bg-input);border:1px solid var(--stroke);border-radius:var(--r-md);padding:11px 13px;font-size:13px;color:var(--text);outline:none;font-family:'Inter',sans-serif;transition:.2s;}
+.field-input:focus{border-color:var(--teal);background:rgba(94,236,208,.06);box-shadow:0 0 0 3px rgba(94,236,208,.08);}
+.field-input::placeholder{color:var(--text-faint);} textarea.field-input{resize:none;min-height:70px;line-height:1.5;} .field-input-full{margin-bottom:12px;}
+.toggle-group{display:flex;background:rgba(0,0,0,.2);border:1px solid var(--stroke);border-radius:var(--r-md);padding:3px;gap:3px;margin-bottom:12px;}
+.toggle-btn{flex:1;padding:9px;border:none;background:transparent;border-radius:calc(var(--r-md) - 4px);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:.2s;text-align:center;}
+.toggle-btn.active-teal,.tyre-type-btn.active-new{background:var(--teal-dim);color:var(--teal);box-shadow:0 0 0 1px rgba(94,236,208,.3);}
+.toggle-btn.active-muted,.tyre-type-btn.active-old{background:rgba(122,155,194,.12);color:var(--text-muted);box-shadow:0 0 0 1px rgba(122,155,194,.3);}
+.repair-group{display:flex;gap:8px;margin-bottom:12px;}
+.repair-opt{flex:1;padding:9px 8px;border:1.5px solid var(--stroke);background:transparent;border-radius:var(--r-md);font-size:11px;font-weight:600;color:var(--text-muted);cursor:pointer;text-align:center;transition:.2s;}
+.repair-opt.active,.repair-btn.active{background:var(--blue-dim);border-color:rgba(96,165,250,.5);color:var(--blue);} .repair-none{opacity:.7;font-weight:500;}
+.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.pos-btn{background:transparent;border:1.5px solid var(--stroke);color:var(--text-muted);padding:10px 8px;border-radius:var(--r-md);cursor:pointer;font-weight:600;font-size:11px;text-align:center;transition:.2s;}
+.pos-btn.active{background:var(--gold-dim);border-color:rgba(248,210,110,.5);color:var(--gold);}
+.photo-area{border:1.5px dashed var(--stroke);border-radius:var(--r-md);padding:18px 14px;text-align:center;background:rgba(255,255,255,.02);cursor:pointer;transition:.2s;margin-bottom:16px;min-height:116px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;overflow:hidden;}
+.photo-area:hover{border-color:var(--stroke-accent);background:rgba(94,236,208,.03);} .photo-area i{font-size:22px;color:var(--text-muted);display:block;} .photo-area p{font-size:12px;color:var(--text-muted);} .photo-area.has-photo{padding:0;border-style:solid;} .photo-preview{display:none;width:100%;height:100%;object-fit:cover;min-height:116px;}
+.btn-cta{width:100%;border:none;border-radius:18px;padding:14px 16px;background:linear-gradient(135deg,var(--teal),#3dd4b8 50%,var(--blue));color:#04111d;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:var(--shadow-btn);transition:.2s;}
+.btn-cta:hover{transform:translateY(-1px);} .btn-cta:active{transform:translateY(0);}
+#sale-results{margin-top:14px;} #sale-results .sec-label,#search-hub-results .sec-label{margin-bottom:10px;}
+.tyre-result{background:rgba(94,236,208,.05);border:1px solid var(--stroke-accent);border-radius:var(--r-lg);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:.2s;margin-bottom:10px;}
+.tyre-result:hover{background:rgba(94,236,208,.1);transform:translateY(-1px);box-shadow:var(--shadow-glow);} .tyre-info{min-width:0;} .tyre-size{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--teal);letter-spacing:.04em;margin-bottom:4px;} .tyre-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;} .tyre-brand{font-size:11px;color:var(--text-muted);font-weight:500;} .stock-badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:var(--r-pill);display:inline-flex;align-items:center;gap:5px;} .stock-ok{background:var(--success-dim);color:var(--success);} .stock-low{background:var(--gold-dim);color:var(--gold);} .stock-out{background:var(--danger-dim);color:var(--danger);} .tyre-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;} .tyre-price{font-size:12px;font-weight:700;color:var(--text);} .tyre-price span{font-size:11px;font-weight:400;color:var(--text-muted);} .tyre-select-btn{background:linear-gradient(135deg,var(--teal),#38b8a0);border:none;border-radius:var(--r-sm);padding:7px 14px;font-size:11px;font-weight:700;color:var(--bg-base);cursor:pointer;transition:.2s;box-shadow:var(--shadow-btn);} .tyre-select-btn:hover{opacity:.92;transform:scale(1.03);} .stock-out + .tyre-select-btn{opacity:.7;}
+.section-head-inline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+.scroll-hint{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-faint);padding:0 2px 6px;}
+.scroll-hint i{font-size:12px;}
+.services-scroll{display:flex;gap:12px;overflow-x:auto;padding-top:0;padding-bottom:6px;scrollbar-width:none;} .services-scroll::-webkit-scrollbar{display:none;}
+.svc-card{min-width:270px;max-width:270px;background:var(--bg-card);border:1px solid var(--stroke);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-card);} .svc-card-hd{background:var(--teal-dim);padding:11px 13px;border-bottom:1px solid var(--stroke);display:flex;justify-content:space-between;align-items:center;gap:8px;} .svc-card-size{font-family:'DM Mono',monospace;font-size:14px;color:var(--teal);font-weight:600;} .time-chip{font-size:10px;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.25);border:1px solid var(--stroke);color:var(--text-muted);} .svc-photo-btn{position:relative;display:block;width:100%;padding:0;border:none;background:#09101c;cursor:pointer;} .svc-photo{display:block;width:100%;height:190px;object-fit:cover;background:#09101c;} .svc-photo-zoom{position:absolute;inset-inline-end:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(5,12,24,.76);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:10px;font-weight:700;backdrop-filter:blur(10px);} .svc-photo-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;height:160px;background:rgba(255,255,255,.03);color:var(--text-muted);font-size:11px;padding:16px;text-align:center;} .svc-card-body{padding:12px 13px;} .svc-card-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:7px;} .svc-card-row .label{color:var(--text-muted);} .svc-card-row .val{color:var(--text);font-weight:600;text-align:end;} .svc-card-note{padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.45;} .svc-card-note strong{color:var(--text);} .svc-card-plate{display:inline-block;background:rgba(0,0,0,.3);border:1px solid var(--stroke);border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;padding:2px 6px;color:var(--gold);margin-top:4px;} .svc-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;} .image-lightbox{z-index:220;padding:18px;background:rgba(0,0,0,.88);} .image-lightbox-inner{position:relative;width:min(100%,430px);margin:auto;} .image-lightbox-img{display:block;width:100%;max-height:82vh;object-fit:contain;border-radius:18px;background:#000;} .image-lightbox-close{position:absolute;top:10px;inset-inline-end:10px;background:rgba(5,12,24,.75);backdrop-filter:blur(10px);}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(5,12,24,.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--stroke);display:flex;align-items:stretch;z-index:70;padding-bottom:env(safe-area-inset-bottom,0px);} .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;transition:.2s;border:none;background:transparent;position:relative;gap:3px;} .nav-item i{font-size:18px;color:var(--text-faint);transition:.2s;} .nav-item span{font-size:9px;font-weight:500;color:var(--text-faint);transition:.2s;letter-spacing:.03em;} .nav-item.active i{color:var(--teal);} .nav-item.active span{color:var(--teal);font-weight:700;} .nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:2px;background:var(--teal);border-radius:0 0 var(--r-pill) var(--r-pill);} .nav-item.nav-center{position:relative;margin-top:-16px;} .nav-center-orb{width:52px;height:52px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(94,236,208,.35),0 0 0 4px rgba(5,12,24,.9),0 0 0 5px var(--stroke);transition:.2s;} .nav-center-orb i{font-size:20px;color:var(--bg-base) !important;} .nav-item.nav-center span{margin-top:4px;color:var(--text);} .nav-tabs{display:none !important;}
+.search-hub-sheet{max-width:420px;width:calc(100% - 24px);border-radius:24px;padding:0;overflow:hidden;} .search-hub-body{padding:16px 18px 18px;max-height:70vh;overflow:auto;} .search-hub-results{margin-top:14px;}
+.scroll-top-btn{position:fixed;right:18px;bottom:104px;width:42px;height:42px;border:none;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));color:#04111d;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-btn);cursor:pointer;z-index:85;opacity:0;pointer-events:none;transform:translateY(14px);transition:.25s;} .scroll-top-btn.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+@media (max-width:480px){.form-row,.quick-actions,.pos-grid{grid-template-columns:1fr 1fr;}.repair-group{display:grid;grid-template-columns:1fr;}.svc-card{min-width:88%;max-width:88%;}.svc-photo{height:200px;}}
+
 </style>
 </head>
 <body>
-
-<div id="auth-screen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;">
-  <div class="auth-card">
-    <div class="brand">Quality Part X</div>
-    <div class="auth-location">Dunstable</div>
-    <div class="auth-division">Tyre Services Department</div>
-    <div class="auth-divider"></div>
-    <div class="auth-title">Sign In to Continue</div>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="login-user" placeholder="Enter username" autocomplete="off" autocapitalize="off" spellcheck="false">
+<div id="auth-screen">
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="brand">Quality Part X</div>
+      <div class="auth-location">Dunstable</div>
+      <div class="auth-division">Tyre Services Department</div>
+      <div class="auth-divider"></div>
+      <div class="auth-title">Sign In to Continue</div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="Enter username" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="login()">Sign In</button>
+      <p id="login-error" style="color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none;"></p>
     </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" id="login-pass" placeholder="Enter password" autocomplete="off" autocapitalize="off" spellcheck="false">
-    </div>
-    <button class="btn btn-primary btn-block" onclick="login()">Sign In</button>
-    <p id="login-error" style="color:var(--danger);font-size:12px;text-align:center;margin-top:12px;display:none;"></p>
   </div>
 </div>
 
-<div id="app-screen">
-  <div class="topbar">
-    <div><div class="topbar-brand">Quality Part X</div><div class="topbar-sub">TYRE SERVICES · DUNSTABLE</div></div>
-    <div class="topbar-right"><span class="operator-badge" id="operator-name"></span><div class="lang-switch"><button class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">English</button><button class="lang-btn" id="lang-btn-ar" onclick="setLanguage('ar')">العربية</button></div><button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()">Logout</button></div>
-  </div>
-
-  <div class="nav-tabs">
-    <button class="nav-tab active" data-page="service" id="nav-service" onclick="showPage('service')">🔧 Services</button>
-    <button class="nav-tab" data-page="dashboard" id="nav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="nav-tab" data-page="inventory" id="nav-inventory" onclick="showPage('inventory')">📦 Inventory</button>
-    <button class="nav-tab" data-page="report" id="nav-report" onclick="showPage('report')">📋 Reports</button>
-  </div>
-
-  <div class="main-content">
-
-    <!-- SERVICES PAGE -->
-    <div class="page active" id="page-service">
-      <div class="card">
-        <div class="card-header"><div><div class="card-title">🔍 Search Tyre</div></div></div>
-        <div class="search-bar">
-          <div class="form-group"><input type="text" id="sale-search" inputmode="numeric" maxlength="9" placeholder="Search size (e.g. 215/55/17)..." oninput="formatTyreSizeField(this); searchTyre()"></div>
-          <button class="btn btn-ghost btn-sm" onclick="clearSvc()">✕ Clear</button>
+<div id="app-screen" style="display:none;">
+  <div class="mobile-shell">
+    <div class="topbar">
+      <div class="topbar-main">
+        <div>
+          <div class="topbar-brand">Quality Part X</div>
+          <div class="topbar-sub">Tyre Services · Dunstable</div>
         </div>
-        <div id="sale-results"></div>
-      </div>
-
-      <div class="card" id="service-form" style="display:none;">
-        <div class="card-header"><div><div class="card-title" id="svc-title">Service Details</div></div><button class="btn btn-ghost btn-sm" onclick="clearSvc()">✕ Clear</button></div>
-        <div class="row">
-          <div class="form-group"><label>Plate Number</label><input type="text" id="svc-plate" placeholder="e.g. AB12 CDE"></div>
-          <div class="form-group"><label>Quantity</label><input type="number" id="svc-qty" value="1" min="1" max="4"></div>
+        <div class="topbar-right">
+          <span class="operator-badge" id="operator-name"></span>
+          <div class="lang-switch">
+            <button class="lang-btn active" id="lang-btn-en" onclick="setLanguage('en')">English</button>
+            <button class="lang-btn" id="lang-btn-ar" onclick="setLanguage('ar')">العربية</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="logout-btn" onclick="logout()">Logout</button>
         </div>
-        <div class="form-group"><label>Tyre Condition</label><div class="tyre-type-btns"><button class="tyre-type-btn" data-type="new" onclick="selectTyreType('new')">✨ New</button><button class="tyre-type-btn" data-type="old" onclick="selectTyreType('old')">🔄 Used</button></div></div>
-        <div class="form-group"><label>Notes During Issue / Sale</label><textarea id="svc-notes" placeholder="Write the note that should appear in the invoice and reports..."></textarea></div>
-        <div class="form-group"><label>Repair (optional)</label><div class="repair-btns"><button class="repair-btn" data-repair="Standard Patch" onclick="selectRepair('Standard Patch')">🔧 Standard Patch</button><button class="repair-btn" data-repair="Internal Patch" onclick="selectRepair('Internal Patch')">🔧 Internal Patch</button></div></div>
-        <div class="form-group"><label>Car Photo</label><div class="photo-area" id="photo-area" onclick="document.getElementById('car-photo-input').click()"><img id="photo-preview" class="photo-preview"><div id="photo-placeholder">📷 Tap to capture</div></div><input type="file" id="car-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(this)"></div>
-        <div style="font-size:12px;color:var(--muted);margin-top:-8px;">Photo is saved on this device for 24 hours, then removed automatically.</div>
-        <button class="btn btn-primary btn-block" onclick="submitService(event)">✅ Complete Service & Deduct Stock</button>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-value" id="svc-stat-today">–</div><div class="stat-label">Today's Services</div></div>
-        <div class="stat-card"><div class="stat-value" id="svc-stat-stock">–</div><div class="stat-label">Total Stock</div></div>
-        <div class="stat-card"><div class="stat-value" id="svc-stat-out">–</div><div class="stat-label">Out of Stock</div></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header"><div><div class="card-title">Today's Services</div></div><button class="btn btn-ghost btn-sm" onclick="loadTodayCards()">🔄</button></div>
-        <div class="services-scroll" id="today-cards"><div class="empty-state"><span class="loading"></span></div></div>
       </div>
     </div>
 
-    <!-- DASHBOARD PAGE -->
-    <div class="page" id="page-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-value" id="stat-total">–</div><div class="stat-label">Total Tyres</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-low">–</div><div class="stat-label">Low Stock</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-today">–</div><div class="stat-label">Today's Services</div></div>
-        <div class="stat-card"><div class="stat-value" id="stat-sizes">–</div><div class="stat-label">Tyre Sizes</div></div>
-      </div>
-      <div class="card"><div class="card-header"><div><div class="card-title">⚡ Control Panel</div></div></div><div class="ctrl-grid"><button class="btn btn-info btn-sm" onclick="printDailyReport()">🖨️ Print Daily Report</button><button class="btn btn-info btn-sm" onclick="printInventoryStock()">📦 Print Full Stock Report</button><div class="admin-employee-actions" id="admin-employee-actions" style="display:none;"><button class="btn btn-success btn-sm" id="add-employee-btn" onclick="showAddEmployee()">👤 Add Employee</button><button class="btn btn-ghost btn-sm" id="view-employees-btn" onclick="toggleEmployeeList()">View Employees</button></div></div></div>
-      <div class="card" id="employee-card" style="display:none;">
-        <div class="card-header">
-          <div><div class="card-title">👥 Employees</div></div>
-          <div class="employee-toolbar"><button class="btn btn-ghost btn-sm" onclick="loadEmployees()">🔄 Refresh</button><button class="btn btn-ghost btn-sm" onclick="toggleEmployeeList(false)">✕ Hide</button></div>
+    <div class="main-content">
+            <div class="page active" id="page-service">
+        <div class="glass-card search-card-main">
+          <div class="card-hd">
+            <div class="card-title">
+              <div class="card-icon ci-teal"><i class="fas fa-search"></i></div>
+              <span id="service-search-title">Search Tyre</span>
+            </div>
+            <button class="btn-sec" onclick="clearSvc()"><span id="service-clear-btn">✕ Clear</span></button>
+          </div>
+          <div class="card-body">
+            <div class="search-wrap search-wrap-main">
+              <i class="fas fa-tire search-icon"></i>
+              <input type="text" id="sale-search" class="search-input mono-input" inputmode="numeric" maxlength="9" placeholder="Type size e.g. 2155517…" data-i18n-placeholder="sale-search" oninput="formatTyreSizeField(this); searchTyre()">
+              <button class="search-clear" type="button" onclick="clearSvc()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="sale-results"></div>
+          </div>
         </div>
-        <div id="emp-list"><div class="empty-state"><span class="loading"></span></div></div>
+
+        <div class="greeting-row svc-shift-row">
+          <div class="greeting-text">
+            <span id="service-overview-label">Service overview</span>
+            <strong id="service-shift-label">Today's Shift</strong>
+          </div>
+          <div class="date-badge" id="service-date-badge">
+            <span id="service-date-year">2026</span>
+            <strong id="service-date-main">Mon 14 Apr</strong>
+          </div>
+        </div>
+
+        <div class="stat-strip service-stat-strip">
+          <div class="stat-pill">
+            <div class="sv sv-teal" id="svc-stat-today">–</div>
+            <div class="sl" id="svc-stat-today-label">Services Today</div>
+          </div>
+          <div class="stat-pill">
+            <div class="sv sv-gold" id="svc-stat-stock">–</div>
+            <div class="sl" id="svc-stat-stock-label">Total Stock</div>
+          </div>
+          <div class="stat-pill">
+            <div class="sv sv-danger" id="svc-stat-out">–</div>
+            <div class="sl" id="svc-stat-out-label">Out of Stock</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="sec-label" id="quick-actions-label">Quick Actions</div>
+          <div class="quick-actions">
+            <button class="qa-btn" onclick="openQuickRestockShortcut()">
+              <div class="qa-btn-icon" style="background:var(--teal-dim);color:var(--teal)">
+                <i class="fas fa-boxes-stacked"></i>
+              </div>
+              <div class="qa-btn-label" id="qa-restock-label">Quick Restock</div>
+              <div class="qa-btn-sub" id="qa-restock-sub">Receive new stock</div>
+            </button>
+            <button class="qa-btn" onclick="printDailyReport()">
+              <div class="qa-btn-icon" style="background:var(--blue-dim);color:var(--blue)">
+                <i class="fas fa-print"></i>
+              </div>
+              <div class="qa-btn-label" id="qa-print-label">Print Report</div>
+              <div class="qa-btn-sub" id="qa-print-sub">Daily summary</div>
+            </button>
+            <button class="qa-btn" onclick="printInventoryStock()">
+              <div class="qa-btn-icon" style="background:var(--gold-dim);color:var(--gold)">
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div class="qa-btn-label" id="qa-stock-label">Full Stock</div>
+              <div class="qa-btn-sub" id="qa-stock-sub">All warehouse sizes</div>
+            </button>
+            <button class="qa-btn" onclick="openEmployeeShortcut()">
+              <div class="qa-btn-icon" style="background:var(--success-dim);color:var(--success)">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="qa-btn-label" id="qa-employee-label">Add Employee</div>
+              <div class="qa-btn-sub" id="qa-employee-sub">Admin only</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card service-form-card" id="service-form" style="display:none;">
+          <div class="card-hd">
+            <div class="card-title">
+              <div class="card-icon ci-blue"><i class="fas fa-wrench"></i></div>
+              <span id="svc-title">Service Details</span>
+            </div>
+            <button class="btn-sec" onclick="clearSvc()">✕</button>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="field-group">
+                <div class="field-label" id="svc-plate-label">Plate Number</div>
+                <input class="field-input" type="text" id="svc-plate" placeholder="AB12 CDE" data-i18n-placeholder="svc-plate">
+              </div>
+              <div class="field-group">
+                <div class="field-label" id="svc-qty-label">Quantity</div>
+                <input class="field-input" type="number" id="svc-qty" value="1" min="1" max="4">
+              </div>
+            </div>
+
+            <div class="field-label service-sub-label" id="svc-condition-label">Tyre Condition</div>
+            <div class="toggle-group">
+              <button class="toggle-btn tyre-type-btn" data-type="new" onclick="selectTyreType('new')" id="svc-type-new">✨ New</button>
+              <button class="toggle-btn tyre-type-btn" data-type="old" onclick="selectTyreType('old')" id="svc-type-old">🔄 Used</button>
+            </div>
+
+            <div class="field-label service-sub-label" id="svc-repair-label">Repair (optional)</div>
+            <div class="repair-group">
+              <button class="repair-opt repair-none repair-btn" data-repair="" onclick="selectRepair('')" id="svc-repair-none">None</button>
+              <button class="repair-opt repair-btn" data-repair="Standard Patch" onclick="selectRepair('Standard Patch')" id="svc-repair-standard"><i class="fas fa-wrench" style="font-size:10px;margin-right:4px;"></i><span>Standard Patch</span></button>
+              <button class="repair-opt repair-btn" data-repair="Internal Patch" onclick="selectRepair('Internal Patch')" id="svc-repair-internal"><i class="fas fa-wrench" style="font-size:10px;margin-right:4px;"></i><span>Internal Patch</span></button>
+            </div>
+
+            <div class="field-label service-sub-label" id="svc-position-label">Tyre Position</div>
+            <div class="pos-grid">
+              <button class="pos-btn" data-pos="front_left" onclick="togglePos('front_left')" id="svc-pos-front-left">↖ Front Left</button>
+              <button class="pos-btn" data-pos="front_right" onclick="togglePos('front_right')" id="svc-pos-front-right">↗ Front Right</button>
+              <button class="pos-btn" data-pos="rear_left" onclick="togglePos('rear_left')" id="svc-pos-rear-left">↙ Rear Left</button>
+              <button class="pos-btn" data-pos="rear_right" onclick="togglePos('rear_right')" id="svc-pos-rear-right">↘ Rear Right</button>
+            </div>
+
+            <div class="field-label service-sub-label" id="svc-notes-label">Notes</div>
+            <div class="field-input-full">
+              <textarea class="field-input" style="width:100%;" id="svc-notes" placeholder="Write note for invoice & reports…" data-i18n-placeholder="svc-notes"></textarea>
+            </div>
+
+            <div class="field-label service-sub-label" id="svc-photo-label">Car Photo</div>
+            <div class="photo-area" id="photo-area" onclick="document.getElementById('car-photo-input').click()">
+              <img id="photo-preview" class="photo-preview">
+              <div id="photo-placeholder"><i class="fas fa-camera"></i><p id="svc-photo-placeholder">Tap to capture car photo</p></div>
+            </div>
+            <input type="file" id="car-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="handlePhoto(this)">
+
+            <button class="btn-cta" onclick="submitService(event)">
+              <i class="fas fa-check-circle"></i>
+              <span id="svc-complete-label">Complete Service & Deduct Stock</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-head-inline">
+            <div class="sec-label" style="margin-bottom:0" id="today-services-label">Today's Services</div>
+            <button class="btn-sec btn-sec-teal" onclick="loadTodayCards()"><i class="fas fa-sync-alt"></i><span id="today-services-refresh">Refresh</span></button>
+          </div>
+          <div class="scroll-hint" id="today-services-hint"><i class="fas fa-hand-point-right"></i><span>Scroll right to see more</span></div>
+          <div class="services-scroll" id="today-cards"><div class="empty-state"><span class="loading"></span></div></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-dashboard">
+        <div class="page-intro">
+          <div>
+            <div class="page-kicker">Dashboard</div>
+            <div class="page-title">Quick control and overview</div>
+          </div>
+          <div class="date-badge">Live<span>Overview</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Control Panel</div>
+              <div class="panel-subtitle">الأوامر السريعة تم نقلها لقسم مستقل حتى يبقى قسم الخدمة خفيف وواضح.</div>
+            </div>
+          </div>
+          <div class="ctrl-grid">
+            <button class="btn btn-info btn-sm" onclick="printDailyReport()">🖨️ Print Daily Report</button>
+            <button class="btn btn-info btn-sm" onclick="printInventoryStock()">📦 Print Full Stock Report</button>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('inventory')">📥 Open Inventory</button>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('report')">📋 Open Reports</button>
+            <div class="admin-employee-actions" id="admin-employee-actions" style="display:none;">
+              <button class="btn btn-success btn-sm" id="add-employee-btn" onclick="showAddEmployee()">👤 Add Employee</button>
+              <button class="btn btn-ghost btn-sm" id="view-employees-btn" onclick="toggleEmployeeList()">View Employees</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Key Indicator</div>
+              <div class="panel-subtitle">عدد المقاسات المختلفة في النظام.</div>
+            </div>
+          </div>
+          <div style="padding:0 18px 18px;">
+            <div class="stat-card" style="padding:18px;">
+              <div class="stat-value" id="stat-sizes">–</div>
+              <div class="stat-label">Tyre Sizes</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="employee-card" style="display:none;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Employees</div>
+              <div class="panel-subtitle">إدارة الموظفين في قسم مستقل ومنظم.</div>
+            </div>
+            <div class="employee-toolbar"><button class="btn btn-ghost btn-sm" onclick="loadEmployees()">🔄 Refresh</button><button class="btn btn-ghost btn-sm" onclick="toggleEmployeeList(false)">✕ Hide</button></div>
+          </div>
+          <div id="emp-list"><div class="empty-state"><span class="loading"></span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Overview Totals</div>
+              <div class="panel-subtitle">تم نقل مربعات الكميات إلى أسفل القسم حتى يظهر قسم الإعدادات بشكل مستقل أولاً.</div>
+            </div>
+          </div>
+          <div style="padding:0 18px 18px;">
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-value" id="stat-total">–</div><div class="stat-label">Total Tyres</div></div>
+              <div class="stat-card"><div class="stat-value" id="stat-low">–</div><div class="stat-label">Low Stock</div></div>
+              <div class="stat-card"><div class="stat-value" id="stat-today">–</div><div class="stat-label">Today's Services</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="page-inventory">
+        <div class="page-intro">
+          <div>
+            <div class="page-kicker">Inventory</div>
+            <div class="page-title">Organized stock management</div>
+          </div>
+          <div class="date-badge">Stock<span>Warehouse</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title" id="inventory-title">Inventory Management</div>
+              <div class="panel-subtitle">كل أدوات المخزون أصبحت في مكان واحد بشكل أوضح وأسهل على شاشة الهاتف.</div>
+            </div>
+            <div class="ctrl-grid">
+              <button class="btn btn-success btn-sm" id="restock-toggle-btn" onclick="toggleRestockMode()">📥 Quick Restock / Receive Stock</button>
+              <button class="btn btn-primary btn-sm" id="inventory-add-btn" onclick="openAddModal()">+ Add Tyre</button>
+              <button class="btn btn-info btn-sm" id="inventory-print-btn" onclick="openInventoryPrintModal()">🖨 Inventory Print Options</button>
+              <button class="btn btn-ghost btn-sm" id="inventory-print-available-btn" onclick="printInventoryStock({ stockFilter: 'available' })">✅ Print Available Only</button>
+              <button class="btn btn-ghost btn-sm" id="inventory-print-out-btn" onclick="printInventoryStock({ stockFilter: 'out' })">❌ Print Out of Stock</button>
+            </div>
+          </div>
+          <div class="search-bar"><div class="form-group"><input type="text" id="inv-search" placeholder="Search size or warehouse..." oninput="formatInventorySearch(this)"></div><button class="btn btn-ghost btn-sm" onclick="loadInventory()">🔄 Refresh</button></div>
+          <div class="card" id="quick-restock-panel" style="display:none;margin:0 18px 18px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title" id="quick-restock-title">Quick Restock Mode</div>
+                <div class="panel-subtitle" id="quick-restock-subtitle">Choose a warehouse once, search by size, then use + and - quickly.</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="quick-restock-close-btn" onclick="toggleRestockMode(false)">✕ Close</button>
+            </div>
+            <div class="quick-restock-grid">
+              <div class="form-group"><label id="quick-location-label">Warehouse / Location</label><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div>
+              <div class="form-group"><label id="quick-location-add-label">Add Warehouse / Location</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="Example: Warehouse 1"><button class="btn btn-primary btn-sm" id="quick-location-save-btn" onclick="saveQuickLocation()">Save</button></div></div>
+            </div>
+            <div class="quick-restock-last" id="quick-location-last">Last selected warehouse: -</div>
+            <div class="search-bar" style="padding-top:0;"><div class="form-group"><input type="text" id="quick-restock-search" class="mono-input" inputmode="numeric" maxlength="9" placeholder="Search by size without / e.g. 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" id="quick-restock-focus-btn" onclick="focusQuickRestock()">🔎 Focus</button></div>
+            <div id="quick-restock-results"><div class="empty-state">Choose a warehouse, then search for a tyre size.</div></div>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th id="inv-head-size">Size</th><th id="inv-head-qty">Qty</th><th id="inv-head-location">Warehouse</th><th id="inv-head-plus">+1</th><th id="inv-head-notes">Notes</th><th id="inv-head-actions">Actions</th></tr></thead><tbody id="inv-table"><tr><td colspan="6"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="page-report">
+        <div class="page-intro">
+          <div>
+            <div class="page-kicker">Reports</div>
+            <div class="page-title">Service and stock reports</div>
+          </div>
+          <div class="date-badge">Print<span>Summary</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Service Reports</div>
+              <div class="panel-subtitle">التقارير اليومية والفترة الزمنية في بطاقة مستقلة وواضحة.</div>
+            </div>
+            <div class="report-actions"><button class="btn btn-info btn-sm" onclick="loadReport()">🔄 Load</button><button class="btn btn-primary btn-sm" onclick="printReport()">🖨 Print</button></div>
+          </div>
+          <div class="row"><div class="form-group"><label>From Date</label><input type="date" id="rep-from"></div><div class="form-group"><label>To Date</label><input type="date" id="rep-to"></div><button class="btn btn-ghost btn-sm" onclick="loadReport()">Filter</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Note</th><th>Repair</th><th>Operator</th><th>Actions</th></tr></thead><tbody id="rep-table"><tr><td colspan="8"><div class="empty-state">Select date range and click Load</div></td></tr></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Full Stock Report (All Locations)</div><div class="panel-subtitle">ملخص كامل للمخزون في جميع المواقع.</div></div><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Full Stock</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Size</th><th>Location</th><th>Quantity</th><th>Status</th><th>Notes</th></tr></thead><tbody id="stock-rep-table"><tr><td colspan="5"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
+        </div>
       </div>
     </div>
 
-    <!-- INVENTORY PAGE -->
-    <div class="page" id="page-inventory">
-      <div class="card"><div class="card-header"><div><div class="card-title" id="inventory-title">Inventory Management</div></div><div class="ctrl-grid"><button class="btn btn-success btn-sm" id="restock-toggle-btn" onclick="toggleRestockMode()">📥 Quick Restock / Receive Stock</button><button class="btn btn-primary btn-sm" id="inventory-add-btn" onclick="openAddModal()">+ Add Tyre</button><button class="btn btn-info btn-sm" id="inventory-print-btn" onclick="openInventoryPrintModal()">🖨 Inventory Print Options</button><button class="btn btn-ghost btn-sm" id="inventory-print-available-btn" onclick="printInventoryStock({ stockFilter: 'available' })">✅ Print Available Only</button><button class="btn btn-ghost btn-sm" id="inventory-print-out-btn" onclick="printInventoryStock({ stockFilter: 'out' })">❌ Print Out of Stock</button></div></div>
-        <div class="search-bar"><div class="form-group"><input type="text" id="inv-search" placeholder="Search size or warehouse..." oninput="formatInventorySearch(this)"></div><button class="btn btn-ghost btn-sm" onclick="loadInventory()">🔄</button></div>
-        <div class="card" id="quick-restock-panel" style="display:none;"><div class="card-header"><div><div class="card-title" id="quick-restock-title">Quick Restock Mode</div><div class="panel-subtitle" id="quick-restock-subtitle">Choose a warehouse once, search by size, then use + and - quickly.</div></div><button class="btn btn-ghost btn-sm" id="quick-restock-close-btn" onclick="toggleRestockMode(false)">✕ Close</button></div><div class="quick-restock-grid"><div class="form-group"><label id="quick-location-label">Warehouse / Location</label><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div><div class="form-group"><label id="quick-location-add-label">Add Warehouse / Location</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="Example: Warehouse 1"><button class="btn btn-primary btn-sm" id="quick-location-save-btn" onclick="saveQuickLocation()">Save</button></div></div></div><div class="quick-restock-last" id="quick-location-last">Last selected warehouse: -</div><div class="search-bar" style="margin-bottom:12px;"><div class="form-group"><input type="text" id="quick-restock-search" inputmode="numeric" maxlength="9" placeholder="Search by size without / e.g. 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" id="quick-restock-focus-btn" onclick="focusQuickRestock()">🔎 Focus</button></div><div id="quick-restock-results"><div class="empty-state">Choose a warehouse, then search for a tyre size.</div></div></div>
-        <div class="table-wrap"><table><thead><tr><th id="inv-head-size">Size</th><th id="inv-head-qty">Qty</th><th id="inv-head-location">Warehouse</th><th id="inv-head-plus">+1</th><th id="inv-head-notes">Notes</th><th id="inv-head-actions">Actions</th></tr></thead><tbody id="inv-table"><tr><td colspan="6"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
-      </div>
-    </div>
-
-    <!-- REPORTS PAGE -->
-    <div class="page" id="page-report">
-      <div class="card"><div class="card-header"><div><div class="card-title">Service Reports</div></div><div><button class="btn btn-info btn-sm" onclick="loadReport()">🔄 Load</button><button class="btn btn-primary btn-sm" onclick="printReport()">🖨 Print</button></div></div>
-        <div class="row"><div class="form-group"><label>From Date</label><input type="date" id="rep-from"></div><div class="form-group"><label>To Date</label><input type="date" id="rep-to"></div><button class="btn btn-ghost btn-sm" onclick="loadReport()">Filter</button></div>
-        <div class="table-wrap"><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Note</th><th>Repair</th><th>Operator</th><th>Actions</th></tr></thead><tbody id="rep-table"><tr><td colspan="8"><div class="empty-state">Select date range and click Load</div></td></tr></tbody></table></div>
-      </div>
-      <div class="card"><div class="card-header"><div><div class="card-title">Full Stock Report (All Locations)</div></div><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Full Stock</button></div>
-        <div class="table-wrap"><table><thead><tr><th>Size</th><th>Location</th><th>Quantity</th><th>Status</th><th>Notes</th></tr></thead><tbody id="stock-rep-table"><tr><td colspan="5"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
-      </div>
-    </div>
-
+        <nav class="bottom-nav">
+      <button class="nav-item active" data-page="service" id="nav-service" onclick="showPage('service')">
+        <i class="fas fa-wrench"></i>
+        <span id="nav-service-label">Services</span>
+      </button>
+      <button class="nav-item" data-page="dashboard" id="nav-dashboard" onclick="showPage('dashboard')">
+        <i class="fas fa-chart-pie"></i>
+        <span id="nav-dashboard-label">Dashboard</span>
+      </button>
+      <button class="nav-item nav-center" id="nav-search-center" onclick="openSearchHub()">
+        <div class="nav-center-orb">
+          <i class="fas fa-search"></i>
+        </div>
+        <span id="nav-search-label">Search</span>
+      </button>
+      <button class="nav-item" data-page="inventory" id="nav-inventory" onclick="showPage('inventory')">
+        <i class="fas fa-boxes"></i>
+        <span id="nav-inventory-label">Inventory</span>
+      </button>
+      <button class="nav-item" data-page="report" id="nav-report" onclick="showPage('report')">
+        <i class="fas fa-file-alt"></i>
+        <span id="nav-report-label">Reports</span>
+      </button>
+    </nav>
   </div>
 </div>
 
-<!-- MODALS -->
-<div class="modal-overlay" id="inv-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inv-modal-title">Add Tyre</div><button class="modal-close" onclick="closeModal('inv-modal')">✕</button></div><div class="form-group"><input type="text" id="m-size" inputmode="numeric" maxlength="9" placeholder="Size (e.g. 215/55/17)" oninput="formatTyreSizeField(this)"></div><div class="form-group"><input type="text" id="m-location" placeholder="Storage Location (e.g. Shelf A3)"></div><div class="form-group"><input type="number" id="m-qty" value="1" placeholder="Quantity"></div><div class="form-group"><textarea id="m-notes" placeholder="Notes"></textarea></div><input type="hidden" id="m-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inv-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" onclick="saveInv()">Save</button></div></div></div>
+<div class="modal-overlay" id="inv-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inv-modal-title">Add Tyre</div><button class="modal-close" onclick="closeModal('inv-modal')">✕</button></div><div class="form-group"><input type="text" id="m-size" class="mono-input" inputmode="numeric" maxlength="9" placeholder="Size (e.g. 215/55/17)" oninput="formatTyreSizeField(this)"></div><div class="form-group"><input type="text" id="m-location" placeholder="Storage Location (e.g. Shelf A3)"></div><div class="form-group"><input type="number" id="m-qty" value="1" placeholder="Quantity"></div><div class="form-group"><textarea id="m-notes" placeholder="Notes"></textarea></div><input type="hidden" id="m-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inv-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" onclick="saveInv()">Save</button></div></div></div>
 
 <div class="modal-overlay" id="restock-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Add Stock</div><button class="modal-close" onclick="closeModal('restock-modal')">✕</button></div><div id="restock-info"></div><div class="form-group"><input type="number" id="restock-qty" value="1" min="1"></div><input type="hidden" id="restock-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('restock-modal')">Cancel</button><button class="btn btn-success" style="flex:2" onclick="confirmRestock()">Add Stock</button></div></div></div>
 
 <div class="modal-overlay" id="emp-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Add Employee</div><button class="modal-close" onclick="closeModal('emp-modal')">✕</button></div><div class="form-group"><label>Worker Name</label><input type="text" id="emp-username" placeholder="Enter worker name"></div><div class="form-group"><label>Access Code</label><input type="password" id="emp-password" placeholder="Enter code / password"></div><div class="form-group"><label>Role</label><select id="emp-role"><option value="worker">Worker</option><option value="admin">Admin</option></select></div><input type="hidden" id="emp-edit-id"><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('emp-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" onclick="saveEmployee()">Save</button></div></div></div>
 
 <div class="modal-overlay" id="inventory-print-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inventory-print-modal-title">Inventory Print Options</div><button class="modal-close" onclick="closeModal('inventory-print-modal')">✕</button></div><div class="print-option-grid"><div class="form-group"><label id="print-mode-label">Report Type</label><select id="print-mode"><option value="stock">Stock Report</option><option value="usage">Usage Report</option></select></div><div class="form-group"><label id="print-stock-filter-label">Stock Filter</label><select id="print-stock-filter"><option value="all">All Stock</option><option value="available">Available Only</option><option value="out">Out of Stock Only</option></select></div><div class="form-group"><label id="print-usage-mode-label">Usage Focus</label><select id="print-usage-mode"><option value="most">Most Used</option><option value="least">Least Used</option></select></div><div class="form-group"><label id="print-sort-direction-label">Sort Direction</label><select id="print-sort-direction"><option value="desc">Descending</option><option value="asc">Ascending</option></select></div></div><div class="print-summary" id="inventory-print-summary">Choose how you want the inventory report to be printed.</div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inventory-print-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" id="inventory-print-run-btn" onclick="applyInventoryPrint()">Print</button></div></div></div>
+
+<div class="modal-overlay" id="search-hub-modal">
+  <div class="modal search-hub-sheet">
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-search"></i> Search Sizes</div>
+      <button class="modal-close" onclick="closeSearchHub()">✕</button>
+    </div>
+    <div class="search-hub-body">
+      <div class="search-wrap search-wrap-main">
+        <i class="fas fa-tire search-icon"></i>
+        <input type="text" id="search-hub-input" class="search-input mono-input" inputmode="numeric" maxlength="9" placeholder="Type size e.g. 2155517…" data-i18n-placeholder="sale-search" oninput="formatTyreSizeField(this); searchTyreModal()">
+        <button class="search-clear" type="button" onclick="clearSearchHub()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="search-hub-results" class="search-hub-results"><div class="empty-state">Search for a size, then select it to continue the invoice.</div></div>
+    </div>
+  </div>
+</div>
+
+<button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTopSmooth()" aria-label="Back to top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<div class="modal-overlay image-lightbox" id="image-lightbox" onclick="closeImageLightbox(event)">
+  <div class="image-lightbox-inner">
+    <button class="modal-close image-lightbox-close" type="button" onclick="closeImageLightbox()">✕</button>
+    <img id="image-lightbox-img" class="image-lightbox-img" alt="Service photo preview">
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -298,7 +851,7 @@ let allEmployees = [];
 let selTyreId = null, selTyreSize = '', selPositions = [], selRepair = '', selTyreType = '';
 let capturedPhotoDataUrl = null;
 let currentReportData = [];
-const SERVICE_SUBMIT_LABEL = '✅ Complete Service & Deduct Stock';
+const SERVICE_SUBMIT_LABEL = '✅ <span id="svc-complete-label">Complete Service & Deduct Stock</span>';
 
 const LOCAL_DB_NAME = 'quality-part-x-local';
 const LOCAL_DB_VERSION = 1;
@@ -311,7 +864,7 @@ const APP_LANG_KEY = 'quality-part-x-language';
 let currentLang = localStorage.getItem(APP_LANG_KEY) || 'en';
 const I18N = {
   en: {
-    logout: 'Logout', serviceNav: '🔧 Services', dashboardNav: '📊 Dashboard', inventoryNav: '📦 Inventory', reportNav: '📋 Reports', viewEmployees: 'View Employees', hideEmployees: 'Hide Employees',
+    logout: 'Logout', serviceNav: 'Services', dashboardNav: 'Dashboard', inventoryNav: 'Inventory', reportNav: 'Reports', searchNav: 'Search', viewEmployees: 'View Employees', hideEmployees: 'Hide Employees', serviceSearchTitle: 'Search Tyre', clear: 'Clear', serviceSearchPlaceholder: 'Type size e.g. 2155517…', serviceOverview: 'Service overview', todaysShift: "Today's Shift", servicesTodayLabel: 'Services Today', totalStockLabel: 'Total Stock', outOfStockLabel: 'Out of Stock', quickActions: 'Quick Actions', quickRestockShort: 'Quick Restock', receiveNewStock: 'Receive new stock', printReportShort: 'Print Report', dailySummary: 'Daily summary', fullStockShort: 'Full Stock', allWarehouseSizes: 'All warehouse sizes', addEmployeeShort: 'Add Employee', adminOnly: 'Admin only', plateNumber: 'Plate Number', quantityLabel: 'Quantity', tyreCondition: 'Tyre Condition', newTyre: '✨ New', usedTyre: '🔄 Used', repairOptional: 'Repair (optional)', noneLabel: 'None', standardPatch: 'Standard Patch', internalPatch: 'Internal Patch', tyrePosition: 'Tyre Position', frontLeft: '↖ Front Left', frontRight: '↗ Front Right', rearLeft: '↙ Rear Left', rearRight: '↘ Rear Right', notesLabel: 'Notes', notesPlaceholder: 'Write note for invoice & reports…', carPhoto: 'Car Photo', tapCapturePhoto: 'Tap to capture car photo', completeService: 'Complete Service & Deduct Stock', todaysServicesTitle: "Today's Services", refresh: 'Refresh', scrollRightHint: 'Scroll right to see more', viewPhoto: 'View photo', noPhotoCard: 'No photo added', shareTextLead: 'Send this service photo with details',
     inventoryTitle: 'Inventory Management', quickRestockOpen: '📥 Quick Restock / Receive Stock', quickRestockClose: '✕ Close Quick Restock', addTyre: '+ Add Tyre', printOptions: '🖨 Inventory Print Options', printAvailableOnly: '✅ Print Available Only', printOutOnly: '❌ Print Out of Stock',
     quickRestockTitle: 'Quick Restock Mode', quickRestockSubtitle: 'Choose a warehouse once, search by size, then use + and - quickly.', warehouseLabel: 'Warehouse / Location', addWarehouseLabel: 'Add Warehouse / Location', save: 'Save', focus: '🔎 Focus',
     chooseWarehouse: 'Choose warehouse', lastWarehouse: 'Last selected warehouse: {value}', warehouseRequired: 'Choose a warehouse first', sizeRequiredFirst: 'Enter the tyre size first', noWarehouseForSize: 'This size is not available in the selected warehouse', qtyBelowZero: 'Quantity cannot go below zero', warehouseSaved: 'Warehouse saved',
@@ -322,7 +875,7 @@ const I18N = {
     printModalTitle: 'Inventory Print Options', reportType: 'Report Type', stockFilter: 'Stock Filter', usageFocus: 'Usage Focus', sortDirection: 'Sort Direction', print: 'Print', none: '-', usageCount: 'Usage Count', warehouse: 'Warehouse', qty: 'Qty', notes: 'Notes', actions: 'Actions', size: 'Size'
   },
   ar: {
-    logout: 'تسجيل الخروج', serviceNav: '🔧 الخدمات', dashboardNav: '📊 لوحة التحكم', inventoryNav: '📦 المخزون', reportNav: '📋 التقارير', viewEmployees: 'View Employees', hideEmployees: 'Hide Employees',
+    logout: 'تسجيل الخروج', serviceNav: 'الخدمات', dashboardNav: 'الإدارة', inventoryNav: 'المخزن', reportNav: 'التقارير', searchNav: 'بحث', viewEmployees: 'عرض الموظفين', hideEmployees: 'إخفاء الموظفين', serviceSearchTitle: 'البحث عن الكفر', clear: 'مسح', serviceSearchPlaceholder: 'اكتب المقاس مثل 2155517…', serviceOverview: 'نظرة الخدمة', todaysShift: 'خدمات اليوم', servicesTodayLabel: 'خدمات اليوم', totalStockLabel: 'إجمالي المخزون', outOfStockLabel: 'المنتهي', quickActions: 'اختصارات سريعة', quickRestockShort: 'تعبئة سريعة', receiveNewStock: 'إدخال بضاعة جديدة', printReportShort: 'طباعة التقرير', dailySummary: 'ملخص يومي', fullStockShort: 'كل المخزون', allWarehouseSizes: 'جميع مقاسات المخزن', addEmployeeShort: 'إضافة موظف', adminOnly: 'للمشرف فقط', plateNumber: 'رقم اللوحة', quantityLabel: 'الكمية', tyreCondition: 'حالة الكفر', newTyre: '✨ جديد', usedTyre: '🔄 مستعمل', repairOptional: 'إصلاح (اختياري)', noneLabel: 'بدون', standardPatch: 'ترقيع عادي', internalPatch: 'ترقيع داخلي', tyrePosition: 'مكان الكفر', frontLeft: '↖ أمامي يسار', frontRight: '↗ أمامي يمين', rearLeft: '↙ خلفي يسار', rearRight: '↘ خلفي يمين', notesLabel: 'ملاحظة', notesPlaceholder: 'اكتب ملاحظة للفواتير والتقارير…', carPhoto: 'صورة السيارة', tapCapturePhoto: 'اضغط لالتقاط صورة السيارة', completeService: 'إنهاء الخدمة وخصم المخزون', todaysServicesTitle: 'خدمات اليوم', refresh: 'تحديث', scrollRightHint: 'اسحب لليمين لرؤية المزيد', viewPhoto: 'عرض الصورة', noPhotoCard: 'لا توجد صورة', shareTextLead: 'إرسال صورة الخدمة مع البيانات',
     inventoryTitle: 'إدارة المخزون', quickRestockOpen: '📥 تعبئة سريعة / إدخال بضاعة', quickRestockClose: '✕ إغلاق التعبئة السريعة', addTyre: '+ إضافة مقاس', printOptions: '🖨 خيارات طباعة المخزون', printAvailableOnly: '✅ طباعة المتوفر فقط', printOutOnly: '❌ طباعة غير المتوفر',
     quickRestockTitle: 'وضع التعبئة السريعة', quickRestockSubtitle: 'Choose warehouse مرة واحدة ثم ابحث بالمقاس واستخدم + و - بسرعة.', warehouseLabel: 'المخزن / الموقع', addWarehouseLabel: 'إضافة مخزن / موقع', save: 'حفظ', focus: '🔎 تركيز',
     chooseWarehouse: 'Choose warehouse', lastWarehouse: 'آخر مخزن مختار: {value}', warehouseRequired: 'Choose warehouse أولاً', sizeRequiredFirst: 'اكتب المقاس أولاً', noWarehouseForSize: 'هذا المقاس غير موجود في المخزن المختار', qtyBelowZero: 'لا يمكن أن تصبح الكمية أقل من صفر', warehouseSaved: 'تم حفظ المخزن',
@@ -350,19 +903,27 @@ function applyLanguage() {
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
   const map = {
-    'logout-btn':'logout','nav-service':'serviceNav','nav-dashboard':'dashboardNav','nav-inventory':'inventoryNav','nav-report':'reportNav','inventory-title':'inventoryTitle','inventory-add-btn':'addTyre',
+    'logout-btn':'logout','nav-service-label':'serviceNav','nav-dashboard-label':'dashboardNav','nav-search-label':'searchNav','nav-inventory-label':'inventoryNav','nav-report-label':'reportNav','inventory-title':'inventoryTitle','inventory-add-btn':'addTyre',
     'inventory-print-btn':'printOptions','inventory-print-available-btn':'printAvailableOnly','inventory-print-out-btn':'printOutOnly','quick-restock-title':'quickRestockTitle','quick-restock-subtitle':'quickRestockSubtitle',
     'quick-location-label':'warehouseLabel','quick-location-add-label':'addWarehouseLabel','quick-location-save-btn':'save','quick-restock-focus-btn':'focus','view-employees-btn': document.getElementById('employee-card')?.style.display === 'block' ? 'hideEmployees' : 'viewEmployees',
-    'inventory-print-modal-title':'printModalTitle','print-mode-label':'reportType','print-stock-filter-label':'stockFilter','print-usage-mode-label':'usageFocus','print-sort-direction-label':'sortDirection','inventory-print-run-btn':'print'
+    'inventory-print-modal-title':'printModalTitle','print-mode-label':'reportType','print-stock-filter-label':'stockFilter','print-usage-mode-label':'usageFocus','print-sort-direction-label':'sortDirection','inventory-print-run-btn':'print',
+    'service-search-title':'serviceSearchTitle','service-clear-btn':'clear','service-overview-label':'serviceOverview','service-shift-label':'todaysShift','svc-stat-today-label':'servicesTodayLabel','svc-stat-stock-label':'totalStockLabel','svc-stat-out-label':'outOfStockLabel',
+    'quick-actions-label':'quickActions','qa-restock-label':'quickRestockShort','qa-restock-sub':'receiveNewStock','qa-print-label':'printReportShort','qa-print-sub':'dailySummary','qa-stock-label':'fullStockShort','qa-stock-sub':'allWarehouseSizes','qa-employee-label':'addEmployeeShort','qa-employee-sub':'adminOnly',
+    'svc-plate-label':'plateNumber','svc-qty-label':'quantityLabel','svc-condition-label':'tyreCondition','svc-type-new':'newTyre','svc-type-old':'usedTyre','svc-repair-label':'repairOptional','svc-repair-none':'noneLabel','svc-position-label':'tyrePosition','svc-pos-front-left':'frontLeft','svc-pos-front-right':'frontRight','svc-pos-rear-left':'rearLeft','svc-pos-rear-right':'rearRight','svc-notes-label':'notesLabel','svc-photo-label':'carPhoto','svc-photo-placeholder':'tapCapturePhoto','svc-complete-label':'completeService','today-services-label':'todaysServicesTitle','today-services-refresh':'refresh'
   };
   Object.entries(map).forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.textContent = tr(key); });
+  const hintSpan = document.querySelector('#today-services-hint span'); if (hintSpan) hintSpan.textContent = tr('scrollRightHint');
+  const repairStandard = document.querySelector('#svc-repair-standard span'); if (repairStandard) repairStandard.textContent = tr('standardPatch');
+  const repairInternal = document.querySelector('#svc-repair-internal span'); if (repairInternal) repairInternal.textContent = tr('internalPatch');
   const restockBtn = document.getElementById('restock-toggle-btn');
   if (restockBtn) restockBtn.textContent = document.getElementById('quick-restock-panel')?.style.display === 'block' ? tr('quickRestockClose') : tr('quickRestockOpen');
-  const locLast = document.getElementById('quick-location-last');
-  if (locLast) updateQuickLocationLastLabel();
+  if (document.getElementById('quick-location-last')) updateQuickLocationLastLabel();
   const search = document.getElementById('inv-search'); if (search) search.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس أو المخزن...' : 'Search size or warehouse...';
   const newLoc = document.getElementById('quick-new-location'); if (newLoc) newLoc.placeholder = currentLang === 'ar' ? 'مثال: مخزن 1' : 'Example: Warehouse 1';
   const quickSearch = document.getElementById('quick-restock-search'); if (quickSearch) quickSearch.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس بدون / مثال 2155517' : 'Search by size without / e.g. 2155517';
+  const saleSearch = document.getElementById('sale-search'); if (saleSearch) saleSearch.placeholder = tr('serviceSearchPlaceholder');
+  const svcPlate = document.getElementById('svc-plate'); if (svcPlate) svcPlate.placeholder = currentLang === 'ar' ? 'مثال: ١٢٣٤٥' : 'AB12 CDE';
+  const svcNotes = document.getElementById('svc-notes'); if (svcNotes) svcNotes.placeholder = tr('notesPlaceholder');
   document.getElementById('inventory-print-summary')?.replaceChildren(document.createTextNode(tr('printChooseOptions')));
   const pm = document.getElementById('print-mode'); if (pm) { pm.options[0].text = tr('printTypeStock'); pm.options[1].text = tr('printTypeUsage'); }
   const pf = document.getElementById('print-stock-filter'); if (pf) { pf.options[0].text = tr('allStock'); pf.options[1].text = tr('availableOnly'); pf.options[2].text = tr('outOfStockOnly'); }
@@ -851,10 +1412,17 @@ function logout() { location.reload(); }
 
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  const activeTab = document.querySelector(`.nav-tab[data-page="${name}"]`);
+  document.querySelectorAll('.nav-item[data-page]').forEach(t => t.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (!page) return;
+  page.classList.add('active');
+  const activeTab = document.querySelector(`.nav-item[data-page="${name}"]`);
   if (activeTab) activeTab.classList.add('active');
+
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) mainContent.scrollTop = 0;
+  window.scrollTo({ top: 0, behavior: 'auto' });
+  requestAnimationFrame(() => page.scrollIntoView({ behavior: 'auto', block: 'start' }));
 
   if (name === 'dashboard') {
     loadDashboard();
@@ -1447,18 +2015,36 @@ async function printReport() {
 
 function formatInvoiceShareText(tx) {
   const createdAt = tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString();
-  const condition = tx?.tyre_condition === 'new' ? 'New' : tx?.tyre_condition === 'old' ? 'Used' : '-';
-  return [
-    'QUALITY PART X - TYRE SERVICE INVOICE',
-    `Date: ${createdAt}`,
-    `Plate: ${tx?.plate_number || '-'}`,
-    `Tyre Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
-    `Condition: ${condition}`,
-    `Quantity: ${Number(tx?.quantity) || 1}`,
-    `Repair: ${tx?.repair_type || '-'}`,
-    `Note: ${getTransactionNoteText(tx)}`,
-    `Operator: ${tx?.operator || '-'}`
-  ].join('\n');
+  const condition = tx?.tyre_condition === 'new'
+    ? (currentLang === 'ar' ? 'جديد' : 'New')
+    : tx?.tyre_condition === 'old'
+      ? (currentLang === 'ar' ? 'مستعمل' : 'Used')
+      : '-';
+  return currentLang === 'ar'
+    ? [
+        'QUALITY PART X',
+        'تفاصيل الخدمة:',
+        `التاريخ: ${createdAt}`,
+        `رقم اللوحة: ${tx?.plate_number || '-'}`,
+        `مقاس الكفر: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+        `الحالة: ${condition}`,
+        `الكمية: ${Number(tx?.quantity) || 1}`,
+        `الإصلاح: ${tx?.repair_type || '-'}`,
+        `الملاحظة: ${getTransactionNoteText(tx)}`,
+        `الموظف: ${tx?.operator || '-'}`
+      ].join('\n')
+    : [
+        'QUALITY PART X',
+        'Service details:',
+        `Date: ${createdAt}`,
+        `Plate: ${tx?.plate_number || '-'}`,
+        `Tyre Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+        `Condition: ${condition}`,
+        `Quantity: ${Number(tx?.quantity) || 1}`,
+        `Repair: ${tx?.repair_type || '-'}`,
+        `Note: ${getTransactionNoteText(tx)}`,
+        `Operator: ${tx?.operator || '-'}`
+      ].join('\n');
 }
 
 async function getInvoicePhotoFile(tx) {
@@ -1487,6 +2073,15 @@ async function getInvoicePhotoFile(tx) {
   }
 
   return null;
+}
+
+async function getTransactionPhotoSource(tx) {
+  const meta = await getServiceArtifacts(tx?.id);
+  if (meta?.photoKey) {
+    const localPhoto = await idbGet(LOCAL_PHOTO_STORE, meta.photoKey);
+    if (localPhoto?.dataUrl) return localPhoto.dataUrl;
+  }
+  return tx?.photo_url || '';
 }
 
 function wrapCanvasText(ctx, text, maxWidth) {
@@ -1575,17 +2170,18 @@ async function shareInvoiceToWhatsApp(txId) {
   if (error || !tx) { showToast('Unable to load invoice data', 'error'); return; }
 
   const shareText = formatInvoiceShareText(tx);
-  const shareCard = await createInvoiceShareCard(tx);
+  const originalPhoto = await getInvoicePhotoFile(tx);
+  const shareFile = originalPhoto || await createInvoiceShareCard(tx);
 
-  if (navigator.share && shareCard) {
+  if (navigator.share && shareFile) {
     try {
-      if (!navigator.canShare || navigator.canShare({ files: [shareCard] })) {
+      if (!navigator.canShare || navigator.canShare({ files: [shareFile] })) {
         await navigator.share({
-          title: `Invoice ${tx.plate_number || ''}`.trim() || 'Invoice',
-          text: 'Open WhatsApp and send this invoice card image.',
-          files: [shareCard]
+          title: `Service ${tx.plate_number || ''}`.trim() || 'Service',
+          text: shareText,
+          files: [shareFile]
         });
-        showToast('Share sheet opened. Choose WhatsApp to send the invoice image card.', 'success');
+        showToast(currentLang === 'ar' ? 'تم فتح المشاركة. اختر واتساب لإرسال الصورة مع البيانات.' : 'Share sheet opened. Choose WhatsApp to send the photo with details.', 'success');
         return;
       }
     } catch (err) {
@@ -1595,7 +2191,7 @@ async function shareInvoiceToWhatsApp(txId) {
   }
 
   window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
-  showToast('WhatsApp opened with invoice details. On mobile, use the Share button to send the invoice image card.', 'success');
+  showToast(currentLang === 'ar' ? 'تم فتح واتساب بالنص. إذا كان جهازك يدعم المشاركة المباشرة فستُرسل الصورة مع التعليق من زر المشاركة.' : 'WhatsApp opened with text details. On supported mobile devices, the share button sends the photo with the caption.', 'success');
 }
 
 async function loadStockRep() {
@@ -1850,11 +2446,337 @@ document.getElementById('login-pass').addEventListener('keypress', e => { if (e.
 document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }); });
 cleanupExpiredLocalData().catch(() => {});
 applyLanguage();
+
+function updateServiceDateBadge(){
+  const main = document.getElementById('service-date-main');
+  const year = document.getElementById('service-date-year');
+  if (!main || !year) return;
+  const now = new Date();
+  main.textContent = now.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: 'short' });
+  year.textContent = now.getFullYear();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab, .nav-item[data-page]').forEach(t => t.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  const activeTab = document.querySelector(`.nav-item[data-page="${name}"], .nav-tab[data-page="${name}"]`);
+  if (activeTab) activeTab.classList.add('active');
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'auto' });
+  if (name === 'dashboard') {
+    loadDashboard();
+    loadEmployees();
+  }
+  if (name === 'inventory') loadInventory();
+  if (name === 'report') {
+    setDates();
+    loadStockRep();
+  }
+  if (name === 'service') {
+    loadTodayStats();
+    loadTodayCards();
+    updateServiceDateBadge();
+  }
+  applyLanguage();
+}
+
+function getTyreSearchMarkup(data, options = {}) {
+  const mode = options.mode || 'service';
+  const countLabel = `<div class="sec-label">Results (${data.length} found)</div>`;
+  const cards = data.map(t => {
+    const qty = Number(t.quantity || 0);
+    const isOut = qty <= 0;
+    const isLow = qty > 0 && qty <= 4;
+    const size = esc(formatTyreSizeValue(t.size) || t.size);
+    const location = esc(t.location || 'No location');
+    const stockClass = isOut ? 'stock-out' : isLow ? 'stock-low' : 'stock-ok';
+    const stockText = isOut ? 'Out of stock' : isLow ? `${qty} left` : `${qty} in stock`;
+    const action = mode === 'modal' ? `selectTyreFromSearchHub('${t.id}','${size}')` : `selectTyre('${t.id}','${size}')`;
+    const style = isLow ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"' : isOut ? ' style="border-color:rgba(251,113,133,0.35);background:rgba(251,113,133,0.05);"' : '';
+    const sizeStyle = isLow ? ' style="color:var(--gold);"' : isOut ? ' style="color:var(--danger);"' : '';
+    const btnStyle = isLow ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"' : isOut ? ' style="background:linear-gradient(135deg,#fb7185,#fda4af);"' : '';
+    return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${stockText}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${isOut ? 'disabled' : ''} ${btnStyle} onclick="${action}">${isOut ? 'Unavailable' : 'Select →'}</button></div></div>`;
+  }).join('');
+  return countLabel + `<div style="display:flex;flex-direction:column;gap:10px;">${cards}</div>`;
+}
+
+async function runTyreSearch(query, containerId, options = {}) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const q = String(query || '').trim();
+  if (!q) {
+    container.innerHTML = options.emptyHtml || '';
+    return;
+  }
+  const source = await ensureInventoryLoaded();
+  const qKey = normalizeTyreKey(q);
+  const data = source.filter(t => {
+    const size = t.size || '';
+    const sizeKey = normalizeTyreKey(size);
+    return sizeKey.includes(qKey) || String(size).toLowerCase().includes(q.toLowerCase());
+  }).sort((a, b) => String(a.size || '').localeCompare(String(b.size || '')));
+  if (!data.length) {
+    container.innerHTML = '<div class="empty-state">No tyres found</div>';
+    return;
+  }
+  container.innerHTML = getTyreSearchMarkup(data, options);
+}
+
+async function searchTyre() {
+  const input = document.getElementById('sale-search');
+  if (!input) return;
+  const q = formatTyreSizeField(input).trim();
+  await runTyreSearch(q, 'sale-results', { mode: 'service', emptyHtml: '' });
+}
+
+async function searchTyreModal() {
+  const input = document.getElementById('search-hub-input');
+  if (!input) return;
+  const q = formatTyreSizeField(input).trim();
+  await runTyreSearch(q, 'search-hub-results', { mode: 'modal', emptyHtml: '<div class="empty-state">Search for a size, then select it to continue the invoice.</div>' });
+}
+
+function openSearchHub() {
+  const modal = document.getElementById('search-hub-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('search-hub-input')?.focus(), 50);
+}
+
+function closeSearchHub() {
+  document.getElementById('search-hub-modal')?.classList.remove('open');
+}
+
+function clearSearchHub() {
+  const input = document.getElementById('search-hub-input');
+  const results = document.getElementById('search-hub-results');
+  if (input) input.value = '';
+  if (results) results.innerHTML = '<div class="empty-state">Search for a size, then select it to continue the invoice.</div>';
+}
+
+function selectTyreFromSearchHub(id, size) {
+  const topSearch = document.getElementById('sale-search');
+  if (topSearch) topSearch.value = formatTyreSizeValue(size) || size;
+  closeSearchHub();
+  showPage('service');
+  selectTyre(id, size);
+}
+
+function selectTyre(id, size) {
+  selTyreId = id;
+  selTyreSize = size;
+  selPositions = [];
+  selRepair = '';
+  selTyreType = '';
+  capturedPhotoDataUrl = null;
+  const title = document.getElementById('svc-title');
+  if (title) title.innerHTML = `Service Details <span class="badge badge-teal" style="font-family:'DM Mono',monospace;font-size:10px;">${esc(formatTyreSizeValue(size) || size)}</span>`;
+  document.getElementById('service-form').style.display = 'block';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-placeholder').style.display = 'flex';
+  document.getElementById('svc-plate').value = '';
+  document.getElementById('svc-qty').value = '1';
+  document.getElementById('svc-notes').value = '';
+  document.getElementById('car-photo-input').value = '';
+  document.getElementById('photo-area').classList.remove('has-photo');
+  document.querySelectorAll('.repair-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tyre-type-btn').forEach(b => b.classList.remove('active-new', 'active-old', 'active-teal', 'active-muted'));
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('service-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectRepair(type) {
+  selRepair = type || '';
+  document.querySelectorAll('.repair-btn').forEach(b => b.classList.remove('active'));
+  if (type === '') {
+    document.querySelector('.repair-btn[data-repair=""]')?.classList.add('active');
+    return;
+  }
+  document.querySelector(`.repair-btn[data-repair="${type}"]`)?.classList.add('active');
+}
+
+function selectTyreType(type) {
+  selTyreType = type;
+  document.querySelectorAll('.tyre-type-btn').forEach(b => b.classList.remove('active-new', 'active-old', 'active-teal', 'active-muted'));
+  const btn = document.querySelector(`.tyre-type-btn[data-type="${type}"]`);
+  if (btn) btn.classList.add(type === 'new' ? 'active-new' : 'active-old');
+}
+
+function clearSvc() {
+  selTyreId = null;
+  selTyreSize = '';
+  selPositions = [];
+  selRepair = '';
+  selTyreType = '';
+  capturedPhotoDataUrl = null;
+  const title = document.getElementById('svc-title');
+  if (title) title.textContent = 'Service Details';
+  document.getElementById('service-form').style.display = 'none';
+  document.getElementById('sale-search').value = '';
+  document.getElementById('sale-results').innerHTML = '';
+  document.getElementById('svc-plate').value = '';
+  document.getElementById('svc-qty').value = '1';
+  document.getElementById('svc-notes').value = '';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-placeholder').style.display = 'flex';
+  document.getElementById('car-photo-input').value = '';
+  document.getElementById('photo-area').classList.remove('has-photo');
+  document.querySelectorAll('.repair-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tyre-type-btn').forEach(b => b.classList.remove('active-new', 'active-old', 'active-teal', 'active-muted'));
+  document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
+}
+
+async function submitService(event) {
+  if (!selTyreId) { showToast('Select a tyre first', 'error'); return; }
+  const plate = document.getElementById('svc-plate').value.trim().toUpperCase();
+  const qty = parseInt(document.getElementById('svc-qty').value, 10) || 1;
+  const notes = document.getElementById('svc-notes').value.trim();
+  const btn = event?.target?.closest('button') || event?.target;
+  if (!plate) { showToast('Enter plate number', 'error'); return; }
+  if (!selTyreType) { showToast('Select tyre condition', 'error'); return; }
+  setServiceSubmitButton(btn, true);
+  try {
+    const { data: inv, error: invErr } = await db.from('inventory').select('*').eq('id', selTyreId).single();
+    if (invErr || !inv) {
+      showToast('Tyre not found', 'error');
+      setServiceSubmitButton(btn, false);
+      return;
+    }
+    if (inv.quantity < qty) {
+      showToast('Not enough stock', 'error');
+      setServiceSubmitButton(btn, false);
+      return;
+    }
+    const { data: insertedTxn, error: txnErr } = await db.from('transactions').insert({
+      tyre_size: formatTyreSizeValue(inv.size) || inv.size,
+      plate_number: plate,
+      front_left: selPositions.includes('front_left'),
+      front_right: selPositions.includes('front_right'),
+      rear_left: selPositions.includes('rear_left'),
+      rear_right: selPositions.includes('rear_right'),
+      repair_type: selRepair || null,
+      tyre_condition: selTyreType || null,
+      notes: notes || null,
+      operator: currentUser.username,
+      photo_url: null,
+      quantity: qty,
+      brand: inv.brand || null
+    }).select().single();
+    if (txnErr || !insertedTxn) {
+      showToast(txnErr?.message || 'Unable to save service', 'error');
+      setServiceSubmitButton(btn, false);
+      return;
+    }
+    const { error: stockErr } = await db.from('inventory').update({ quantity: inv.quantity - qty }).eq('id', selTyreId);
+    if (stockErr) {
+      await db.from('transactions').delete().eq('id', insertedTxn.id);
+      showToast(stockErr.message, 'error');
+      setServiceSubmitButton(btn, false);
+      return;
+    }
+    let uploadedPhotoUrl = null;
+    if (capturedPhotoDataUrl) {
+      uploadedPhotoUrl = await uploadServicePhoto(capturedPhotoDataUrl, plate);
+      if (uploadedPhotoUrl) {
+        await db.from('transactions').update({ photo_url: uploadedPhotoUrl }).eq('id', insertedTxn.id);
+        insertedTxn.photo_url = uploadedPhotoUrl;
+      }
+    }
+    await storeServiceArtifacts(insertedTxn.id, selTyreId, capturedPhotoDataUrl);
+    showToast('✅ Service recorded! Stock deducted.', 'success');
+    clearSvc();
+    await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+    if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+  } finally {
+    setServiceSubmitButton(btn, false);
+  }
+}
+
+async function loadTodayStats() {
+  updateServiceDateBadge();
+  const today = new Date().toISOString().split('T')[0];
+  const { data: txns } = await db.from('transactions').select('id').gte('created_at', today + 'T00:00:00');
+  const { data: inv } = await db.from('inventory').select('*');
+  document.getElementById('svc-stat-today').textContent = txns?.length || 0;
+  document.getElementById('svc-stat-stock').textContent = inv?.reduce((s, i) => s + Number(i.quantity || 0), 0) || 0;
+  document.getElementById('svc-stat-out').textContent = inv?.filter(i => Number(i.quantity) === 0).length || 0;
+}
+
+async function loadTodayCards() {
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+  const container = document.getElementById('today-cards');
+  if (!container) return;
+  if (!data?.length) { container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`; return; }
+
+  const cards = await Promise.all((data || []).map(async t => {
+    const time = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const typeLabel = t.tyre_condition === 'new' ? tr('newTyre') : t.tyre_condition === 'old' ? tr('usedTyre') : '—';
+    const repairLabel = t.repair_type ? esc(t.repair_type) : esc(tr('noneLabel'));
+    const sizeLabel = esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size);
+    const isOld = t.tyre_condition === 'old';
+    const photoSrc = await getTransactionPhotoSource(t);
+    const noteText = esc(getTransactionNoteText(t));
+    const photoMarkup = photoSrc
+      ? `<button class="svc-photo-btn" type="button" data-photo="${esc(photoSrc)}" onclick="openImageLightbox(this.dataset.photo)"><img class="svc-photo" src="${esc(photoSrc)}" alt="Service photo" loading="lazy" decoding="async"><span class="svc-photo-zoom"><i class="fas fa-expand"></i>${esc(tr('viewPhoto'))}</span></button>`
+      : `<div class="svc-photo-empty"><i class="fas fa-camera"></i><span>${esc(tr('noPhotoCard'))}</span></div>`;
+    return `<div class="svc-card" ${isOld ? 'style="border-color:rgba(248,210,110,0.25);"' : ''}><div class="svc-card-hd" ${isOld ? 'style="background:var(--gold-dim);"' : ''}><div class="svc-card-size" ${isOld ? 'style="color:var(--gold);"' : ''}>${sizeLabel}</div><div class="time-chip">${time}</div></div>${photoMarkup}<div class="svc-card-body"><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'النوع' : 'Type')}</span><span class="val">${typeLabel}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الكمية' : 'Qty')}</span><span class="val">${Number(t.quantity) || 1}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الإصلاح' : 'Repair')}</span><span class="val">${repairLabel}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'بواسطة' : 'By')}</span><span class="val">${esc(t.operator || '—')}</span></div><div class="svc-card-plate">${esc(t.plate_number || '—')}</div><div class="svc-card-note"><strong>${esc(currentLang === 'ar' ? 'ملاحظة:' : 'Note:')}</strong> ${noteText}</div><div class="svc-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 ${esc(tr('deleteLabel'))}</button></div></div></div>`;
+  }));
+  container.innerHTML = cards.join('');
+}
+
+function openImageLightbox(src) {
+  const modal = document.getElementById('image-lightbox');
+  const img = document.getElementById('image-lightbox-img');
+  if (!modal || !img || !src) return;
+  img.src = src;
+  modal.classList.add('open');
+}
+
+function closeImageLightbox(event) {
+  const modal = document.getElementById('image-lightbox');
+  const img = document.getElementById('image-lightbox-img');
+  if (event && event.target && event.target !== modal) return;
+  if (img) img.removeAttribute('src');
+  modal?.classList.remove('open');
+}
+
+function openQuickRestockShortcut() {
+  showPage('inventory');
+  setTimeout(() => {
+    toggleRestockMode(true);
+    document.getElementById('quick-restock-search')?.focus();
+  }, 120);
+}
+
+function openEmployeeShortcut() {
+  if (currentUser?.role === 'admin') {
+    showAddEmployee();
+    return;
+  }
+  showPage('dashboard');
+  showToast('Admin access required', 'error');
+}
+
+function scrollToTopSmooth() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleScrollTopButton() {
+  const btn = document.getElementById('scroll-top-btn');
+  if (!btn) return;
+  btn.classList.toggle('show', window.scrollY > 280);
+}
+
+window.addEventListener('scroll', handleScrollTopButton, { passive: true });
+document.addEventListener('DOMContentLoaded', () => {
+  updateServiceDateBadge();
+  handleScrollTopButton();
+});
+
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
