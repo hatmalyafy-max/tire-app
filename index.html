@@ -285,12 +285,41 @@ a{color:inherit;text-decoration:none;}
 .quick-location-add{display:flex;gap:8px;flex-wrap:wrap;}
 .quick-location-add input{flex:1;min-width:150px;}
 .quick-restock-last,.print-summary,.quick-restock-meta{font-size:12px;color:var(--text-muted);}
-.quick-restock-last{padding-top:0;padding-bottom:12px;color:var(--gold);}
-.quick-restock-result{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-input);
-  border:1px solid var(--stroke);border-radius:16px;padding:14px;margin-bottom:10px;
-}
+.quick-restock-last{padding-top:0;padding-bottom:0;color:var(--gold);}
+.quick-restock-warehouse{display:flex;flex-direction:column;gap:12px;padding-top:16px;}
+.quick-warehouse-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border-radius:18px;background:rgba(248,210,110,0.08);border:1px solid var(--stroke-gold);}
+.quick-warehouse-current{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1;}
+.quick-location-inline{display:none;grid-template-columns:1fr;gap:12px;}
+.quick-location-inline.open{display:grid;}
+.quick-restock-layout{display:flex;flex-direction:column;gap:12px;padding-bottom:18px;}
+.quick-restock-results-grid{display:flex;flex-direction:column;gap:12px;}
+.quick-restock-card,.quick-restock-list-item{background:rgba(255,255,255,0.04);border:1px solid var(--stroke);border-radius:20px;padding:16px;box-shadow:var(--shadow-card);}
+.quick-restock-card.active{border-color:var(--stroke-accent);background:linear-gradient(135deg, rgba(94,236,208,0.08), rgba(96,165,250,0.08));box-shadow:var(--shadow-glow);}
+.quick-restock-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.quick-restock-size{font-family:'DM Mono',monospace;font-size:24px;font-weight:600;color:var(--teal);letter-spacing:.04em;}
+.quick-restock-subline{font-size:12px;color:var(--text-muted);margin-top:6px;}
+.quick-stock-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--blue-dim);color:var(--blue);font-size:11px;font-weight:700;}
+.quick-restock-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.quick-qty-control{display:inline-flex;align-items:center;gap:10px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid var(--stroke);}
+.quick-qty-btn{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue),#3b82f6);color:var(--gold);font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 10px 18px rgba(59,130,246,0.28);}
+.quick-qty-btn:hover{transform:translateY(-1px);}
+.quick-qty-btn.minus{background:linear-gradient(135deg,#2563eb,#1d4ed8);}
+.quick-qty-input{width:82px;min-width:82px;border:none;background:transparent;color:var(--text);text-align:center;font-family:'DM Mono',monospace;font-size:20px;font-weight:700;outline:none;}
 .quick-restock-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.quick-restock-actions .btn{flex:1;min-width:120px;}
+.quick-restock-suggestions{display:flex;flex-wrap:wrap;gap:8px;}
+.quick-suggestion{padding:8px 12px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,0.04);color:var(--text-muted);cursor:pointer;font-size:12px;font-weight:700;}
+.quick-suggestion.active{background:var(--teal-dim);border-color:var(--stroke-accent);color:var(--teal);}
+.quick-restock-list-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.quick-restock-list{display:flex;flex-direction:column;gap:10px;}
+.quick-restock-list-item{padding:14px 16px;}
+.quick-restock-list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.quick-restock-list-meta{display:flex;flex-direction:column;gap:6px;}
+.quick-restock-list-size{font-family:'DM Mono',monospace;font-size:20px;font-weight:600;color:var(--teal);}
+.quick-restock-list-warehouse{font-size:12px;color:var(--text-muted);}
+.quick-restock-list-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.quick-restock-list-actions .btn-ghost{min-width:auto;padding-inline:12px;}
+.quick-restock-inline-note{font-size:11px;color:var(--text-muted);}
 .qty-pill{display:inline-flex;align-items:center;justify-content:center;min-width:38px;padding:5px 10px;border-radius:999px;background:var(--teal-dim);color:var(--teal);font-weight:800;}
 
 .table-wrap{overflow-x:auto;border-top:1px solid var(--stroke);}
@@ -304,6 +333,25 @@ tr:hover td{background:rgba(255,255,255,.02);}
 .badge-red{background:var(--danger-dim);color:var(--danger);}
 .inventory-note-cell{min-width:220px;max-width:320px;}
 .inventory-action-stack{display:flex;flex-direction:column;gap:8px;min-width:220px;}
+.warehouse-manager-list,.transfer-list{display:flex;flex-direction:column;gap:10px;padding-bottom:18px;}
+.warehouse-manager-item,.transfer-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--stroke);border-radius:16px;background:rgba(255,255,255,0.04);}
+.warehouse-manager-item strong,.transfer-item strong{font-size:14px;}
+.warehouse-manager-summary{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.transfer-item{flex-direction:column;}
+.transfer-item-head{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.transfer-qty-input{width:110px;min-width:110px;text-align:center;font-family:'DM Mono',monospace;}
+.transfer-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--blue-dim);color:var(--blue);font-size:11px;font-weight:700;margin-top:6px;}
+.service-position-wrap{display:inline-flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap;}
+.position-shortcodes{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(248,210,110,0.12);border:1px solid rgba(248,210,110,0.22);color:var(--gold);font-size:10px;font-weight:800;letter-spacing:.08em;}
+.svc-card-row-position .val{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;}
+.mini-position-diagram{position:relative;width:56px;height:92px;flex-shrink:0;}
+.mini-car-body{position:absolute;inset:12px 10px;border-radius:18px;background:linear-gradient(180deg,rgba(122,155,194,0.45),rgba(122,155,194,0.22));border:1px solid rgba(122,155,194,0.3);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.03);}
+.mini-tyre{position:absolute;width:14px;height:22px;border-radius:999px;background:#7f8ea3;border:1px solid rgba(255,255,255,0.18);box-shadow:0 2px 8px rgba(0,0,0,0.22);}
+.mini-tyre.active{background:var(--gold);border-color:rgba(248,210,110,0.5);box-shadow:0 0 0 2px rgba(248,210,110,0.12),0 4px 10px rgba(248,210,110,0.18);}
+.mini-tyre.tyre-front-left{top:12px;left:0;}
+.mini-tyre.tyre-front-right{top:12px;right:0;}
+.mini-tyre.tyre-rear-left{bottom:12px;left:0;}
+.mini-tyre.tyre-rear-right{bottom:12px;right:0;}
 .empty-state{text-align:center;padding:28px 12px;color:var(--text-muted);}
 
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);z-index:120;align-items:center;justify-content:center;padding:16px;}
@@ -345,7 +393,20 @@ tr:hover td{background:rgba(255,255,255,.02);}
   .search-bar > *, .row > *, .ctrl-grid > *, .employee-toolbar > *, .service-card-actions > *, .report-actions > *, .admin-employee-actions > *, .table-actions > *, .quick-location-add > *{width:100%;}
   .btn,.btn-sm{width:100%;}
   .service-card{min-width:86%;}
-  table{min-width:980px;}
+  .quick-warehouse-summary,.quick-restock-top,.quick-restock-list-row{flex-direction:column;align-items:stretch;}
+  .quick-restock-actions .btn{min-width:0;}
+  .quick-qty-control{justify-content:space-between;width:100%;}
+  .table-wrap{overflow:visible;border-top:none;}
+  table{min-width:0 !important;width:100%;}
+  .table-wrap thead{display:none;}
+  .table-wrap table,.table-wrap tbody,.table-wrap tr,.table-wrap td{display:block;width:100%;}
+  .table-wrap tr{margin-bottom:12px;border:1px solid var(--stroke);border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.04);}
+  .table-wrap td{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 14px;border-top:1px solid rgba(255,255,255,.06);}
+  .table-wrap td::before{content:attr(data-label);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);min-width:92px;}
+  .table-wrap td:first-child{border-top:none;}
+  .table-wrap td[colspan]{display:block;text-align:center;}
+  .table-wrap td[colspan]::before{display:none;content:'';}
+  .inventory-action-stack,.table-actions{width:100%;}
 }
 @media (max-width:390px){
   .stats-grid{grid-template-columns:1fr;}
@@ -721,6 +782,8 @@ tr:hover td{background:rgba(255,255,255,.02);}
             <div class="ctrl-grid">
               <button class="btn btn-success btn-sm" id="restock-toggle-btn" onclick="toggleRestockMode()">📥 Quick Restock / Receive Stock</button>
               <button class="btn btn-primary btn-sm" id="inventory-add-btn" onclick="openAddModal()">+ Add Tyre</button>
+              <button class="btn btn-ghost btn-sm" onclick="openWarehouseManager()">🏬 Warehouses / المخازن</button>
+              <button class="btn btn-info btn-sm" onclick="openTransferModal()">🔁 Transfer Stock / نقل</button>
               <button class="btn btn-info btn-sm" id="inventory-print-btn" onclick="openInventoryPrintModal()">🖨 Inventory Print Options</button>
               <button class="btn btn-ghost btn-sm" id="inventory-print-available-btn" onclick="printInventoryStock({ stockFilter: 'available' })">✅ Print Available Only</button>
               <button class="btn btn-ghost btn-sm" id="inventory-print-out-btn" onclick="printInventoryStock({ stockFilter: 'out' })">❌ Print Out of Stock</button>
@@ -731,17 +794,41 @@ tr:hover td{background:rgba(255,255,255,.02);}
             <div class="card-header">
               <div>
                 <div class="card-title" id="quick-restock-title">Quick Restock Mode</div>
-                <div class="panel-subtitle" id="quick-restock-subtitle">Choose a warehouse once, search by size, then use + and - quickly.</div>
+                <div class="panel-subtitle" id="quick-restock-subtitle">Open search مباشرة, اختر أقرب مقاس, ثم أضفه للقائمة واحفظ الجميع مرة واحدة.</div>
               </div>
               <button class="btn btn-ghost btn-sm" id="quick-restock-close-btn" onclick="toggleRestockMode(false)">✕ Close</button>
             </div>
-            <div class="quick-restock-grid">
-              <div class="form-group"><label id="quick-location-label">Warehouse / Location</label><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div>
-              <div class="form-group"><label id="quick-location-add-label">Add Warehouse / Location</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="Example: Warehouse 1"><button class="btn btn-primary btn-sm" id="quick-location-save-btn" onclick="saveQuickLocation()">Save</button></div></div>
+            <div class="quick-restock-layout">
+              <div class="quick-restock-warehouse">
+                <div class="quick-warehouse-summary">
+                  <div class="quick-warehouse-current">
+                    <label class="field-label" id="quick-location-label">Warehouse / Location</label>
+                    <div class="quick-restock-last" id="quick-location-last">Last selected warehouse: -</div>
+                  </div>
+                  <button class="btn btn-ghost btn-sm" id="quick-location-change-btn" onclick="toggleQuickWarehousePicker()">Change warehouse</button>
+                </div>
+                <div class="quick-location-inline" id="quick-location-inline">
+                  <div class="form-group"><select id="quick-location-select" onchange="handleQuickLocationChange()"></select></div>
+                  <div class="form-group"><label id="quick-location-add-label">Add Warehouse / Location</label><div class="quick-location-add"><input type="text" id="quick-new-location" placeholder="Example: Warehouse 1"><button class="btn btn-primary btn-sm" id="quick-location-save-btn" onclick="saveQuickLocation()">Save</button></div></div>
+                </div>
+              </div>
+              <div class="search-bar" style="padding-top:0;"><div class="form-group"><input type="text" id="quick-restock-search" class="mono-input" inputmode="numeric" maxlength="9" placeholder="Search by size without / e.g. 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" id="quick-restock-focus-btn" onclick="focusQuickRestock()">🔎 Focus</button></div>
+              <div class="quick-restock-results-grid" id="quick-restock-results">
+                <div id="quick-restock-draft"><div class="empty-state">Choose a warehouse, then search for a tyre size.</div></div>
+                <div class="quick-restock-suggestions" id="quick-restock-suggestions"></div>
+              </div>
+              <div class="quick-restock-list-head">
+                <div>
+                  <div class="card-title" id="quick-restock-queue-title">Restock list</div>
+                  <div class="quick-restock-meta" id="quick-restock-queue-meta">Review the sizes below, edit any quantity, then save once.</div>
+                </div>
+              </div>
+              <div class="quick-restock-list" id="quick-restock-queue"><div class="empty-state">No sizes added yet.</div></div>
+              <div class="quick-restock-actions">
+                <button class="btn btn-ghost btn-sm" id="quick-restock-next-btn" onclick="addCurrentQuickRestockItem()">Next size</button>
+                <button class="btn btn-primary btn-sm" id="quick-restock-save-all-btn" onclick="saveQuickRestockBatch()">Save all</button>
+              </div>
             </div>
-            <div class="quick-restock-last" id="quick-location-last">Last selected warehouse: -</div>
-            <div class="search-bar" style="padding-top:0;"><div class="form-group"><input type="text" id="quick-restock-search" class="mono-input" inputmode="numeric" maxlength="9" placeholder="Search by size without / e.g. 2155517" oninput="handleQuickRestockSearch(this)"></div><button class="btn btn-ghost btn-sm" id="quick-restock-focus-btn" onclick="focusQuickRestock()">🔎 Focus</button></div>
-            <div id="quick-restock-results"><div class="empty-state">Choose a warehouse, then search for a tyre size.</div></div>
           </div>
           <div class="table-wrap"><table><thead><tr><th id="inv-head-size">Size</th><th id="inv-head-qty">Qty</th><th id="inv-head-location">Warehouse</th><th id="inv-head-plus">+1</th><th id="inv-head-notes">Notes</th><th id="inv-head-actions">Actions</th></tr></thead><tbody id="inv-table"><tr><td colspan="6"><div class="empty-state"><span class="loading"></span></div></td></tr></tbody></table></div>
         </div>
@@ -764,7 +851,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
             <div class="report-actions"><button class="btn btn-info btn-sm" onclick="loadReport()">🔄 Load</button><button class="btn btn-primary btn-sm" onclick="printReport()">🖨 Print</button></div>
           </div>
           <div class="row"><div class="form-group"><label>From Date</label><input type="date" id="rep-from"></div><div class="form-group"><label>To Date</label><input type="date" id="rep-to"></div><button class="btn btn-ghost btn-sm" onclick="loadReport()">Filter</button></div>
-          <div class="table-wrap"><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Note</th><th>Repair</th><th>Operator</th><th>Actions</th></tr></thead><tbody id="rep-table"><tr><td colspan="8"><div class="empty-state">Select date range and click Load</div></td></tr></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Position</th><th>Note</th><th>Repair</th><th>Operator</th><th>Actions</th></tr></thead><tbody id="rep-table"><tr><td colspan="9"><div class="empty-state">Select date range and click Load</div></td></tr></tbody></table></div>
         </div>
         <div class="card">
           <div class="card-header"><div><div class="card-title">Full Stock Report (All Locations)</div><div class="panel-subtitle">ملخص كامل للمخزون في جميع المواقع.</div></div><button class="btn btn-info btn-sm" onclick="printInventoryStock()">🖨 Print Full Stock</button></div>
@@ -808,6 +895,10 @@ tr:hover td{background:rgba(255,255,255,.02);}
 
 <div class="modal-overlay" id="inventory-print-modal"><div class="modal"><div class="modal-header"><div class="modal-title" id="inventory-print-modal-title">Inventory Print Options</div><button class="modal-close" onclick="closeModal('inventory-print-modal')">✕</button></div><div class="print-option-grid"><div class="form-group"><label id="print-mode-label">Report Type</label><select id="print-mode"><option value="stock">Stock Report</option><option value="usage">Usage Report</option></select></div><div class="form-group"><label id="print-stock-filter-label">Stock Filter</label><select id="print-stock-filter"><option value="all">All Stock</option><option value="available">Available Only</option><option value="out">Out of Stock Only</option></select></div><div class="form-group"><label id="print-usage-mode-label">Usage Focus</label><select id="print-usage-mode"><option value="most">Most Used</option><option value="least">Least Used</option></select></div><div class="form-group"><label id="print-sort-direction-label">Sort Direction</label><select id="print-sort-direction"><option value="desc">Descending</option><option value="asc">Ascending</option></select></div></div><div class="print-summary" id="inventory-print-summary">Choose how you want the inventory report to be printed.</div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('inventory-print-modal')">Cancel</button><button class="btn btn-primary" style="flex:2" id="inventory-print-run-btn" onclick="applyInventoryPrint()">Print</button></div></div></div>
 
+<div class="modal-overlay" id="warehouse-manager-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Warehouses / المخازن</div><button class="modal-close" onclick="closeModal('warehouse-manager-modal')">✕</button></div><div class="form-group"><label>New warehouse / مخزن جديد</label><div class="quick-location-add"><input type="text" id="warehouse-manager-new-input" placeholder="Warehouse name / اسم المخزن"><button class="btn btn-primary btn-sm" onclick="addWarehouseFromManager()">Save / حفظ</button></div></div><div id="warehouse-manager-list" class="warehouse-manager-list"></div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('warehouse-manager-modal')">Close / إغلاق</button></div></div></div>
+
+<div class="modal-overlay" id="stock-transfer-modal"><div class="modal"><div class="modal-header"><div class="modal-title">Transfer Stock / نقل المخزون</div><button class="modal-close" onclick="closeModal('stock-transfer-modal')">✕</button></div><div class="form-group"><label>Source warehouse / المخزن المصدر</label><select id="transfer-source-select" onchange="handleTransferSourceChange()"></select></div><div class="form-group"><label>Destination warehouse / المخزن الهدف</label><select id="transfer-destination-select"></select></div><div class="form-group"><label>Or new destination / أو مخزن جديد</label><input type="text" id="transfer-new-destination" placeholder="New warehouse name / اسم مخزن جديد"></div><div class="form-group"><label>Search size / ابحث بالمقاس</label><input type="text" id="transfer-search" class="mono-input" inputmode="numeric" maxlength="9" placeholder="2155517" oninput="formatTyreSizeField(this); renderTransferRows()"></div><div id="transfer-summary" class="quick-restock-meta">Select quantities then press Transfer / اختر الكميات ثم اضغط نقل</div><div id="transfer-list" class="transfer-list"></div><div class="row"><button class="btn btn-ghost" style="flex:1" onclick="closeModal('stock-transfer-modal')">Cancel / إلغاء</button><button class="btn btn-primary" style="flex:2" onclick="executeTransferStock()">Transfer / نقل</button></div></div></div>
+
 <div class="modal-overlay" id="search-hub-modal">
   <div class="modal search-hub-sheet">
     <div class="modal-header">
@@ -847,6 +938,9 @@ const db = createClient(SURL, SKEY);
 
 let currentUser = null;
 let allInv = [];
+let quickRestockDraft = { key: '', size: '', location: '', currentQuantity: 0, quantity: 1 };
+let quickRestockQueue = [];
+let quickWarehouseExpanded = false;
 let allEmployees = [];
 let selTyreId = null, selTyreSize = '', selPositions = [], selRepair = '', selTyreType = '';
 let capturedPhotoDataUrl = null;
@@ -887,6 +981,67 @@ const I18N = {
   }
 };
 
+Object.assign(I18N.en, {
+  quickRestockSubtitle: 'Open search immediately, show the closest size under it, then add each size to one save list.',
+  changeWarehouse: 'Change warehouse',
+  quickSearchPlaceholder: 'Search by size without / e.g. 2155517',
+  quickQueueTitle: 'Restock list',
+  quickQueueHint: 'Review the sizes below, edit any quantity, then save once.',
+  quickNext: 'Next size',
+  saveAll: 'Save all',
+  quickNoDraft: 'Choose a warehouse, then search for a tyre size.',
+  quickTypeSize: 'Type the tyre size to show the closest match مباشرة below the search.',
+  quickClosest: 'Closest size',
+  quickCurrentQty: 'Current stock: {qty}',
+  quickQtyToAdd: 'Qty to add',
+  quickSelectedWarehouse: 'Warehouse used recently: {value}',
+  quickNoItems: 'No sizes added yet.',
+  quickAddedToList: '{size} added to the list',
+  quickListSaved: 'The full restock list was saved',
+  quickMinQty: 'Quantity must be at least 1',
+  remove: 'Remove',
+  quickTapToEdit: 'Tap the number to type the quantity directly.',
+  quickSuggestionsHint: 'Closest matches',
+  quickSaveFirst: 'Add at least one size to the list first',
+  quickWarehouseBadge: 'Warehouse',
+  quickSearchAnother: 'Search the next size while your list stays visible.',
+  quickExistingQty: 'Existing qty: {qty}'
+});
+Object.assign(I18N.ar, {
+  quickRestockSubtitle: 'افتح البحث مباشرة، يظهر أقرب مقاس تحته، ثم أضف كل المقاسات إلى قائمة واحدة واحفظها مرة واحدة.',
+  changeWarehouse: 'تغيير المخزن',
+  quickSearchPlaceholder: 'ابحث بالمقاس بدون / مثال 2155517',
+  quickQueueTitle: 'قائمة التعبئة',
+  quickQueueHint: 'راجع المقاسات بالأسفل، وعدّل أي كمية، ثم اضغط حفظ مرة واحدة.',
+  quickNext: 'التالي',
+  saveAll: 'حفظ الكل',
+  quickNoDraft: 'اختر المخزن أولاً ثم ابحث عن المقاس.',
+  quickTypeSize: 'اكتب المقاس ليظهر أقرب مقاس مباشرة تحت البحث.',
+  quickClosest: 'أقرب مقاس',
+  quickCurrentQty: 'الكمية الحالية: {qty}',
+  quickQtyToAdd: 'الكمية المضافة',
+  quickSelectedWarehouse: 'المخزن المستخدم مؤخراً: {value}',
+  quickNoItems: 'لم تتم إضافة أي مقاس بعد.',
+  quickAddedToList: 'تمت إضافة {size} إلى القائمة',
+  quickListSaved: 'تم حفظ قائمة التعبئة كاملة',
+  quickMinQty: 'يجب أن تكون الكمية 1 على الأقل',
+  remove: 'حذف',
+  quickTapToEdit: 'يمكنك الضغط على الرقم وكتابة الكمية مباشرة.',
+  quickSuggestionsHint: 'أقرب النتائج',
+  quickSaveFirst: 'أضف مقاساً واحداً على الأقل قبل الحفظ',
+  quickWarehouseBadge: 'المخزن',
+  quickSearchAnother: 'ابحث عن المقاس التالي بينما تبقى القائمة أمامك.',
+  quickExistingQty: 'الموجود حالياً: {qty}',
+  chooseWarehouse: 'اختر المخزن',
+  warehouseRequired: 'اختر المخزن أولاً',
+  chooseWarehouseThenSearch: 'اختر المخزن ثم ابحث عن المقاس.',
+  warehouseLabel: 'المخزن / الموقع',
+  addWarehouseLabel: 'إضافة مخزن / موقع',
+  focus: 'تركيز',
+  quickRestockOpen: '📥 تعبئة سريعة / إدخال بضاعة',
+  quickRestockClose: '✕ إغلاق التعبئة السريعة'
+});
+
 function tr(key, vars = {}) {
   const dict = I18N[currentLang] || I18N.en;
   let value = dict[key] ?? I18N.en[key] ?? key;
@@ -909,7 +1064,8 @@ function applyLanguage() {
     'inventory-print-modal-title':'printModalTitle','print-mode-label':'reportType','print-stock-filter-label':'stockFilter','print-usage-mode-label':'usageFocus','print-sort-direction-label':'sortDirection','inventory-print-run-btn':'print',
     'service-search-title':'serviceSearchTitle','service-clear-btn':'clear','service-overview-label':'serviceOverview','service-shift-label':'todaysShift','svc-stat-today-label':'servicesTodayLabel','svc-stat-stock-label':'totalStockLabel','svc-stat-out-label':'outOfStockLabel',
     'quick-actions-label':'quickActions','qa-restock-label':'quickRestockShort','qa-restock-sub':'receiveNewStock','qa-print-label':'printReportShort','qa-print-sub':'dailySummary','qa-stock-label':'fullStockShort','qa-stock-sub':'allWarehouseSizes','qa-employee-label':'addEmployeeShort','qa-employee-sub':'adminOnly',
-    'svc-plate-label':'plateNumber','svc-qty-label':'quantityLabel','svc-condition-label':'tyreCondition','svc-type-new':'newTyre','svc-type-old':'usedTyre','svc-repair-label':'repairOptional','svc-repair-none':'noneLabel','svc-position-label':'tyrePosition','svc-pos-front-left':'frontLeft','svc-pos-front-right':'frontRight','svc-pos-rear-left':'rearLeft','svc-pos-rear-right':'rearRight','svc-notes-label':'notesLabel','svc-photo-label':'carPhoto','svc-photo-placeholder':'tapCapturePhoto','svc-complete-label':'completeService','today-services-label':'todaysServicesTitle','today-services-refresh':'refresh'
+    'svc-plate-label':'plateNumber','svc-qty-label':'quantityLabel','svc-condition-label':'tyreCondition','svc-type-new':'newTyre','svc-type-old':'usedTyre','svc-repair-label':'repairOptional','svc-repair-none':'noneLabel','svc-position-label':'tyrePosition','svc-pos-front-left':'frontLeft','svc-pos-front-right':'frontRight','svc-pos-rear-left':'rearLeft','svc-pos-rear-right':'rearRight','svc-notes-label':'notesLabel','svc-photo-label':'carPhoto','svc-photo-placeholder':'tapCapturePhoto','svc-complete-label':'completeService','today-services-label':'todaysServicesTitle','today-services-refresh':'refresh',
+    'quick-location-change-btn':'changeWarehouse','quick-restock-queue-title':'quickQueueTitle','quick-restock-queue-meta':'quickQueueHint','quick-restock-next-btn':'quickNext','quick-restock-save-all-btn':'saveAll'
   };
   Object.entries(map).forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.textContent = tr(key); });
   const hintSpan = document.querySelector('#today-services-hint span'); if (hintSpan) hintSpan.textContent = tr('scrollRightHint');
@@ -920,7 +1076,7 @@ function applyLanguage() {
   if (document.getElementById('quick-location-last')) updateQuickLocationLastLabel();
   const search = document.getElementById('inv-search'); if (search) search.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس أو المخزن...' : 'Search size or warehouse...';
   const newLoc = document.getElementById('quick-new-location'); if (newLoc) newLoc.placeholder = currentLang === 'ar' ? 'مثال: مخزن 1' : 'Example: Warehouse 1';
-  const quickSearch = document.getElementById('quick-restock-search'); if (quickSearch) quickSearch.placeholder = currentLang === 'ar' ? 'ابحث بالمقاس بدون / مثال 2155517' : 'Search by size without / e.g. 2155517';
+  const quickSearch = document.getElementById('quick-restock-search'); if (quickSearch) quickSearch.placeholder = tr('quickSearchPlaceholder');
   const saleSearch = document.getElementById('sale-search'); if (saleSearch) saleSearch.placeholder = tr('serviceSearchPlaceholder');
   const svcPlate = document.getElementById('svc-plate'); if (svcPlate) svcPlate.placeholder = currentLang === 'ar' ? 'مثال: ١٢٣٤٥' : 'AB12 CDE';
   const svcNotes = document.getElementById('svc-notes'); if (svcNotes) svcNotes.placeholder = tr('notesPlaceholder');
@@ -930,6 +1086,11 @@ function applyLanguage() {
   const pu = document.getElementById('print-usage-mode'); if (pu) { pu.options[0].text = tr('mostUsed'); pu.options[1].text = tr('leastUsed'); }
   const ps = document.getElementById('print-sort-direction'); if (ps) { ps.options[0].text = tr('descending'); ps.options[1].text = tr('ascending'); }
   updateLangButtons();
+  if (document.getElementById('quick-restock-panel')?.style.display === 'block') {
+    syncQuickWarehousePanel();
+    renderQuickRestockResults();
+    renderQuickRestockQueue();
+  }
 }
 
 function setLanguage(lang) {
@@ -1068,6 +1229,197 @@ function saveQuickLocation() {
   showToast(tr('warehouseSaved'), 'success');
 }
 
+function toggleQuickWarehousePicker(forceOpen) {
+  const picker = document.getElementById('quick-location-inline');
+  if (!picker) return;
+  quickWarehouseExpanded = typeof forceOpen === 'boolean' ? forceOpen : !quickWarehouseExpanded;
+  picker.classList.toggle('open', quickWarehouseExpanded);
+}
+
+function syncQuickWarehousePanel() {
+  const picker = document.getElementById('quick-location-inline');
+  if (picker) picker.classList.toggle('open', quickWarehouseExpanded);
+}
+
+function getQuickRestockMatches(location, query) {
+  const queryKey = normalizeTyreKey(query);
+  if (!location || !queryKey) return [];
+  const grouped = new Map();
+  (allInv || []).forEach(item => {
+    const sameLocation = String(item.location || '').trim().toLowerCase() === location.toLowerCase();
+    if (!sameLocation) return;
+    const key = normalizeTyreKey(item.size);
+    if (!key) return;
+    if (!grouped.has(key)) grouped.set(key, { key, size: formatTyreSizeValue(item.size) || item.size, quantity: 0 });
+    grouped.get(key).quantity += Number(item.quantity) || 0;
+  });
+  const arr = Array.from(grouped.values()).filter(item => item.key.includes(queryKey) || queryKey.includes(item.key) || item.size.includes(query));
+  if (!arr.length && queryKey) arr.push({ key: queryKey, size: formatTyreSizeValue(queryKey), quantity: 0 });
+  const prefix = (a, b) => {
+    let count = 0;
+    for (let i = 0; i < Math.min(a.length, b.length); i += 1) {
+      if (a[i] !== b[i]) break;
+      count += 1;
+    }
+    return count;
+  };
+  return arr.sort((a, b) => {
+    const scoreA = a.key === queryKey ? 100 : (a.key.startsWith(queryKey) ? 80 : (a.key.includes(queryKey) ? 60 : prefix(a.key, queryKey)));
+    const scoreB = b.key === queryKey ? 100 : (b.key.startsWith(queryKey) ? 80 : (b.key.includes(queryKey) ? 60 : prefix(b.key, queryKey)));
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    if (a.quantity !== b.quantity) return b.quantity - a.quantity;
+    return a.size.localeCompare(b.size);
+  });
+}
+
+function getQuickDraftFromMatches(matches, location) {
+  if (!matches.length) return { key: '', size: '', location, currentQuantity: 0, quantity: quickRestockDraft.quantity || 1 };
+  const current = matches.find(item => item.key === quickRestockDraft.key) || matches[0];
+  const keepQty = current.key === quickRestockDraft.key ? Number(quickRestockDraft.quantity) || 1 : 1;
+  return { key: current.key, size: current.size, location, currentQuantity: Number(current.quantity) || 0, quantity: Math.max(1, keepQty) };
+}
+
+function setQuickDraftQuantity(value) {
+  const next = Math.max(1, parseInt(value, 10) || 1);
+  quickRestockDraft.quantity = next;
+  renderQuickRestockResults();
+}
+
+function adjustQuickDraftQuantity(delta) {
+  setQuickDraftQuantity((Number(quickRestockDraft.quantity) || 1) + delta);
+}
+
+function selectQuickRestockSuggestion(sizeKey) {
+  const location = String(document.getElementById('quick-location-select')?.value || '').trim();
+  const query = String(document.getElementById('quick-restock-search')?.value || '').trim();
+  const matches = getQuickRestockMatches(location, query);
+  const selected = matches.find(item => item.key === sizeKey);
+  if (!selected) return;
+  quickRestockDraft = { key: selected.key, size: selected.size, location, currentQuantity: selected.quantity, quantity: Math.max(1, Number(quickRestockDraft.quantity) || 1) };
+  renderQuickRestockResults();
+}
+
+function renderQuickRestockQueue() {
+  const container = document.getElementById('quick-restock-queue');
+  const saveBtn = document.getElementById('quick-restock-save-all-btn');
+  if (!container) return;
+  if (!quickRestockQueue.length) {
+    container.innerHTML = `<div class="empty-state">${esc(tr('quickNoItems'))}</div>`;
+    if (saveBtn) saveBtn.disabled = true;
+    return;
+  }
+  if (saveBtn) saveBtn.disabled = false;
+  container.innerHTML = quickRestockQueue.map((item, index) => `
+    <div class="quick-restock-list-item">
+      <div class="quick-restock-list-row">
+        <div class="quick-restock-list-meta">
+          <div class="quick-restock-list-size">${esc(item.size)}</div>
+          <div class="quick-restock-list-warehouse">${esc(tr('quickWarehouseBadge'))}: ${esc(item.location)}</div>
+          <div class="quick-inline-note">${esc(tr('quickExistingQty', { qty: item.currentQuantity }))}</div>
+        </div>
+        <div class="quick-restock-list-actions">
+          <div class="quick-qty-control">
+            <button class="quick-qty-btn minus" onclick="adjustQuickQueueQuantityByIndex(${index},-1)">−</button>
+            <input class="quick-qty-input" type="number" min="1" value="${item.quantity}" onclick="this.select()" onchange="setQuickQueueQuantityByIndex(${index},this.value)">
+            <button class="quick-qty-btn" onclick="adjustQuickQueueQuantityByIndex(${index},1)">+</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="removeQuickQueueItemByIndex(${index})">${esc(tr('remove'))}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addCurrentQuickRestockItem() {
+  const location = String(document.getElementById('quick-location-select')?.value || '').trim();
+  if (!location) {
+    showToast(tr('warehouseRequired'), 'error');
+    return false;
+  }
+  if (!quickRestockDraft.key || !quickRestockDraft.size) {
+    showToast(tr('sizeRequiredFirst'), 'error');
+    return false;
+  }
+  const quantity = Math.max(1, parseInt(quickRestockDraft.quantity, 10) || 1);
+  const existing = quickRestockQueue.find(item => item.key === quickRestockDraft.key && item.location.toLowerCase() === location.toLowerCase());
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    quickRestockQueue.push({
+      key: quickRestockDraft.key,
+      size: quickRestockDraft.size,
+      location,
+      quantity,
+      currentQuantity: quickRestockDraft.currentQuantity || 0
+    });
+  }
+  setLastQuickLocation(location);
+  showToast(tr('quickAddedToList', { size: quickRestockDraft.size }), 'success');
+  const input = document.getElementById('quick-restock-search');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  quickRestockDraft = { key: '', size: '', location, currentQuantity: 0, quantity: 1 };
+  renderQuickRestockResults();
+  renderQuickRestockQueue();
+  return true;
+}
+
+function getQuickQueueItemByIndex(index) {
+  return quickRestockQueue[index];
+}
+
+function adjustQuickQueueQuantityByIndex(index, delta) {
+  const item = getQuickQueueItemByIndex(index);
+  if (!item) return;
+  item.quantity = Math.max(1, (Number(item.quantity) || 1) + delta);
+  renderQuickRestockQueue();
+}
+
+function setQuickQueueQuantityByIndex(index, value) {
+  const item = getQuickQueueItemByIndex(index);
+  if (!item) return;
+  item.quantity = Math.max(1, parseInt(value, 10) || 1);
+  renderQuickRestockQueue();
+}
+
+function removeQuickQueueItemByIndex(index) {
+  quickRestockQueue.splice(index, 1);
+  renderQuickRestockQueue();
+}
+
+async function saveQuickRestockBatch() {
+  if (!quickRestockQueue.length) {
+    showToast(tr('quickSaveFirst'), 'error');
+    return;
+  }
+  for (const item of quickRestockQueue) {
+    const normalizedSize = normalizeTyreKey(item.key);
+    const formattedSize = formatTyreSizeValue(normalizedSize);
+    const location = String(item.location || '').trim();
+    const matchingRows = (allInv || []).filter(row => normalizeTyreKey(row.size) === normalizedSize && String(row.location || '').trim().toLowerCase() === location.toLowerCase());
+    if (!matchingRows.length) {
+      const { error } = await db.from('inventory').insert({ size: formattedSize, location, quantity: item.quantity, notes: 'Quick restock batch' });
+      if (error) { showToast(error.message, 'error'); return; }
+    } else {
+      const target = matchingRows[0];
+      const nextQty = (Number(target.quantity) || 0) + (Number(item.quantity) || 0);
+      const { error } = await db.from('inventory').update({ quantity: nextQty }).eq('id', target.id);
+      if (error) { showToast(error.message, 'error'); return; }
+    }
+  }
+  const lastLocation = quickRestockQueue[quickRestockQueue.length - 1]?.location || getLastQuickLocation() || '';
+  quickRestockQueue = [];
+  quickRestockDraft = { key: '', size: '', location: lastLocation, currentQuantity: 0, quantity: 1 };
+  await loadInventory();
+  setLastQuickLocation(lastLocation);
+  renderQuickRestockResults();
+  renderQuickRestockQueue();
+  if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
+  showToast(tr('quickListSaved'), 'success');
+}
+
 function toggleRestockMode(forceOpen) {
   const panel = document.getElementById('quick-restock-panel');
   const btn = document.getElementById('restock-toggle-btn');
@@ -1078,8 +1430,12 @@ function toggleRestockMode(forceOpen) {
   if (btn) btn.textContent = shouldOpen ? tr('quickRestockClose') : tr('quickRestockOpen');
   if (shouldOpen) {
     populateQuickLocationSelect();
+    quickWarehouseExpanded = !getLastQuickLocation();
+    syncQuickWarehousePanel();
     renderQuickRestockResults();
+    renderQuickRestockQueue();
     panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => document.getElementById('quick-restock-search')?.focus(), 80);
   }
 }
 
@@ -1098,91 +1454,57 @@ function handleQuickRestockSearch(input) {
 }
 
 function renderQuickRestockResults() {
-  const container = document.getElementById('quick-restock-results');
+  const draftEl = document.getElementById('quick-restock-draft');
+  const suggestionsEl = document.getElementById('quick-restock-suggestions');
   const location = String(document.getElementById('quick-location-select')?.value || '').trim();
   const query = String(document.getElementById('quick-restock-search')?.value || '').trim();
-  if (!container) return;
-  if (!location) {
-    container.innerHTML = `<div class="empty-state">${esc(tr('warehouseRequired'))}</div>`;
-    updateQuickLocationLastLabel();
-    return;
-  }
+  if (!draftEl || !suggestionsEl) return;
   updateQuickLocationLastLabel();
-  if (!query) {
-    container.innerHTML = `<div class="empty-state">${esc(tr('writeSizeThenQuick'))}</div>`;
+  if (!location) {
+    draftEl.innerHTML = `<div class="empty-state">${esc(tr('warehouseRequired'))}</div>`;
+    suggestionsEl.innerHTML = '';
     return;
   }
-  const queryKey = normalizeTyreKey(query);
-  const matches = (allInv || []).filter(item => {
-    const sameLocation = String(item.location || '').trim().toLowerCase() === location.toLowerCase();
-    if (!sameLocation) return false;
-    const size = String(item.size || '');
-    return size.toLowerCase().includes(query.toLowerCase()) || normalizeTyreKey(size).includes(queryKey);
-  });
-
-  const grouped = new Map();
-  matches.forEach(item => {
-    const key = normalizeTyreKey(item.size);
-    if (!key) return;
-    if (!grouped.has(key)) grouped.set(key, { key, size: formatTyreSizeValue(item.size) || item.size, quantity: 0 });
-    grouped.get(key).quantity += Number(item.quantity) || 0;
-  });
-
-  if (!grouped.size && queryKey) grouped.set(queryKey, { key: queryKey, size: formatTyreSizeValue(queryKey), quantity: 0 });
-
-  const rows = Array.from(grouped.values()).sort((a, b) => a.size.localeCompare(b.size));
-  container.innerHTML = rows.map(item => `
-    <div class="quick-restock-result">
-      <div>
-        <div class="tyre-result-size">${esc(item.size)}</div>
-        <div class="quick-restock-meta">${esc(tr('warehouseCurrentQty', { warehouse: location, qty: item.quantity }))}</div>
+  if (!query) {
+    quickRestockDraft = { key: '', size: '', location, currentQuantity: 0, quantity: 1 };
+    draftEl.innerHTML = `<div class="empty-state">${esc(tr('quickTypeSize'))}</div>`;
+    suggestionsEl.innerHTML = '';
+    return;
+  }
+  const matches = getQuickRestockMatches(location, query);
+  quickRestockDraft = getQuickDraftFromMatches(matches, location);
+  if (!quickRestockDraft.key) {
+    draftEl.innerHTML = `<div class="empty-state">${esc(tr('quickNoDraft'))}</div>`;
+    suggestionsEl.innerHTML = '';
+    return;
+  }
+  draftEl.innerHTML = `
+    <div class="quick-restock-card active">
+      <div class="quick-restock-top">
+        <div>
+          <div class="quick-inline-note">${esc(tr('quickClosest'))}</div>
+          <div class="quick-restock-size">${esc(quickRestockDraft.size)}</div>
+          <div class="quick-restock-subline">${esc(tr('quickCurrentQty', { qty: quickRestockDraft.currentQuantity }))}</div>
+        </div>
+        <div class="quick-stock-badge">${esc(tr('quickSelectedWarehouse', { value: location }))}</div>
+      </div>
+      <div class="quick-restock-controls">
+        <div class="quick-qty-control">
+          <button class="quick-qty-btn minus" onclick="adjustQuickDraftQuantity(-1)">−</button>
+          <input class="quick-qty-input" type="number" min="1" value="${quickRestockDraft.quantity}" onclick="this.select()" onchange="setQuickDraftQuantity(this.value)">
+          <button class="quick-qty-btn" onclick="adjustQuickDraftQuantity(1)">+</button>
+        </div>
+        <div class="quick-inline-note">${esc(tr('quickTapToEdit'))}</div>
       </div>
       <div class="quick-restock-actions">
-        <button class="btn btn-danger btn-sm" onclick="changeQuickStock('${item.key}',-1)">−1</button>
-        <button class="btn btn-success btn-sm" onclick="changeQuickStock('${item.key}',1)">+1</button>
+        <button class="btn btn-ghost btn-sm" onclick="addCurrentQuickRestockItem()">${esc(tr('quickNext'))}</button>
+        <button class="btn btn-primary btn-sm" onclick="saveQuickRestockBatch()">${esc(tr('saveAll'))}</button>
       </div>
     </div>
+  `;
+  suggestionsEl.innerHTML = matches.slice(0, 6).map(item => `
+    <button class="quick-suggestion ${item.key === quickRestockDraft.key ? 'active' : ''}" onclick="selectQuickRestockSuggestion('${item.key}')">${esc(item.size)} · ${esc(tr('quickExistingQty', { qty: item.quantity }))}</button>
   `).join('');
-}
-
-async function changeQuickStock(sizeKey, delta) {
-  const location = String(document.getElementById('quick-location-select')?.value || '').trim();
-  const normalizedSize = normalizeTyreKey(sizeKey);
-  const formattedSize = formatTyreSizeValue(normalizedSize);
-  if (!location) {
-    showToast(tr('warehouseRequired'), 'error');
-    return;
-  }
-  if (!formattedSize) {
-    showToast(tr('sizeRequiredFirst'), 'error');
-    return;
-  }
-
-  const matchingRows = (allInv || []).filter(item => normalizeTyreKey(item.size) === normalizedSize && String(item.location || '').trim().toLowerCase() === location.toLowerCase());
-
-  if (!matchingRows.length) {
-    if (delta < 0) {
-      showToast(tr('noWarehouseForSize'), 'error');
-      return;
-    }
-    const { error } = await db.from('inventory').insert({ size: formattedSize, location, quantity: delta, notes: 'Quick restock' });
-    if (error) { showToast(error.message, 'error'); return; }
-  } else {
-    const target = matchingRows[0];
-    const nextQty = (Number(target.quantity) || 0) + delta;
-    if (nextQty < 0) {
-      showToast(tr('qtyBelowZero'), 'error');
-      return;
-    }
-    const { error } = await db.from('inventory').update({ quantity: nextQty }).eq('id', target.id);
-    if (error) { showToast(error.message, 'error'); return; }
-  }
-
-  setLastQuickLocation(location);
-  showToast(tr(delta > 0 ? 'qtyIncreased' : 'qtyDecreased', { size: formattedSize }), 'success');
-  await loadInventory();
-  renderQuickRestockResults();
-  if (document.getElementById('page-dashboard').classList.contains('active')) loadDashboard();
 }
 
 async function ensureInventoryLoaded() {
@@ -1801,12 +2123,12 @@ function renderInv(items) {
       const noteLabel = esc(i.notes || tr('none'));
       const locationOptions = buildLocationOptions(selectedLocation, true);
       return `<tr>
-        <td><b>${sizeLabel}</b></td>
-        <td><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity}</span></td>
-        <td><select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select></td>
-        <td><button class="btn btn-success btn-sm" onclick="changeInventoryQty('${i.id}',1)">+1</button></td>
-        <td class="inventory-note-cell">${noteLabel}</td>
-        <td><div class="inventory-action-stack"><select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="openEditModal('${i.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteInv('${i.id}','${esc(i.size)}')">🗑 ${esc(tr('deleteLabel'))}</button></div></div></td>
+        <td data-label="${esc(tr('size'))}"><b>${sizeLabel}</b></td>
+        <td data-label="${esc(tr('qty'))}"><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity}</span></td>
+        <td data-label="${esc(tr('warehouse'))}"><select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select></td>
+        <td data-label="+1"><button class="btn btn-success btn-sm" onclick="changeInventoryQty('${i.id}',1)">+1</button></td>
+        <td data-label="${esc(tr('notes'))}" class="inventory-note-cell">${noteLabel}</td>
+        <td data-label="${esc(tr('actions'))}"><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="openEditModal('${i.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteInv('${i.id}','${esc(i.size)}')">🗑 ${esc(tr('deleteLabel'))}</button></div></td>
       </tr>`;
   }).join('');
 }
@@ -1919,14 +2241,14 @@ async function loadReport() {
     const time = new Date(t.created_at).toLocaleString();
     const condition = t.tyre_condition === 'new' ? '✨ New' : t.tyre_condition === 'old' ? '🔄 Used' : '-';
     return `<tr>
-      <td style="white-space:nowrap;">${esc(time)}</td>
-      <td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td>
-      <td>${esc(t.plate_number || '-')}</td>
-      <td>${condition}</td>
-      <td>${esc(getTransactionNoteText(t))}</td>
-      <td>${esc(t.repair_type || '-')}</td>
-      <td>${esc(t.operator || '-')}</td>
-      <td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></td>
+      <td data-label="Time" style="white-space:nowrap;">${esc(time)}</td>
+      <td data-label="${esc(tr('size'))}"><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td>
+      <td data-label="Plate">${esc(t.plate_number || '-')}</td>
+      <td data-label="Condition">${condition}</td>
+      <td data-label="${esc(tr('notes'))}">${esc(getTransactionNoteText(t))}</td>
+      <td data-label="Repair">${esc(t.repair_type || '-')}</td>
+      <td data-label="Operator">${esc(t.operator || '-')}</td>
+      <td data-label="${esc(tr('actions'))}"><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></td>
     </tr>`;
   }).join('');
 
@@ -2199,11 +2521,11 @@ async function loadStockRep() {
   const tbody = document.getElementById('stock-rep-table');
   if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">No inventory data</div></td></tr>'; return; }
   tbody.innerHTML = data.map(i => `<tr>
-      <td><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td>
-      <td>${esc(i.location || '-')}</td>
-      <td><b>${i.quantity}</b></td>
-      <td><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity === 0 ? 'Out of Stock' : i.quantity <= 4 ? 'Low Stock' : 'In Stock'}</span></td>
-      <td>${esc(i.notes || '-')}</td>
+      <td data-label="${esc(tr('size'))}"><b>${esc(formatTyreSizeValue(i.size) || i.size)}</b></td>
+      <td data-label="${esc(tr('warehouse'))}">${esc(i.location || '-')}</td>
+      <td data-label="${esc(tr('qty'))}"><b>${i.quantity}</b></td>
+      <td data-label="Status"><span class="badge ${i.quantity === 0 ? 'badge-red' : i.quantity <= 4 ? 'badge-orange' : 'badge-green'}">${i.quantity === 0 ? 'Out of Stock' : i.quantity <= 4 ? 'Low Stock' : 'In Stock'}</span></td>
+      <td data-label="${esc(tr('notes'))}">${esc(i.notes || '-')}</td>
     </tr>`).join('');
 }
 
@@ -2770,6 +3092,470 @@ function handleScrollTopButton() {
   btn.classList.toggle('show', window.scrollY > 280);
 }
 
+
+function uiText(ar, en) {
+  return currentLang === 'ar' ? ar : en;
+}
+
+const TYRE_POSITION_META = [
+  { key: 'front_left', short: 'FL', en: 'Front Left', ar: 'أمامي يسار' },
+  { key: 'front_right', short: 'FR', en: 'Front Right', ar: 'أمامي يمين' },
+  { key: 'rear_left', short: 'RL', en: 'Rear Left', ar: 'خلفي يسار' },
+  { key: 'rear_right', short: 'RR', en: 'Rear Right', ar: 'خلفي يمين' }
+];
+
+function getTransactionPositions(tx) {
+  return TYRE_POSITION_META
+    .filter(item => Boolean(tx?.[item.key]))
+    .map(item => ({ ...item, label: currentLang === 'ar' ? item.ar : item.en }));
+}
+
+function getPositionShortCodes(tx) {
+  const positions = getTransactionPositions(tx);
+  return positions.length ? positions.map(p => p.short).join(' · ') : '-';
+}
+
+function getPositionFullLabels(tx) {
+  const positions = getTransactionPositions(tx);
+  return positions.length ? positions.map(p => p.label).join(currentLang === 'ar' ? '، ' : ', ') : '-';
+}
+
+function getPositionDiagramHtml(tx) {
+  const active = new Set(getTransactionPositions(tx).map(p => p.key));
+  return `<div class="mini-position-diagram" title="${esc(getPositionFullLabels(tx))}"><div class="mini-car-body"></div>${TYRE_POSITION_META.map(item => `<span class="mini-tyre tyre-${item.key.replace(/_/g, '-')} ${active.has(item.key) ? 'active' : ''}" title="${esc(currentLang === 'ar' ? item.ar : item.en)}"></span>`).join('')}</div>`;
+}
+
+function renderPositionSummary(tx, options = {}) {
+  const positions = getTransactionPositions(tx);
+  if (!positions.length) return `<span class="position-shortcodes">-</span>`;
+  const codes = positions.map(p => p.short).join(' · ');
+  if (options.codesOnly) return `<span class="position-shortcodes" title="${esc(getPositionFullLabels(tx))}">${esc(codes)}</span>`;
+  return `<div class="service-position-wrap"><span class="position-shortcodes" title="${esc(getPositionFullLabels(tx))}">${esc(codes)}</span>${getPositionDiagramHtml(tx)}</div>`;
+}
+
+function removeSavedLocation(location) {
+  const clean = String(location || '').trim();
+  if (!clean) return;
+  const next = getSavedLocations().filter(item => item.toLowerCase() !== clean.toLowerCase());
+  setSavedLocations(next);
+  if (getLastQuickLocation().toLowerCase() === clean.toLowerCase()) {
+    localStorage.removeItem(QUICK_LAST_LOCATION_KEY);
+  }
+}
+
+function getWarehouseRows(location) {
+  const target = String(location || '').trim().toLowerCase();
+  return (allInv || []).filter(item => String(item.location || '').trim().toLowerCase() === target);
+}
+
+function getWarehouseStats(location) {
+  const rows = getWarehouseRows(location);
+  return {
+    rows,
+    totalQty: rows.reduce((sum, item) => sum + Number(item.quantity || 0), 0)
+  };
+}
+
+async function openWarehouseManager() {
+  await loadInventory();
+  renderWarehouseManager();
+  document.getElementById('warehouse-manager-modal')?.classList.add('open');
+}
+
+function renderWarehouseManager() {
+  const container = document.getElementById('warehouse-manager-list');
+  if (!container) return;
+  const locations = getAllKnownLocations();
+  if (!locations.length) {
+    container.innerHTML = `<div class="empty-state">${esc(uiText('لا توجد مخازن محفوظة بعد', 'No saved warehouses yet'))}</div>`;
+    return;
+  }
+  container.innerHTML = locations.map(loc => {
+    const stats = getWarehouseStats(loc);
+    return `<div class="warehouse-manager-item"><div><div><strong>${esc(loc)}</strong></div><div class="warehouse-manager-summary">${esc(uiText(`${stats.rows.length} مقاسات · ${stats.totalQty} كفر`, `${stats.rows.length} sizes · ${stats.totalQty} tyres`))}</div></div><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick='renameWarehousePrompt(${JSON.stringify(loc)})'>✏️ ${esc(uiText('تعديل', 'Rename'))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehousePrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText('حذف', 'Delete'))}</button></div></div>`;
+  }).join('');
+}
+
+function addWarehouseFromManager() {
+  const input = document.getElementById('warehouse-manager-new-input');
+  const location = String(input?.value || '').trim();
+  if (!location) {
+    showToast(uiText('اكتب اسم المخزن أولاً', 'Type the warehouse name first'), 'error');
+    return;
+  }
+  addSavedLocation(location);
+  setLastQuickLocation(location);
+  if (input) input.value = '';
+  populateQuickLocationSelect(location);
+  renderWarehouseManager();
+  showToast(uiText('تم حفظ المخزن', 'Warehouse saved'), 'success');
+}
+
+async function renameWarehousePrompt(oldLocation) {
+  const nextLocation = String(prompt(uiText('اسم المخزن الجديد', 'New warehouse name'), oldLocation) || '').trim();
+  if (!nextLocation || nextLocation.toLowerCase() === String(oldLocation || '').trim().toLowerCase()) return;
+  const { error } = await db.from('inventory').update({ location: nextLocation }).eq('location', oldLocation);
+  if (error) {
+    showToast(error.message, 'error');
+    return;
+  }
+  removeSavedLocation(oldLocation);
+  addSavedLocation(nextLocation);
+  if (getLastQuickLocation().toLowerCase() === String(oldLocation || '').trim().toLowerCase()) {
+    setLastQuickLocation(nextLocation);
+  }
+  await loadInventory();
+  renderWarehouseManager();
+  populateTransferSelects(nextLocation, nextLocation);
+  showToast(uiText('تم تعديل اسم المخزن', 'Warehouse renamed'), 'success');
+}
+
+async function deleteWarehousePrompt(location) {
+  const stats = getWarehouseStats(location);
+  const activeRows = stats.rows.filter(item => Number(item.quantity || 0) > 0);
+  if (activeRows.length) {
+    showToast(uiText('لا يمكن حذف مخزن يحتوي على مخزون. انقل الكميات أولاً.', 'Cannot delete a warehouse that still has stock. Transfer the quantities first.'), 'error');
+    return;
+  }
+  if (!confirm(uiText(`حذف المخزن "${location}" من القائمة؟`, `Remove "${location}" from the warehouse list?`))) return;
+  if (stats.rows.length) {
+    const { error } = await db.from('inventory').update({ location: null }).eq('location', location);
+    if (error) {
+      showToast(error.message, 'error');
+      return;
+    }
+  }
+  removeSavedLocation(location);
+  await loadInventory();
+  renderWarehouseManager();
+  populateTransferSelects();
+  showToast(uiText('تم حذف المخزن من القائمة', 'Warehouse removed from the list'), 'success');
+}
+
+function populateTransferSelects(preferredSource = '', preferredDestination = '') {
+  const source = document.getElementById('transfer-source-select');
+  const destination = document.getElementById('transfer-destination-select');
+  if (!source || !destination) return;
+  const locations = getAllKnownLocations();
+  const sourceValue = preferredSource || source.value || '';
+  source.innerHTML = [`<option value="">${esc(uiText('اختر المخزن المصدر', 'Choose source warehouse'))}</option>`, ...locations.map(loc => `<option value="${esc(loc)}">${esc(loc)}</option>`)].join('');
+  if (sourceValue && locations.some(loc => loc.toLowerCase() === sourceValue.toLowerCase())) {
+    source.value = locations.find(loc => loc.toLowerCase() === sourceValue.toLowerCase()) || sourceValue;
+  }
+  const currentSource = source.value || sourceValue || '';
+  const destinationLocations = locations.filter(loc => loc.toLowerCase() !== currentSource.toLowerCase());
+  const destinationValue = preferredDestination || destination.value || '';
+  destination.innerHTML = [`<option value="">${esc(uiText('اختر المخزن الهدف', 'Choose destination warehouse'))}</option>`, ...destinationLocations.map(loc => `<option value="${esc(loc)}">${esc(loc)}</option>`)].join('');
+  if (destinationValue && destinationLocations.some(loc => loc.toLowerCase() === destinationValue.toLowerCase())) {
+    destination.value = destinationLocations.find(loc => loc.toLowerCase() === destinationValue.toLowerCase()) || destinationValue;
+  }
+}
+
+function handleTransferSourceChange() {
+  populateTransferSelects(document.getElementById('transfer-source-select')?.value || '', document.getElementById('transfer-destination-select')?.value || '');
+  renderTransferRows();
+}
+
+function normalizeTransferQty(input) {
+  if (!input) return;
+  let value = parseInt(input.value || '0', 10);
+  const max = Number(input.max || 0);
+  if (Number.isNaN(value) || value < 0) value = 0;
+  if (max >= 0 && value > max) value = max;
+  input.value = String(value);
+}
+
+function renderTransferRows() {
+  const source = String(document.getElementById('transfer-source-select')?.value || '').trim();
+  const query = String(document.getElementById('transfer-search')?.value || '').trim();
+  const container = document.getElementById('transfer-list');
+  const summary = document.getElementById('transfer-summary');
+  if (!container || !summary) return;
+  if (!source) {
+    container.innerHTML = `<div class="empty-state">${esc(uiText('اختر المخزن المصدر أولاً', 'Choose the source warehouse first'))}</div>`;
+    summary.textContent = uiText('اختر الكميات ثم اضغط نقل', 'Select quantities then press Transfer');
+    return;
+  }
+  const queryKey = normalizeTyreKey(query);
+  const rows = (allInv || [])
+    .filter(item => String(item.location || '').trim().toLowerCase() === source.toLowerCase())
+    .filter(item => Number(item.quantity || 0) > 0)
+    .filter(item => {
+      if (!query) return true;
+      const size = String(item.size || '');
+      return size.toLowerCase().includes(query.toLowerCase()) || normalizeTyreKey(size).includes(queryKey);
+    })
+    .sort((a, b) => String(a.size || '').localeCompare(String(b.size || '')));
+
+  if (!rows.length) {
+    container.innerHTML = `<div class="empty-state">${esc(uiText('لا توجد مقاسات في هذا المخزن', 'No sizes found in this warehouse'))}</div>`;
+    summary.textContent = uiText(`المخزن ${source}: لا توجد نتائج`, `${source}: no matching rows`);
+    return;
+  }
+
+  summary.textContent = uiText(`المخزن ${source}: ${rows.length} مقاسات متاحة`, `${source}: ${rows.length} sizes available`);
+  container.innerHTML = rows.map(item => {
+    const qty = Number(item.quantity || 0);
+    return `<div class="transfer-item"><div class="transfer-item-head"><div><div><strong>${esc(formatTyreSizeValue(item.size) || item.size)}</strong></div><div class="transfer-badge">${esc(uiText(`المتوفر ${qty}`, `${qty} available`))}</div></div><input type="number" class="table-select transfer-qty-input" data-id="${item.id}" min="0" max="${qty}" value="0" oninput="normalizeTransferQty(this)"></div>${item.notes ? `<div class="warehouse-manager-summary">📝 ${esc(item.notes)}</div>` : ''}</div>`;
+  }).join('');
+}
+
+async function openTransferModal() {
+  await loadInventory();
+  const last = getLastQuickLocation() || '';
+  populateTransferSelects(last, '');
+  const search = document.getElementById('transfer-search');
+  const next = document.getElementById('transfer-new-destination');
+  if (search) search.value = '';
+  if (next) next.value = '';
+  renderTransferRows();
+  document.getElementById('stock-transfer-modal')?.classList.add('open');
+}
+
+async function executeTransferStock() {
+  const source = String(document.getElementById('transfer-source-select')?.value || '').trim();
+  const destination = String(document.getElementById('transfer-new-destination')?.value || document.getElementById('transfer-destination-select')?.value || '').trim();
+  if (!source) {
+    showToast(uiText('اختر المخزن المصدر أولاً', 'Choose the source warehouse first'), 'error');
+    return;
+  }
+  if (!destination) {
+    showToast(uiText('اختر المخزن الهدف أو اكتب اسماً جديداً', 'Choose the destination warehouse or type a new one'), 'error');
+    return;
+  }
+  if (source.toLowerCase() === destination.toLowerCase()) {
+    showToast(uiText('المخزن المصدر والهدف لا يمكن أن يكونا نفس المخزن', 'Source and destination cannot be the same warehouse'), 'error');
+    return;
+  }
+  const selected = Array.from(document.querySelectorAll('#transfer-list .transfer-qty-input'))
+    .map(input => ({ id: input.dataset.id, amount: Number(input.value || 0) }))
+    .filter(item => item.amount > 0);
+  if (!selected.length) {
+    showToast(uiText('اختر كمية واحدة على الأقل للنقل', 'Choose at least one quantity to transfer'), 'error');
+    return;
+  }
+  if (!confirm(uiText(`سيتم نقل ${selected.length} سطر إلى ${destination}. هل تريد المتابعة؟`, `Transfer ${selected.length} rows to ${destination}?`))) return;
+
+  let movedTotal = 0;
+  let workingInventory = (allInv || []).map(item => ({ ...item, quantity: Number(item.quantity || 0) }));
+
+  try {
+    for (const entry of selected) {
+      const sourceItem = workingInventory.find(item => item.id === entry.id);
+      if (!sourceItem) continue;
+      const available = Number(sourceItem.quantity || 0);
+      const amount = Math.min(Number(entry.amount || 0), available);
+      if (amount <= 0) continue;
+
+      const nextSourceQty = available - amount;
+      const { error: sourceError } = await db.from('inventory').update({ quantity: nextSourceQty }).eq('id', sourceItem.id);
+      if (sourceError) throw sourceError;
+      sourceItem.quantity = nextSourceQty;
+
+      let destinationMatch = workingInventory.find(item => item.id !== sourceItem.id
+        && normalizeTyreKey(item.size) === normalizeTyreKey(sourceItem.size)
+        && String(item.location || '').trim().toLowerCase() === destination.toLowerCase()
+        && String(item.notes || '').trim() === String(sourceItem.notes || '').trim());
+
+      if (destinationMatch) {
+        const nextDestinationQty = Number(destinationMatch.quantity || 0) + amount;
+        const { error: destinationError } = await db.from('inventory').update({ quantity: nextDestinationQty }).eq('id', destinationMatch.id);
+        if (destinationError) throw destinationError;
+        destinationMatch.quantity = nextDestinationQty;
+      } else {
+        const payload = {
+          size: sourceItem.size,
+          location: destination,
+          quantity: amount,
+          notes: sourceItem.notes || null
+        };
+        const { data: created, error: createError } = await db.from('inventory').insert(payload).select().single();
+        if (createError) throw createError;
+        workingInventory.push({ ...created, quantity: Number(created.quantity || 0) });
+      }
+      movedTotal += amount;
+    }
+  } catch (error) {
+    showToast(error?.message || uiText('حدث خطأ أثناء النقل', 'An error occurred during transfer'), 'error');
+    return;
+  }
+
+  addSavedLocation(destination);
+  setLastQuickLocation(destination);
+  closeModal('stock-transfer-modal');
+  await loadInventory();
+  if (document.getElementById('page-dashboard')?.classList.contains('active')) loadDashboard();
+  if (document.getElementById('page-report')?.classList.contains('active')) loadStockRep();
+  if (document.getElementById('warehouse-manager-modal')?.classList.contains('open')) renderWarehouseManager();
+  showToast(uiText(`تم نقل ${movedTotal} كفر إلى ${destination}`, `Moved ${movedTotal} tyres to ${destination}`), 'success');
+}
+
+async function loadTodayCards() {
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+  const container = document.getElementById('today-cards');
+  if (!container) return;
+  if (!data?.length) {
+    container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`;
+    return;
+  }
+  const cards = await Promise.all((data || []).map(async t => {
+    const time = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const typeLabel = t.tyre_condition === 'new' ? tr('newTyre') : t.tyre_condition === 'old' ? tr('usedTyre') : '—';
+    const repairLabel = t.repair_type ? esc(t.repair_type) : esc(tr('noneLabel'));
+    const sizeLabel = esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size);
+    const isOld = t.tyre_condition === 'old';
+    const photoSrc = await getTransactionPhotoSource(t);
+    const noteText = esc(getTransactionNoteText(t));
+    const photoMarkup = photoSrc
+      ? `<button class="svc-photo-btn" type="button" data-photo="${esc(photoSrc)}" onclick="openImageLightbox(this.dataset.photo)"><img class="svc-photo" src="${esc(photoSrc)}" alt="Service photo" loading="lazy" decoding="async"><span class="svc-photo-zoom"><i class="fas fa-expand"></i>${esc(tr('viewPhoto'))}</span></button>`
+      : `<div class="svc-photo-empty"><i class="fas fa-camera"></i><span>${esc(tr('noPhotoCard'))}</span></div>`;
+    return `<div class="svc-card" ${isOld ? 'style="border-color:rgba(248,210,110,0.25);"' : ''}><div class="svc-card-hd" ${isOld ? 'style="background:var(--gold-dim);"' : ''}><div class="svc-card-size" ${isOld ? 'style="color:var(--gold);"' : ''}>${sizeLabel}</div><div class="time-chip">${time}</div></div>${photoMarkup}<div class="svc-card-body"><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'النوع' : 'Type')}</span><span class="val">${typeLabel}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الكمية' : 'Qty')}</span><span class="val">${Number(t.quantity) || 1}</span></div><div class="svc-card-row svc-card-row-position"><span class="label">${esc(currentLang === 'ar' ? 'المكان' : 'Position')}</span><span class="val">${renderPositionSummary(t)}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الإصلاح' : 'Repair')}</span><span class="val">${repairLabel}</span></div><div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'بواسطة' : 'By')}</span><span class="val">${esc(t.operator || '—')}</span></div><div class="svc-card-plate">${esc(t.plate_number || '—')}</div><div class="svc-card-note"><strong>${esc(currentLang === 'ar' ? 'ملاحظة:' : 'Note:')}</strong> ${noteText}</div><div class="svc-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 ${esc(tr('deleteLabel'))}</button></div></div></div>`;
+  }));
+  container.innerHTML = cards.join('');
+}
+
+async function loadReport() {
+  const from = document.getElementById('rep-from').value;
+  const to = document.getElementById('rep-to').value;
+  if (!from || !to) {
+    showToast(uiText('اختر فترة التاريخ', 'Select date range'), 'error');
+    return;
+  }
+  const { data } = await db.from('transactions')
+    .select('*')
+    .gte('created_at', from + 'T00:00:00')
+    .lte('created_at', to + 'T23:59:59')
+    .order('created_at', { ascending: false });
+
+  currentReportData = data || [];
+  const tbody = document.getElementById('rep-table');
+  if (!currentReportData.length) {
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state">${esc(uiText('لا توجد خدمات في هذه الفترة', 'No services found for this period'))}</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = currentReportData.map(t => {
+    const time = new Date(t.created_at).toLocaleString();
+    const condition = t.tyre_condition === 'new' ? '✨ New' : t.tyre_condition === 'old' ? '🔄 Used' : '-';
+    return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${esc(t.plate_number || '-')}</td><td>${condition}</td><td>${renderPositionSummary(t, { codesOnly: true })}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td><td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}','${esc(t.tyre_size)}',${Number(t.quantity) || 1})">🗑 Delete</button></div></td></tr>`;
+  }).join('');
+
+  showToast(uiText(`تم العثور على ${currentReportData.length} سجل`, `Found ${currentReportData.length} records`), 'success');
+}
+
+async function printReport() {
+  if (!currentReportData.length) await loadReport();
+  if (!currentReportData.length) {
+    showToast(uiText('لا توجد بيانات للطباعة', 'No data to print'), 'error');
+    return;
+  }
+  const from = document.getElementById('rep-from').value;
+  const to = document.getElementById('rep-to').value;
+  let html = `<!DOCTYPE html><html><head><title>Quality Part X - Service Report</title><style>body{font-family:Arial,sans-serif;padding:30px;}h1{color:#f0a500;} .header{text-align:center;margin-bottom:30px;border-bottom:2px solid #f0a500;padding-bottom:15px;} .company{font-size:28px;font-weight:bold;color:#f0a500;} .location{color:#666;font-size:12px;} .period{margin:15px 0;font-size:14px;background:#f5f5f5;padding:10px;border-radius:8px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ddd;padding:10px;text-align:left;} th{background:#f0a500;color:#000;font-weight:bold;} .footer{margin-top:30px;text-align:center;font-size:11px;color:#999;} .total{margin-top:20px;font-weight:bold;text-align:right;} .position-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#fff6d6;color:#8a6500;font-size:11px;font-weight:700;}</style></head><body><div class="header"><div class="company">QUALITY PART X</div><div class="location">TYRE SERVICES · DUNSTABLE</div><div class="period">Report Period: ${from} to ${to}<br>Generated: ${new Date().toLocaleString()}<br>Operator: ${currentUser?.username || 'Unknown'}</div></div><h3>Service Transactions Report</h3><table><thead><tr><th>Date & Time</th><th>Tyre Size</th><th>Plate Number</th><th>Condition</th><th>Position</th><th>Note</th><th>Repair Type</th><th>Operator</th></tr></thead><tbody>`;
+  currentReportData.forEach(t => {
+    const time = new Date(t.created_at).toLocaleString();
+    const condition = t.tyre_condition === 'new' ? 'New' : t.tyre_condition === 'old' ? 'Used' : '-';
+    html += `<tr><td>${esc(time)}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${esc(t.plate_number || '-')}</td><td>${condition}</td><td><span class="position-pill">${esc(getPositionShortCodes(t))}</span></td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+  });
+  html += `</tbody></table><div class="total">Total Services: ${currentReportData.length}</div><div class="footer">Quality Part X - Dunstable | Tyre Services Department</div></body></html>`;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(html);
+  printWindow.document.close();
+  setTimeout(() => { printWindow.print(); }, 500);
+}
+
+function formatInvoiceShareText(tx) {
+  const createdAt = tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString();
+  const condition = tx?.tyre_condition === 'new' ? (currentLang === 'ar' ? 'جديد' : 'New') : tx?.tyre_condition === 'old' ? (currentLang === 'ar' ? 'مستعمل' : 'Used') : '-';
+  const position = getPositionShortCodes(tx);
+  return currentLang === 'ar'
+    ? ['QUALITY PART X','تفاصيل الخدمة:',`التاريخ: ${createdAt}`,`رقم اللوحة: ${tx?.plate_number || '-'}`,`مقاس الكفر: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,`الحالة: ${condition}`,`المكان: ${position}`,`الكمية: ${Number(tx?.quantity) || 1}`,`الإصلاح: ${tx?.repair_type || '-'}`,`الملاحظة: ${getTransactionNoteText(tx)}`,`الموظف: ${tx?.operator || '-'}`].join('\n')
+    : ['QUALITY PART X','Service details:',`Date: ${createdAt}`,`Plate: ${tx?.plate_number || '-'}`,`Tyre Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,`Condition: ${condition}`,`Position: ${position}`,`Quantity: ${Number(tx?.quantity) || 1}`,`Repair: ${tx?.repair_type || '-'}`,`Note: ${getTransactionNoteText(tx)}`,`Operator: ${tx?.operator || '-'}`].join('\n');
+}
+
+async function createInvoiceShareCard(tx) {
+  const photoFile = await getInvoicePhotoFile(tx);
+  let bitmap = null;
+  if (photoFile && 'createImageBitmap' in window) {
+    try { bitmap = await createImageBitmap(photoFile); } catch (err) { bitmap = null; }
+  }
+  const width = 1080;
+  const padding = 40;
+  const contentWidth = width - padding * 2;
+  const headerHeight = 130;
+  const photoHeight = bitmap ? Math.round(contentWidth * (bitmap.height / bitmap.width)) : 260;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = '36px sans-serif';
+  const labelMap = currentLang === 'ar'
+    ? { plate: 'رقم اللوحة', size: 'المقاس', condition: 'الحالة', position: 'المكان', qty: 'الكمية', repair: 'الإصلاح', operator: 'الموظف', time: 'الوقت', note: 'الملاحظة' }
+    : { plate: 'Plate', size: 'Tyre Size', condition: 'Condition', position: 'Position', qty: 'Quantity', repair: 'Repair', operator: 'Operator', time: 'Time', note: 'Note' };
+  const infoLines = [
+    `${labelMap.plate}: ${tx?.plate_number || '-'}`,
+    `${labelMap.size}: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+    `${labelMap.condition}: ${tx?.tyre_condition === 'new' ? (currentLang === 'ar' ? 'جديد' : 'New') : tx?.tyre_condition === 'old' ? (currentLang === 'ar' ? 'مستعمل' : 'Used') : '-'}`,
+    `${labelMap.position}: ${getPositionShortCodes(tx)}`,
+    `${labelMap.qty}: ${Number(tx?.quantity) || 1}`,
+    `${labelMap.repair}: ${tx?.repair_type || '-'}`,
+    `${labelMap.operator}: ${tx?.operator || '-'}`,
+    `${labelMap.time}: ${tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString()}`,
+    `${labelMap.note}: ${getTransactionNoteText(tx)}`
+  ].flatMap(line => wrapCanvasText(ctx, line, contentWidth));
+  const lineHeight = 44;
+  const footerHeight = 50;
+  canvas.width = width;
+  canvas.height = headerHeight + photoHeight + 30 + (infoLines.length * lineHeight) + footerHeight;
+  ctx.fillStyle = '#0b0f16';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f0a500';
+  ctx.fillRect(0, 0, canvas.width, 12);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 56px sans-serif';
+  ctx.fillText('QUALITY PART X', padding, 76);
+  ctx.font = '28px sans-serif';
+  ctx.fillStyle = '#c8d0df';
+  ctx.fillText(currentLang === 'ar' ? 'بطاقة فاتورة الخدمة' : 'Tyre Service Invoice Card', padding, 112);
+  const photoY = headerHeight;
+  if (bitmap) {
+    ctx.drawImage(bitmap, padding, photoY, contentWidth, photoHeight);
+  } else {
+    ctx.fillStyle = '#151c26';
+    ctx.fillRect(padding, photoY, contentWidth, photoHeight);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '32px sans-serif';
+    ctx.fillText(currentLang === 'ar' ? 'لا توجد صورة سيارة' : 'No car photo available', padding + 30, photoY + 80);
+  }
+  let y = headerHeight + photoHeight + 50;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '34px sans-serif';
+  infoLines.forEach(line => {
+    ctx.fillText(line, padding, y);
+    y += lineHeight;
+  });
+  return await new Promise(resolve => canvas.toBlob(blob => resolve(blob ? new File([blob], `invoice_${tx.id}.png`, { type: 'image/png' }) : null), 'image/png'));
+}
+
+async function printDailyReport() {
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+  if (!data?.length) {
+    showToast(uiText('لا توجد خدمات اليوم', 'No services today'), 'error');
+    return;
+  }
+  let html = `<!DOCTYPE html><html><head><title>Daily Report - Quality Part X</title><style>body{font-family:Arial,sans-serif;padding:30px;}h1{color:#f0a500;} .header{text-align:center;margin-bottom:30px;border-bottom:2px solid #f0a500;padding-bottom:15px;} .company{font-size:28px;font-weight:bold;color:#f0a500;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ddd;padding:10px;text-align:left;} th{background:#f0a500;color:#000;} .total{margin-top:20px;font-weight:bold;text-align:right;} .position-pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#fff6d6;color:#8a6500;font-size:11px;font-weight:700;}</style></head><body><div class="header"><div class="company">QUALITY PART X</div><div>TYRE SERVICES · DUNSTABLE</div><div>Daily Report - ${new Date().toLocaleDateString()}</div><div>Operator: ${currentUser?.username || '-'}</div></div><table><thead><tr><th>Time</th><th>Size</th><th>Plate</th><th>Condition</th><th>Position</th><th>Note</th><th>Repair</th><th>Operator</th></tr></thead><tbody>`;
+  data.forEach(t => {
+    const time = new Date(t.created_at).toLocaleTimeString();
+    const condition = t.tyre_condition === 'new' ? 'New' : t.tyre_condition === 'old' ? 'Used' : '-';
+    html += `<tr><td>${esc(time)}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${esc(t.plate_number || '-')}</td><td>${condition}</td><td><span class="position-pill">${esc(getPositionShortCodes(t))}</span></td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+  });
+  html += `</tbody></table><div class="total">Total Services Today: ${data.length}</div></body></html>`;
+  const win = window.open();
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 500);
+}
+
 window.addEventListener('scroll', handleScrollTopButton, { passive: true });
 document.addEventListener('DOMContentLoaded', () => {
   updateServiceDateBadge();
@@ -2777,6 +3563,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
