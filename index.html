@@ -10898,5 +10898,756 @@
       crossorigin="anonymous"
     ></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+    <script id="qpx-custom-stock-reports-patch">
+      (() => {
+        const STOCK_LOG_PREFIX = "[[QPX_STOCK:";
+
+        Object.assign(I18N.en, {
+          serviceBalance: "Balancing",
+          stockSummaryTitle: "Available Stock Summary",
+          stockSummarySub: "Available sizes only with total quantity across all warehouses",
+          reportCardTitle: "Reports",
+          reportCardSub:
+            "Choose a period and print services, added quantities, or transferred quantities.",
+          reportTypeLabel: "Report content",
+          reportServicesOption: "Services",
+          reportAdditionsOption: "Added quantities",
+          reportTransfersOption: "Transferred quantities",
+          reportLoad: "Load",
+          reportFilter: "Filter",
+          reportPrint: "Print",
+          reportReady: "Found {count} records",
+          reportNoServices: "No services found for this period",
+          reportNoAdditions: "No added quantities found for this period",
+          reportNoTransfers: "No transfers found for this period",
+          reportPrintNoData: "No data to print for the selected report",
+          inventoryAddOne: "Add one tyre",
+          inventoryEditData: "Edit data",
+          inventoryDeleteData: "Delete",
+          inventoryNoteLabel: "Note",
+          inventoryControlsTitle: "Tools",
+          inventoryWarehousesSub: "Add, rename and organize warehouses",
+          inventoryTransferSub: "Move quantities between warehouses",
+          inventoryAuditSub: "Print grouped stock audit",
+          inventoryPrintSub: "Detailed print options",
+          inventoryAvailableSub: "Print available sizes only",
+          inventoryOutSub: "Print out-of-stock sizes",
+          inventoryAddSub: "Add a new size manually",
+          inventoryRestockSub: "Receive incoming tyres quickly",
+          reportAddedTitle: "Added Quantities Report",
+          reportTransferredTitle: "Transferred Quantities Report",
+          reportServicesTitle: "Service Report",
+          fromWarehouse: "From warehouse",
+          toWarehouse: "To warehouse",
+          movementType: "Movement",
+          noWarehouseValue: "No warehouse",
+          transferredLabel: "Transferred",
+          addedLabel: "Added",
+          totalAddedLabel: "Total added",
+          totalTransferredLabel: "Total transferred",
+          totalServicesReportLabel: "Total services",
+        });
+
+        Object.assign(I18N.ar, {
+          serviceBalance: "ترصيص",
+          stockSummaryTitle: "تقرير المقاسات المتوفرة",
+          stockSummarySub: "المقاسات المتوفرة فقط مع إجمالي الكمية في جميع المخازن",
+          reportCardTitle: "التقارير",
+          reportCardSub:
+            "اختر الفترة ثم اطبع الخدمات أو الكميات المضافة أو الكميات المنقولة.",
+          reportTypeLabel: "محتوى التقرير",
+          reportServicesOption: "الخدمات",
+          reportAdditionsOption: "الكميات المضافة",
+          reportTransfersOption: "الكميات المنقولة",
+          reportLoad: "تحميل",
+          reportFilter: "تصفية",
+          reportPrint: "طباعة",
+          reportReady: "تم العثور على {count} سجل",
+          reportNoServices: "لا توجد خدمات في هذه الفترة",
+          reportNoAdditions: "لا توجد كميات مضافة في هذه الفترة",
+          reportNoTransfers: "لا توجد كميات منقولة في هذه الفترة",
+          reportPrintNoData: "لا توجد بيانات للطباعة في التقرير المحدد",
+          inventoryAddOne: "إضافة كفر واحد",
+          inventoryEditData: "تعديل البيانات",
+          inventoryDeleteData: "حذف",
+          inventoryNoteLabel: "ملاحظة",
+          inventoryControlsTitle: "الأدوات",
+          inventoryWarehousesSub: "إضافة وتعديل وتنظيم المخازن",
+          inventoryTransferSub: "نقل الكميات بين المخازن",
+          inventoryAuditSub: "طباعة جرد مجمع",
+          inventoryPrintSub: "خيارات طباعة مفصلة",
+          inventoryAvailableSub: "طباعة المقاسات المتوفرة فقط",
+          inventoryOutSub: "طباعة المقاسات غير المتوفرة",
+          inventoryAddSub: "إضافة مقاس جديد يدوياً",
+          inventoryRestockSub: "استلام الكميات الجديدة بسرعة",
+          reportAddedTitle: "تقرير الكميات المضافة",
+          reportTransferredTitle: "تقرير الكميات المنقولة",
+          reportServicesTitle: "تقرير الخدمات",
+          fromWarehouse: "من مخزن",
+          toWarehouse: "إلى مخزن",
+          movementType: "الحركة",
+          noWarehouseValue: "بدون مخزن",
+          transferredLabel: "منقول",
+          addedLabel: "مضاف",
+          totalAddedLabel: "إجمالي المضاف",
+          totalTransferredLabel: "إجمالي المنقول",
+          totalServicesReportLabel: "إجمالي الخدمات",
+        });
+
+        const ensureStockPatchStyles = () => {
+          if (document.getElementById("qpx-stock-report-styles")) return;
+          const style = document.createElement("style");
+          style.id = "qpx-stock-report-styles";
+          style.textContent = [
+            ".inventory-qa-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}",
+            "#page-inventory .inventory-qa-grid .qa-btn{width:100%;text-align:start;min-height:118px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;}",
+            "#page-inventory .inventory-qa-grid .qa-btn-label{font-size:13px;line-height:1.35;}",
+            "#page-inventory .inventory-qa-grid .qa-btn-sub{font-size:11px;line-height:1.45;}",
+            "#page-inventory .table-wrap{overflow:visible;}",
+            "#page-inventory .table-wrap table,#page-inventory .table-wrap tbody{display:block;width:100%;}",
+            "#page-inventory .table-wrap tr.inventory-compact-row{display:block;width:100%;margin-bottom:12px;border:none;background:transparent;}",
+            "#page-inventory .table-wrap tr.inventory-compact-row td{display:block;width:100%;padding:0;border:none;}",
+            "#page-inventory .table-wrap tr.inventory-compact-row td::before{display:none !important;content:none !important;}",
+            ".inventory-stock-card{border:1px solid var(--stroke);background:var(--bg-card);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-card);}",
+            ".inventory-stock-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}",
+            ".inventory-stock-size{font-weight:800;font-size:15px;color:var(--text);font-family:'DM Mono',monospace;}",
+            ".inventory-stock-qty{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(94,236,208,0.10);border:1px solid rgba(94,236,208,0.25);font-weight:700;font-size:12px;}",
+            ".inventory-stock-qty.low{background:rgba(245,158,11,0.12);border-color:rgba(245,158,11,0.25);color:#f59e0b;}",
+            ".inventory-stock-qty.zero{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:#ef4444;}",
+            ".inventory-stock-mid{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;}",
+            ".inventory-stock-note{font-size:11px;color:var(--text-muted);line-height:1.5;background:rgba(255,255,255,0.03);border-radius:12px;padding:8px 10px;}",
+            ".inventory-stock-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}",
+            ".inventory-stock-actions .btn{min-width:0;justify-content:center;padding-inline:8px;}",
+            ".report-type-wrap{display:flex;flex-direction:column;gap:6px;}",
+            "#page-report .report-filter-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;}",
+            "#page-report .report-filter-row .btn{height:44px;}",
+            "@media (max-width:560px){#page-report .report-filter-row{grid-template-columns:1fr 1fr;}.inventory-qa-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}",
+            "@media (max-width:420px){.inventory-stock-actions{grid-template-columns:repeat(3,minmax(0,1fr));}.inventory-stock-actions .btn{font-size:11px;padding:9px 6px;}}",
+          ].join("");
+          document.head.appendChild(style);
+        };
+
+        function normalizeStockLogMeta(meta = {}) {
+          const next = { ...meta };
+          next.type = meta.type === "transfer" ? "transfer" : "addition";
+          next.size = String(meta.size || "").trim();
+          next.quantity = Number(meta.quantity || 0);
+          next.location = String(meta.location || "").trim();
+          next.from = String(meta.from || "").trim();
+          next.to = String(meta.to || "").trim();
+          next.reason = String(meta.reason || "").trim();
+          next.mode = "inventory_log";
+          return next;
+        }
+
+        function encodeStockLogMeta(meta = {}) {
+          try {
+            return btoa(unescape(encodeURIComponent(JSON.stringify(normalizeStockLogMeta(meta)))));
+          } catch (error) {
+            return "";
+          }
+        }
+
+        function packStockLogMeta(meta = {}) {
+          const encoded = encodeStockLogMeta(meta);
+          return encoded ? `${STOCK_LOG_PREFIX}${encoded}]]` : "";
+        }
+
+        function decodeStockLogMeta(raw = "") {
+          try {
+            return JSON.parse(decodeURIComponent(escape(atob(raw))));
+          } catch (error) {
+            return null;
+          }
+        }
+
+        function extractStockLogMeta(tx) {
+          const rawNotes = String(tx?.notes || "");
+          const match = rawNotes.match(/^\[\[QPX_STOCK:([^\]]+)\]\](?:\n)?/);
+          if (!match) return null;
+          return decodeStockLogMeta(match[1]);
+        }
+
+        async function createStockLog(meta = {}) {
+          const normalized = normalizeStockLogMeta(meta);
+          if (!normalized.size || normalized.quantity <= 0) return;
+          const payload = {
+            tyre_size: formatTyreSizeValue(normalized.size) || normalized.size,
+            plate_number: null,
+            front_left: false,
+            front_right: false,
+            rear_left: false,
+            rear_right: false,
+            repair_type: null,
+            tyre_condition: null,
+            notes: packStockLogMeta(normalized),
+            operator: currentUser?.username || null,
+            photo_url: null,
+            quantity: normalized.quantity,
+            brand: null,
+          };
+          const { error } = await db.from("transactions").insert(payload);
+          if (error) console.warn("Unable to write stock log", error);
+        }
+
+        function getSelectedReportType() {
+          return document.getElementById("rep-type")?.value || "services";
+        }
+
+        function getReportDateRange() {
+          return {
+            from: document.getElementById("rep-from")?.value || "",
+            to: document.getElementById("rep-to")?.value || "",
+          };
+        }
+
+        function updateReportHeaders(type) {
+          const title = document.querySelector("#page-report .card .card-title");
+          const sub = document.querySelector("#page-report .card .panel-subtitle");
+          const thead = document.querySelector("#rep-table")?.closest("table")?.querySelector("thead");
+          const cardButtons = document.querySelectorAll("#page-report .card .report-actions .btn");
+          if (title) {
+            title.textContent =
+              type === "additions"
+                ? tr("reportAddedTitle")
+                : type === "transfers"
+                  ? tr("reportTransferredTitle")
+                  : tr("reportServicesTitle");
+          }
+          if (sub) sub.textContent = tr("reportCardSub");
+          if (cardButtons[0]) cardButtons[0].textContent = `🔄 ${tr("reportLoad")}`;
+          if (cardButtons[1]) cardButtons[1].textContent = `🖨 ${tr("reportPrint")}`;
+          if (!thead) return;
+          if (type === "additions") {
+            thead.innerHTML = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${tr("qty")}</th><th>${tr("warehouse")}</th><th>${tr("movementType")}</th><th>${currentLang === "ar" ? "السبب" : "Reason"}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th></tr>`;
+          } else if (type === "transfers") {
+            thead.innerHTML = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${tr("qty")}</th><th>${tr("fromWarehouse")}</th><th>${tr("toWarehouse")}</th><th>${tr("movementType")}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th></tr>`;
+          } else {
+            thead.innerHTML = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${currentLang === "ar" ? "اللوحة" : "Plate"}</th><th>${currentLang === "ar" ? "الحالة" : "Condition"}</th><th>${currentLang === "ar" ? "المكان" : "Position"}</th><th>${tr("notes")}</th><th>${currentLang === "ar" ? "الإصلاح" : "Repair"}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th><th>${tr("actions")}</th></tr>`;
+          }
+        }
+
+        function ensureReportTypeUi() {
+          ensureStockPatchStyles();
+          const reportPage = document.getElementById("page-report");
+          if (!reportPage) return;
+          const firstCard = reportPage.querySelector(".card");
+          const row = firstCard?.querySelector(".row");
+          if (!firstCard || !row) return;
+          row.classList.add("report-filter-row");
+          if (!document.getElementById("rep-type")) {
+            const wrap = document.createElement("div");
+            wrap.className = "form-group report-type-wrap";
+            wrap.innerHTML = `
+              <label id="rep-type-label"></label>
+              <select id="rep-type" class="table-select" onchange="loadReport()">
+                <option value="services"></option>
+                <option value="additions"></option>
+                <option value="transfers"></option>
+              </select>
+            `;
+            row.insertBefore(wrap, row.lastElementChild);
+          }
+          const label = document.getElementById("rep-type-label");
+          const select = document.getElementById("rep-type");
+          if (label) label.textContent = tr("reportTypeLabel");
+          if (select) {
+            const options = select.querySelectorAll("option");
+            if (options[0]) options[0].textContent = tr("reportServicesOption");
+            if (options[1]) options[1].textContent = tr("reportAdditionsOption");
+            if (options[2]) options[2].textContent = tr("reportTransfersOption");
+          }
+          const rowButton = row.querySelector(".btn.btn-ghost.btn-sm");
+          if (rowButton) rowButton.textContent = tr("reportFilter");
+          updateReportHeaders(getSelectedReportType());
+        }
+
+        function getStockReportRows(records = [], type = "services") {
+          if (type === "services") {
+            return records
+              .filter((item) => !extractStockLogMeta(item))
+              .map((t) => ({ ...t, __type: "service" }));
+          }
+          return records
+            .map((t) => ({ tx: t, meta: extractStockLogMeta(t) }))
+            .filter((entry) => entry.meta && entry.meta.type === (type === "transfers" ? "transfer" : "addition"))
+            .map((entry) => ({ ...entry.tx, __type: entry.meta.type, __meta: entry.meta }));
+        }
+
+        async function printAvailableStockSummary() {
+          const win = openPrintShell(tr("stockSummaryTitle"));
+          if (!win) return;
+          const { data: inventory } = await db.from("inventory").select("*");
+          const aggregated = aggregateInventoryBySize((inventory || []).filter((item) => Number(item.quantity || 0) > 0));
+          if (!aggregated.length) {
+            try { win.close(); } catch (error) {}
+            showToast(tr("printNoData"), "error");
+            return;
+          }
+          const sorted = sortInventoryRows(aggregated, "size_asc");
+          const rows = sorted
+            .map((item) => `<tr><td><b>${esc(formatTyreSizeValue(item.size) || item.size)}</b></td><td>${Number(item.quantity) || 0}</td></tr>`)
+            .join("");
+          const totalQty = sorted.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+          const html = `<!DOCTYPE html><html><head><title>${esc(tr("stockSummaryTitle"))}</title>${buildPrintStyle()}</head><body><div class="header"><div class="company">QUALITY PART X</div><div>TYRE SERVICES · DUNSTABLE</div><div class="meta">${esc(tr("stockSummaryTitle"))}<br>${esc(tr("stockSummarySub"))}<br>${esc(tr("generatedAtLabel"))}: ${esc(new Date().toLocaleString())}<br>${esc(tr("operatorLabel"))}: ${esc(currentUser?.username || "-")}</div></div><table><thead><tr><th>${tr("size")}</th><th>${tr("qty")}</th></tr></thead><tbody>${rows}</tbody></table><div class="total">${esc(tr("qty"))}: ${totalQty} | ${esc(tr("uniqueSizesTotal"))}: ${sorted.length}</div></body></html>`;
+          finishPrintShell(win, html);
+        }
+
+        serviceOptionLabel = function (value) {
+          const keyMap = {
+            Patch: "servicePatch",
+            "Move Tire": "serviceMoveTire",
+            Rotate: "serviceRotate",
+            Balance: "serviceBalance",
+            Other: "serviceOther",
+          };
+          return tr(keyMap[value] || "serviceOther");
+        };
+
+        refreshServiceEnhancementTexts = function () {
+          const outLabel = document.getElementById("svc-stat-out-label");
+          if (outLabel) outLabel.textContent = tr("usedTyresLabel");
+          const changeBtn = document.getElementById("svc-action-change");
+          const serviceBtn = document.getElementById("svc-action-service");
+          const twoBtn = document.getElementById("svc-action-two");
+          if (changeBtn)
+            changeBtn.innerHTML = `${esc(tr("changeTireAction"))}<span class="mini-badge">${esc(tr("modeChangeTire"))}</span>`;
+          if (serviceBtn)
+            serviceBtn.innerHTML = `${esc(tr("serviceAction"))}<span class="mini-badge">${esc(tr("serviceOptionLabel"))}</span>`;
+          if (twoBtn)
+            twoBtn.innerHTML = `${esc(tr("twoDifferentSizesAction"))}<span class="mini-badge">${esc(tr("rearSearchTitle"))}</span>`;
+          const serviceLabel = document.getElementById("svc-service-option-label");
+          if (serviceLabel) serviceLabel.textContent = tr("serviceOptionLabel");
+          const serviceSelect = document.getElementById("svc-service-type");
+          if (serviceSelect) {
+            const options = [
+              { value: "", key: "serviceOptionPlaceholder" },
+              { value: "Patch", key: "servicePatch" },
+              { value: "Move Tire", key: "serviceMoveTire" },
+              { value: "Rotate", key: "serviceRotate" },
+              { value: "Balance", key: "serviceBalance" },
+              { value: "Other", key: "serviceOther" },
+            ];
+            serviceSelect.innerHTML = options
+              .map((item) => `<option value="${esc(item.value)}">${esc(tr(item.key))}</option>`)
+              .join("");
+            serviceSelect.value = selectedServiceOption || "";
+          }
+          const rearTitle = document.getElementById("svc-rear-title");
+          if (rearTitle) rearTitle.textContent = tr("rearSearchTitle");
+          const rearInput = document.getElementById("svc-rear-search");
+          if (rearInput) rearInput.placeholder = tr("rearSearchPlaceholder");
+          const rearHint = document.getElementById("svc-rear-hint");
+          if (rearHint)
+            rearHint.textContent = rearTyreSelection?.size
+              ? tr("selectedRearPrefix", {
+                  size: formatTyreSizeValue(rearTyreSelection.size) || rearTyreSelection.size,
+                })
+              : tr("rearSearchHint");
+        };
+
+        renderInv = function (items) {
+          const tbody = document.getElementById("inv-table");
+          if (!tbody) return;
+          if (!items.length) {
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">${esc(tr("noInventory"))}</div></td></tr>`;
+            return;
+          }
+          tbody.innerHTML = items
+            .map((i) => {
+              const selectedLocation = getPreferredRowLocation(i);
+              const sizeLabel = esc(formatTyreSizeValue(i.size) || i.size);
+              const noteLabel = esc(i.notes || tr("none"));
+              const locationOptions = buildLocationOptions(selectedLocation, true);
+              const qty = Number(i.quantity) || 0;
+              const qtyClass = qty <= 0 ? "zero" : qty <= 4 ? "low" : "";
+              return `
+                <tr class="inventory-compact-row">
+                  <td colspan="6">
+                    <div class="inventory-stock-card">
+                      <div class="inventory-stock-top">
+                        <div class="inventory-stock-size">${sizeLabel}</div>
+                        <div class="inventory-stock-qty ${qtyClass}">${esc(tr("qty"))}: ${qty}</div>
+                      </div>
+                      <div class="inventory-stock-mid">
+                        <select class="table-select row-location-select" data-id="${i.id}" onchange="handleRowLocationChange('${i.id}', this.value)">${locationOptions}</select>
+                        <div class="inventory-stock-note">${esc(tr("inventoryNoteLabel"))}: ${noteLabel}</div>
+                      </div>
+                      <div class="inventory-stock-actions">
+                        <button class="btn btn-success btn-sm" onclick="changeInventoryQty('${i.id}',1)">➕ ${esc(tr("inventoryAddOne"))}</button>
+                        <button class="btn btn-ghost btn-sm" onclick="openEditModal('${i.id}')">✏️ ${esc(tr("inventoryEditData"))}</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteInv('${i.id}','${String(i.size || "").replace(/'/g, "&#39;")}')">🗑 ${esc(tr("inventoryDeleteData"))}</button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>`;
+            })
+            .join("");
+        };
+
+        const originalChangeInventoryQty = changeInventoryQty;
+        changeInventoryQty = async function (id, delta) {
+          const beforeItem = (allInv || []).find((row) => row.id === id);
+          await originalChangeInventoryQty(id, delta);
+          if (delta > 0 && beforeItem) {
+            await createStockLog({
+              type: "addition",
+              size: beforeItem.size,
+              quantity: delta,
+              location: getPreferredRowLocation(beforeItem) || beforeItem.location || "",
+              reason: "manual_increment",
+            });
+          }
+        };
+
+        saveInv = async function () {
+          const sizeInput = document.getElementById("m-size");
+          const size = formatTyreSizeField(sizeInput).trim();
+          const location = document.getElementById("m-location").value.trim();
+          if (location) addSavedLocation(location);
+          const qty = parseInt(document.getElementById("m-qty").value, 10) || 0;
+          const notes = document.getElementById("m-notes").value.trim();
+          const editId = document.getElementById("m-id").value;
+          if (!size) {
+            showToast(currentLang === "ar" ? "المقاس مطلوب" : "Size required", "error");
+            return;
+          }
+          const oldItem = editId ? (allInv || []).find((item) => item.id === editId) : null;
+          const payload = { size, location: location || null, quantity: qty, notes: notes || null };
+          const { error } = editId
+            ? await db.from("inventory").update(payload).eq("id", editId)
+            : await db.from("inventory").insert(payload);
+          if (error) {
+            showToast(error.message, "error");
+            return;
+          }
+          const addedQty = editId ? Math.max(0, qty - (Number(oldItem?.quantity) || 0)) : Math.max(0, qty);
+          if (addedQty > 0) {
+            await createStockLog({
+              type: "addition",
+              size,
+              quantity: addedQty,
+              location,
+              reason: editId ? "edit_increase" : "manual_add",
+            });
+          }
+          showToast(editId ? (currentLang === "ar" ? "تم التحديث" : "Updated") : (currentLang === "ar" ? "تمت الإضافة" : "Added"), "success");
+          closeModal("inv-modal");
+          loadInventory();
+        };
+
+        saveQuickRestockBatch = async function () {
+          if (!quickRestockQueue.length) {
+            showToast(tr("quickSaveFirst"), "error");
+            return;
+          }
+          for (const item of quickRestockQueue) {
+            const normalizedSize = normalizeTyreKey(item.key);
+            const formattedSize = formatTyreSizeValue(normalizedSize);
+            const location = String(item.location || "").trim();
+            const matchingRows = (allInv || []).filter(
+              (row) =>
+                normalizeTyreKey(row.size) === normalizedSize &&
+                String(row.location || "").trim().toLowerCase() === location.toLowerCase(),
+            );
+            if (!matchingRows.length) {
+              const { error } = await db.from("inventory").insert({
+                size: formattedSize,
+                location,
+                quantity: item.quantity,
+                notes: "Quick restock batch",
+              });
+              if (error) {
+                showToast(error.message, "error");
+                return;
+              }
+            } else {
+              const target = matchingRows[0];
+              const nextQty = (Number(target.quantity) || 0) + (Number(item.quantity) || 0);
+              const { error } = await db.from("inventory").update({ quantity: nextQty }).eq("id", target.id);
+              if (error) {
+                showToast(error.message, "error");
+                return;
+              }
+            }
+            await createStockLog({
+              type: "addition",
+              size: formattedSize || item.size,
+              quantity: Number(item.quantity) || 0,
+              location,
+              reason: "quick_restock",
+            });
+          }
+          const lastLocation = quickRestockQueue[quickRestockQueue.length - 1]?.location || getLastQuickLocation() || "";
+          quickRestockQueue = [];
+          quickRestockDraft = { key: "", size: "", location: lastLocation, currentQuantity: 0, quantity: 1 };
+          await loadInventory();
+          setLastQuickLocation(lastLocation);
+          renderQuickRestockResults();
+          renderQuickRestockQueue();
+          if (document.getElementById("page-dashboard")?.classList.contains("active")) loadDashboard();
+          showToast(tr("quickListSaved"), "success");
+        };
+
+        confirmTransfer = async function () {
+          const source = String(document.getElementById("transfer-source-select")?.value || "").trim();
+          const destination = String(document.getElementById("transfer-new-destination")?.value || document.getElementById("transfer-destination-select")?.value || "").trim();
+          if (!source) {
+            showToast(uiText("اختر المخزن المصدر أولاً", "Choose the source warehouse first"), "error");
+            return;
+          }
+          if (!destination) {
+            showToast(uiText("اختر المخزن الهدف أو اكتب اسماً جديداً", "Choose the destination warehouse or type a new one"), "error");
+            return;
+          }
+          if (source.toLowerCase() === destination.toLowerCase()) {
+            showToast(uiText("المخزن المصدر والهدف لا يمكن أن يكونا نفس المخزن", "Source and destination cannot be the same warehouse"), "error");
+            return;
+          }
+          const selected = Array.from(document.querySelectorAll("#transfer-list .transfer-qty-input"))
+            .map((input) => ({ id: input.dataset.id, amount: Number(input.value || 0) }))
+            .filter((item) => item.amount > 0);
+          if (!selected.length) {
+            showToast(uiText("اختر كمية واحدة على الأقل للنقل", "Choose at least one quantity to transfer"), "error");
+            return;
+          }
+          if (!confirm(uiText(`سيتم نقل ${selected.length} سطر إلى ${destination}. هل تريد المتابعة؟`, `Transfer ${selected.length} rows to ${destination}?`))) return;
+          let movedTotal = 0;
+          let workingInventory = (allInv || []).map((item) => ({ ...item, quantity: Number(item.quantity || 0) }));
+          try {
+            for (const entry of selected) {
+              const sourceItem = workingInventory.find((item) => item.id === entry.id);
+              if (!sourceItem) continue;
+              const available = Number(sourceItem.quantity || 0);
+              const amount = Math.min(Number(entry.amount || 0), available);
+              if (amount <= 0) continue;
+              const nextSourceQty = available - amount;
+              const { error: sourceError } = await db.from("inventory").update({ quantity: nextSourceQty }).eq("id", sourceItem.id);
+              if (sourceError) throw sourceError;
+              sourceItem.quantity = nextSourceQty;
+              let destinationMatch = workingInventory.find(
+                (item) =>
+                  item.id !== sourceItem.id &&
+                  normalizeTyreKey(item.size) === normalizeTyreKey(sourceItem.size) &&
+                  String(item.location || "").trim().toLowerCase() === destination.toLowerCase() &&
+                  String(item.notes || "").trim() === String(sourceItem.notes || "").trim(),
+              );
+              if (destinationMatch) {
+                const nextDestinationQty = Number(destinationMatch.quantity || 0) + amount;
+                const { error: destinationError } = await db.from("inventory").update({ quantity: nextDestinationQty }).eq("id", destinationMatch.id);
+                if (destinationError) throw destinationError;
+                destinationMatch.quantity = nextDestinationQty;
+              } else {
+                const payload = { size: sourceItem.size, location: destination, quantity: amount, notes: sourceItem.notes || null };
+                const { data: created, error: createError } = await db.from("inventory").insert(payload).select().single();
+                if (createError) throw createError;
+                workingInventory.push({ ...created, quantity: Number(created.quantity || 0) });
+              }
+              await createStockLog({
+                type: "transfer",
+                size: sourceItem.size,
+                quantity: amount,
+                from: source,
+                to: destination,
+                reason: "warehouse_transfer",
+              });
+              movedTotal += amount;
+            }
+          } catch (error) {
+            showToast(error?.message || uiText("حدث خطأ أثناء النقل", "An error occurred during transfer"), "error");
+            return;
+          }
+          addSavedLocation(destination);
+          setLastQuickLocation(destination);
+          closeModal("stock-transfer-modal");
+          await loadInventory();
+          if (document.getElementById("page-dashboard")?.classList.contains("active")) loadDashboard();
+          if (document.getElementById("page-report")?.classList.contains("active")) loadStockRep();
+          if (document.getElementById("warehouse-manager-modal")?.classList.contains("open")) renderWarehouseManager();
+          showToast(uiText(`تم نقل ${movedTotal} كفر إلى ${destination}`, `Moved ${movedTotal} tyres to ${destination}`), "success");
+        };
+
+        loadReport = async function () {
+          ensureReportTypeUi();
+          const { from, to } = getReportDateRange();
+          const type = getSelectedReportType();
+          updateReportHeaders(type);
+          if (!from || !to) {
+            showToast(currentLang === "ar" ? "اختر الفترة" : "Select date range", "error");
+            return;
+          }
+          const { data } = await db.from("transactions").select("*").gte("created_at", from + "T00:00:00").lte("created_at", to + "T23:59:59").order("created_at", { ascending: false });
+          currentReportData = getStockReportRows(data || [], type);
+          const tbody = document.getElementById("rep-table");
+          if (!tbody) return;
+          if (!currentReportData.length) {
+            const msgKey = type === "additions" ? "reportNoAdditions" : type === "transfers" ? "reportNoTransfers" : "reportNoServices";
+            const colspan = type === "services" ? 9 : 7;
+            tbody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty-state">${esc(tr(msgKey))}</div></td></tr>`;
+            return;
+          }
+          if (type === "additions") {
+            tbody.innerHTML = currentReportData.map((t) => {
+              const meta = t.__meta || {};
+              const time = new Date(t.created_at).toLocaleString();
+              const location = meta.location || tr("noWarehouseValue");
+              const reason = meta.reason || "-";
+              return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(location)}</td><td>${esc(tr("addedLabel"))}</td><td>${esc(reason)}</td><td>${esc(t.operator || "-")}</td></tr>`;
+            }).join("");
+          } else if (type === "transfers") {
+            tbody.innerHTML = currentReportData.map((t) => {
+              const meta = t.__meta || {};
+              const time = new Date(t.created_at).toLocaleString();
+              return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.from || tr("noWarehouseValue"))}</td><td>${esc(meta.to || tr("noWarehouseValue"))}</td><td>${esc(tr("transferredLabel"))}</td><td>${esc(t.operator || "-")}</td></tr>`;
+            }).join("");
+          } else {
+            tbody.innerHTML = currentReportData.map((t) => {
+              const time = new Date(t.created_at).toLocaleString();
+              const condition = t.tyre_condition === "new" ? (currentLang === "ar" ? "✨ جديد" : "✨ New") : t.tyre_condition === "old" ? (currentLang === "ar" ? "🔄 مستعمل" : "🔄 Used") : "-";
+              return `<tr><td data-label="Time" style="white-space:nowrap;">${esc(time)}</td><td data-label="${esc(tr("size"))}"><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td data-label="Plate">${esc(t.plate_number || "-")}</td><td data-label="Condition">${condition}</td><td data-label="Position">${esc(getPositionShortCodes(t))}</td><td data-label="${esc(tr("notes"))}">${esc(getTransactionNoteText(t))}</td><td data-label="Repair">${esc(t.repair_type || "-")}</td><td data-label="Operator">${esc(t.operator || "-")}</td><td data-label="${esc(tr("actions"))}"><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr("share"))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr("deleteLabel"))}</button></div></td></tr>`;
+            }).join("");
+          }
+          showToast(tr("reportReady", { count: currentReportData.length }), "success");
+        };
+
+        printReport = async function () {
+          if (!currentReportData.length) await loadReport();
+          if (!currentReportData.length) {
+            showToast(tr("reportPrintNoData"), "error");
+            return;
+          }
+          const type = getSelectedReportType();
+          const { from, to } = getReportDateRange();
+          const title = type === "additions" ? tr("reportAddedTitle") : type === "transfers" ? tr("reportTransferredTitle") : tr("reportServicesTitle");
+          let head = "";
+          let body = "";
+          let totalLabel = tr("totalServicesReportLabel");
+          let totalQty = currentReportData.length;
+          if (type === "additions") {
+            head = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${tr("qty")}</th><th>${tr("warehouse")}</th><th>${currentLang === "ar" ? "السبب" : "Reason"}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th></tr>`;
+            body = currentReportData.map((t) => {
+              const meta = t.__meta || {};
+              return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.location || tr("noWarehouseValue"))}</td><td>${esc(meta.reason || "-")}</td><td>${esc(t.operator || "-")}</td></tr>`;
+            }).join("");
+            totalQty = currentReportData.reduce((sum, item) => sum + Number(item.__meta?.quantity || item.quantity || 0), 0);
+            totalLabel = tr("totalAddedLabel");
+          } else if (type === "transfers") {
+            head = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${tr("qty")}</th><th>${tr("fromWarehouse")}</th><th>${tr("toWarehouse")}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th></tr>`;
+            body = currentReportData.map((t) => {
+              const meta = t.__meta || {};
+              return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.from || tr("noWarehouseValue"))}</td><td>${esc(meta.to || tr("noWarehouseValue"))}</td><td>${esc(t.operator || "-")}</td></tr>`;
+            }).join("");
+            totalQty = currentReportData.reduce((sum, item) => sum + Number(item.__meta?.quantity || item.quantity || 0), 0);
+            totalLabel = tr("totalTransferredLabel");
+          } else {
+            head = `<tr><th>${currentLang === "ar" ? "الوقت" : "Time"}</th><th>${tr("size")}</th><th>${currentLang === "ar" ? "اللوحة" : "Plate"}</th><th>${currentLang === "ar" ? "الحالة" : "Condition"}</th><th>${currentLang === "ar" ? "المكان" : "Position"}</th><th>${tr("notes")}</th><th>${currentLang === "ar" ? "الإصلاح" : "Repair"}</th><th>${currentLang === "ar" ? "الموظف" : "Operator"}</th></tr>`;
+            body = currentReportData.map((t) => {
+              const condition = t.tyre_condition === "new" ? (currentLang === "ar" ? "جديد" : "New") : t.tyre_condition === "old" ? (currentLang === "ar" ? "مستعمل" : "Used") : "-";
+              return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${esc(t.plate_number || "-")}</td><td>${esc(condition)}</td><td>${esc(getPositionShortCodes(t))}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || "-")}</td><td>${esc(t.operator || "-")}</td></tr>`;
+            }).join("");
+          }
+          const html = `<!DOCTYPE html><html><head><title>${esc(title)}</title>${buildPrintStyle()}</head><body><div class="header"><div class="company">QUALITY PART X</div><div>TYRE SERVICES · DUNSTABLE</div><div class="meta">${esc(title)}<br>${esc(from)} → ${esc(to)}<br>${esc(tr("generatedAtLabel"))}: ${esc(new Date().toLocaleString())}<br>${esc(tr("operatorLabel"))}: ${esc(currentUser?.username || "-")}</div></div><table><thead>${head}</thead><tbody>${body}</tbody></table><div class="total">${esc(totalLabel)}: ${totalQty}</div></body></html>`;
+          const win = openPrintShell(title);
+          if (!win) return;
+          finishPrintShell(win, html);
+        };
+
+        function ensureInventoryCardsUi() {
+          ensureStockPatchStyles();
+          const inventoryPage = document.getElementById("page-inventory");
+          const grid = inventoryPage?.querySelector(".ctrl-grid");
+          if (!inventoryPage || !grid) return;
+          grid.classList.add("inventory-qa-grid");
+          grid.innerHTML = `
+            <button class="qa-btn" onclick="toggleRestockMode()">
+              <div class="qa-btn-icon" style="background:var(--teal-dim);color:var(--teal)"><i class="fas fa-boxes-stacked"></i></div>
+              <div class="qa-btn-label">${esc(tr("quickRestockOpen"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryRestockSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="openAddModal()">
+              <div class="qa-btn-icon" style="background:rgba(96,165,250,.16);color:#60a5fa"><i class="fas fa-plus-circle"></i></div>
+              <div class="qa-btn-label">${esc(tr("addTyre"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryAddSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="openWarehouseManager()">
+              <div class="qa-btn-icon" style="background:rgba(168,85,247,.18);color:#a855f7"><i class="fas fa-warehouse"></i></div>
+              <div class="qa-btn-label">${esc(tr("warehouseManagerLabel"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryWarehousesSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="openTransferModal()">
+              <div class="qa-btn-icon" style="background:rgba(34,197,94,.16);color:#22c55e"><i class="fas fa-right-left"></i></div>
+              <div class="qa-btn-label">${esc(tr("transferStockLabel"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryTransferSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="printInventoryAudit()">
+              <div class="qa-btn-icon" style="background:rgba(245,158,11,.16);color:#f59e0b"><i class="fas fa-clipboard-check"></i></div>
+              <div class="qa-btn-label">${esc(tr("inventoryAuditBtn"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryAuditSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="openInventoryPrintModal()">
+              <div class="qa-btn-icon" style="background:rgba(59,130,246,.16);color:#3b82f6"><i class="fas fa-print"></i></div>
+              <div class="qa-btn-label">${esc(tr("printOptions"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryPrintSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="printAvailableStockSummary()">
+              <div class="qa-btn-icon" style="background:var(--gold-dim);color:var(--gold)"><i class="fas fa-box-open"></i></div>
+              <div class="qa-btn-label">${esc(tr("fullStockShort"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryAvailableSub"))}</div>
+            </button>
+            <button class="qa-btn" onclick="printInventoryStock({ stockFilter: 'out' })">
+              <div class="qa-btn-icon" style="background:rgba(239,68,68,.16);color:#ef4444"><i class="fas fa-box"></i></div>
+              <div class="qa-btn-label">${esc(tr("printOutOnly"))}</div>
+              <div class="qa-btn-sub">${esc(tr("inventoryOutSub"))}</div>
+            </button>
+          `;
+        }
+
+        const originalUpdateInventoryPageText = updateInventoryPageText;
+        updateInventoryPageText = function () {
+          originalUpdateInventoryPageText();
+          ensureInventoryCardsUi();
+          ensureReportTypeUi();
+          const inventoryPage = document.getElementById("page-inventory");
+          const panelTitle = inventoryPage?.querySelector(".card .card-title");
+          if (panelTitle && panelTitle.id === "inventory-title") panelTitle.textContent = tr("inventoryPanelTitle");
+          const quickStockBtn = document.getElementById("qa-stock-label");
+          if (quickStockBtn) quickStockBtn.textContent = tr("fullStockShort");
+          const quickStockSub = document.getElementById("qa-stock-sub");
+          if (quickStockSub) quickStockSub.textContent = tr("stockSummarySub");
+        };
+
+        const originalApplyLanguageCustom = applyLanguage;
+        applyLanguage = function () {
+          originalApplyLanguageCustom();
+          ensureStockPatchStyles();
+          ensureInventoryCardsUi();
+          ensureReportTypeUi();
+          const quickStockAction = document.querySelector('#page-service .quick-actions .qa-btn:nth-child(3)');
+          if (quickStockAction) quickStockAction.setAttribute('onclick', 'printAvailableStockSummary()');
+          const dashboardStockButtons = Array.from(document.querySelectorAll('.dashboard-qa-grid .qa-btn')).filter((btn) => btn.getAttribute('onclick') === 'printInventoryStock()');
+          dashboardStockButtons.forEach((btn) => btn.setAttribute('onclick', 'printAvailableStockSummary()'));
+          const inventoryCardTitle = document.querySelector('#page-report .card .card-title');
+          if (inventoryCardTitle) updateReportHeaders(getSelectedReportType());
+        };
+
+        const originalShowPageCustom = showPage;
+        showPage = function (name) {
+          originalShowPageCustom(name);
+          if (name === "inventory") ensureInventoryCardsUi();
+          if (name === "report") ensureReportTypeUi();
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+          ensureStockPatchStyles();
+          ensureInventoryCardsUi();
+          ensureReportTypeUi();
+          const quickStockAction = document.querySelector('#page-service .quick-actions .qa-btn:nth-child(3)');
+          if (quickStockAction) quickStockAction.setAttribute('onclick', 'printAvailableStockSummary()');
+        });
+      })();
+    </script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
