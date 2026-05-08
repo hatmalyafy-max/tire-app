@@ -2483,7 +2483,398 @@
         }
       }
     </style>
-  </head>
+  
+<style id="genspark-restyle-override">
+:root {
+  color-scheme: dark;
+
+  --bg-base: #03060d;
+  --bg-mid: #050a14;
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-card-hover: rgba(255, 255, 255, 0.09);
+  --bg-input: rgba(255, 255, 255, 0.05);
+
+  --stroke: rgba(255, 255, 255, 0.12);
+  --stroke-strong: rgba(255, 255, 255, 0.18);
+  --stroke-accent: rgba(96, 165, 250, 0.42);
+  --stroke-gold: rgba(96, 165, 250, 0.24);
+
+  --text: #e6edf7;
+  --text-muted: #8aa0b8;
+  --text-faint: #5f728a;
+
+  --teal: #3b82f6;
+  --teal-dim: rgba(59, 130, 246, 0.16);
+  --teal-glow: rgba(59, 130, 246, 0.22);
+  --blue: #60a5fa;
+  --blue-dim: rgba(96, 165, 250, 0.16);
+
+  --gold: #f8d26e;
+  --gold-dim: rgba(248, 210, 110, 0.12);
+  --danger: #fb7185;
+  --danger-dim: rgba(251, 113, 133, 0.14);
+  --success: #4ade80;
+  --success-dim: rgba(74, 222, 128, 0.14);
+
+  --radius-xl: 20px;
+  --radius-lg: 18px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+
+  --r-xl: 20px;
+  --r-lg: 18px;
+  --r-md: 16px;
+  --r-sm: 12px;
+  --r-pill: 999px;
+
+  --shadow-card:
+    0 18px 48px rgba(0, 0, 0, 0.42),
+    0 6px 18px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  --shadow-glow:
+    0 0 0 1px rgba(96, 165, 250, 0.08),
+    0 14px 36px rgba(59, 130, 246, 0.12);
+
+  --shadow-btn:
+    0 12px 32px rgba(59, 130, 246, 0.28),
+    0 0 22px rgba(96, 165, 250, 0.14);
+
+  --blur-card: blur(20px);
+  --blur-lite: blur(20px);
+  --blur-light: blur(20px);
+
+  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 48%, #60a5fa 100%);
+  --glass-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.04) 100%);
+  --glass-surface-strong: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+html,
+body {
+  background: #03060d;
+}
+
+body {
+  color: var(--text);
+  background: linear-gradient(180deg, #03060d 0%, #050a14 52%, #02040a 100%);
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(59, 130, 246, 0.16) 0%, transparent 32%),
+    radial-gradient(circle at 88% 8%, rgba(96, 165, 250, 0.14) 0%, transparent 28%),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 34%),
+    linear-gradient(180deg, #03060d 0%, #050a14 52%, #02040a 100%);
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.24);
+  color: #ffffff;
+}
+
+.auth-location,
+.auth-division,
+.topbar-sub,
+.panel-subtitle,
+.form-group label,
+.search-bar .form-group::before,
+.nav-tab,
+.nav-item span,
+.modal-close,
+.form-group input::placeholder,
+.form-group textarea::placeholder,
+.field-input::placeholder,
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.topbar,
+.nav-tabs,
+.auth-card,
+.card,
+.modal,
+.table-wrap,
+.btn-ghost,
+.btn-sec,
+.modal-close {
+  background: var(--glass-surface);
+  border: 1px solid var(--stroke);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-card);
+}
+
+.topbar,
+.nav-tabs {
+  background:
+    linear-gradient(180deg, rgba(6, 10, 20, 0.84) 0%, rgba(6, 10, 20, 0.64) 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-card,
+.card,
+.modal {
+  border-radius: 20px;
+}
+
+.card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.card:hover {
+  background: var(--glass-surface-strong);
+  border-color: rgba(96, 165, 250, 0.18);
+  box-shadow:
+    var(--shadow-card),
+    0 0 0 1px rgba(96, 165, 250, 0.06);
+  transform: translateY(-2px);
+}
+
+.card-header,
+.topbar,
+.nav-tabs,
+.modal-header {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.topbar-brand,
+.card-title,
+.auth-title,
+.modal-title {
+  color: var(--text);
+}
+
+.topbar-brand {
+  background: linear-gradient(135deg, #e6edf7 0%, #9fc5ff 45%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn,
+.btn-sec,
+.btn-cta,
+.tyre-select-btn,
+.nav-tab,
+.nav-item,
+.field-input,
+.search-input,
+.form-group input,
+.form-group select,
+.form-group textarea,
+.table-select,
+.modal-close {
+  transition:
+    all 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn,
+.btn-cta,
+.tyre-select-btn {
+  border-radius: 16px;
+}
+
+.btn-primary,
+.btn-info,
+.btn-success,
+.btn-cta,
+.nav-center-orb {
+  background: var(--primary-gradient);
+  color: #ffffff;
+  box-shadow: var(--shadow-btn);
+}
+
+.btn-primary,
+.btn-info,
+.btn-success,
+.btn-cta {
+  border: 1px solid rgba(96, 165, 250, 0.22);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(244, 63, 94, 0.22);
+}
+
+.btn-ghost,
+.btn-sec {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.btn:hover,
+.btn-sec:hover,
+.btn-cta:hover,
+.tyre-select-btn:hover,
+.modal-close:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 24px rgba(59, 130, 246, 0.14),
+    0 0 18px rgba(96, 165, 250, 0.1);
+}
+
+.btn:active,
+.btn-sec:active,
+.btn-cta:active,
+.tyre-select-btn:active,
+.modal-close:active {
+  transform: scale(0.98);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.table-select,
+.field-input,
+.search-input {
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.table-select:focus,
+.field-input:focus,
+.search-input:focus {
+  border-color: rgba(96, 165, 250, 0.56);
+  box-shadow:
+    0 0 0 4px rgba(59, 130, 246, 0.12),
+    0 10px 24px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.table-wrap {
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.table-wrap tr {
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.table-wrap td,
+.table-wrap th {
+  color: var(--text);
+}
+
+.badge {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.badge-green {
+  background: rgba(74, 222, 128, 0.14);
+  color: #86efac;
+}
+
+.badge-orange {
+  background: rgba(251, 191, 36, 0.14);
+  color: #fcd34d;
+}
+
+.badge-red {
+  background: rgba(244, 63, 94, 0.14);
+  color: #fda4af;
+}
+
+.nav-tab.active,
+.nav-item.active i,
+.nav-item.active span {
+  color: #60a5fa;
+}
+
+.nav-tab.active::before,
+.nav-item.active::before {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  box-shadow: 0 0 14px rgba(96, 165, 250, 0.35);
+}
+
+.nav-center-orb {
+  box-shadow:
+    0 10px 30px rgba(59, 130, 246, 0.35),
+    0 0 0 4px rgba(3, 6, 13, 0.92),
+    0 0 0 5px rgba(255, 255, 255, 0.08);
+}
+
+.modal-overlay {
+  background: rgba(2, 6, 14, 0.76);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.modal {
+  background:
+    linear-gradient(180deg, rgba(14, 20, 34, 0.94) 0%, rgba(8, 13, 24, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+a:hover {
+  color: #9fc5ff;
+}
+
+@media (max-width: 768px) {
+  .auth-card,
+  .card,
+  .modal {
+    border-radius: 18px;
+  }
+
+  .card-header {
+    padding: 14px 14px 10px;
+  }
+
+  .card > :not(.card-header),
+  .modal {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .btn,
+  .btn-cta,
+  .btn-primary,
+  .btn-success,
+  .btn-info,
+  .btn-danger,
+  .btn-ghost {
+    width: 100%;
+  }
+
+  .topbar {
+    padding: 12px 14px 10px;
+  }
+
+  .search-input,
+  .field-input,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .table-select {
+    font-size: 16px;
+  }
+}
+
+</style>
+</head>
   <body>
     <div id="auth-screen">
       <div class="auth-shell">
@@ -8363,7 +8754,7 @@
         style.id = "service-enhancement-styles";
         style.textContent = [
           ".service-action-wrap{display:flex;flex-direction:column;gap:10px;margin:-2px 0 14px;}",
-          ".service-action-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}",
+          ".service-action-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}",
           ".service-mini-btn{border:1px solid var(--stroke);background:rgba(255,255,255,0.05);color:var(--text);border-radius:12px;padding:10px 8px;font-size:12px;font-weight:700;line-height:1.15;cursor:pointer;transition:.18s ease;min-height:44px;}",
           ".service-mini-btn.active{background:linear-gradient(135deg,var(--teal),#0f9f8f);border-color:transparent;color:#041514;box-shadow:0 10px 24px rgba(45,212,191,.22);}",
           ".service-mini-btn .mini-badge{display:block;font-size:10px;font-weight:600;opacity:.78;margin-top:2px;}",
@@ -8375,7 +8766,7 @@
           ".service-size-stack{display:flex;flex-direction:column;gap:8px;}",
           ".service-size-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:8px 10px;border-radius:12px;background:rgba(148,163,184,0.08);}",
           ".service-note-stack{display:flex;flex-direction:column;gap:4px;}",
-          "@media (max-width:440px){.service-action-row{grid-template-columns:1fr 1fr 1fr;}.service-mini-btn{font-size:11px;padding:9px 6px;}}",
+          "@media (max-width:440px){.service-action-row{grid-template-columns:1fr 1fr;}.service-mini-btn{font-size:11px;padding:9px 6px;}}",
         ].join("");
         document.head.appendChild(style);
       }
@@ -8579,12 +8970,15 @@
         const changeBtn = document.getElementById("svc-action-change");
         const serviceBtn = document.getElementById("svc-action-service");
         const twoBtn = document.getElementById("svc-action-two");
+        const warehouseBtn = document.getElementById("svc-action-warehouse");
         if (changeBtn)
           changeBtn.innerHTML = `${esc(tr("changeTireAction"))}<span class="mini-badge">${esc(tr("modeChangeTire"))}</span>`;
         if (serviceBtn)
           serviceBtn.innerHTML = `${esc(tr("serviceAction"))}<span class="mini-badge">${esc(tr("serviceOptionLabel"))}</span>`;
         if (twoBtn)
           twoBtn.innerHTML = `${esc(tr("twoDifferentSizesAction"))}<span class="mini-badge">${esc(tr("rearSearchTitle"))}</span>`;
+        if (warehouseBtn)
+          warehouseBtn.innerHTML = `${esc(tr("manualWarehouseToggle"))}<span class="mini-badge">${esc(tr("manualWarehouseToggleHint"))}</span>`;
         const serviceLabel = document.getElementById(
           "svc-service-option-label",
         );
@@ -8637,6 +9031,7 @@
       <button type="button" class="service-mini-btn active" id="svc-action-change" onclick="setServiceActionMode('change')"></button>
       <button type="button" class="service-mini-btn" id="svc-action-service" onclick="setServiceActionMode('service')"></button>
       <button type="button" class="service-mini-btn" id="svc-action-two" onclick="activateTwoDifferentSizes()"></button>
+      <button type="button" class="service-mini-btn" id="svc-action-warehouse" onclick="toggleManualWarehousePicker()"></button>
     </div>
     <div class="service-subpanel" id="svc-service-panel">
       <div class="service-subpanel-title" id="svc-service-option-label"></div>
@@ -8685,15 +9080,16 @@
         const countLabel = `<div class="sec-label">${esc(tr("resultsFound", { count: data.length }))}</div>`;
         const cards = data
           .map((t) => {
-            const qty = Number(t.quantity || 0);
+            const qty = Math.max(0, Number(t.quantity || 0));
+            const isZero = qty === 0;
             const isLow = qty > 0 && qty <= 4;
             const size = esc(formatTyreSizeValue(t.size) || t.size);
             const location = esc(t.location || "No location");
-            const stockClass = isLow ? "stock-low" : "stock-ok";
+            const stockClass = isZero || isLow ? "stock-low" : "stock-ok";
             const stockText = isLow
               ? tr("leftText", { qty })
               : tr("inStockText", { qty });
-            return `<div class="tyre-result"><div class="tyre-info"><div class="tyre-size">${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" onclick="selectRearTyre('${String(t.id).replace(/'/g, "&#39;")}','${String(t.size).replace(/'/g, "&#39;")}')">${esc(tr("selectLabel"))}</button></div></div>`;
+            return `<div class="tyre-result"${isZero ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"' : ""}><div class="tyre-info"><div class="tyre-size"${isZero ? ' style="color:var(--gold);"' : ""}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn"${isZero ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"' : ""} onclick="selectRearTyre('${String(t.id).replace(/'/g, "&#39;")}','${String(t.size).replace(/'/g, "&#39;")}')">${esc(tr("selectLabel"))}</button></div></div>`;
           })
           .join("");
         container.innerHTML =
@@ -8714,10 +9110,7 @@
         const source = await ensureInventoryLoaded();
         const qKey = normalizeTyreKey(q);
         const data = source
-          .filter(
-            (t) =>
-              Number(t.quantity || 0) > 0 && String(t.id) !== String(selTyreId),
-          )
+          .filter((t) => String(t.id) !== String(selTyreId))
           .filter((t) => {
             const size = t.size || "";
             const sizeKey = normalizeTyreKey(size);
@@ -8758,12 +9151,13 @@
         const countLabel = `<div class="sec-label">${esc(tr("resultsFound", { count: data.length }))}</div>`;
         const cards = data
           .map((t) => {
-            const qty = Number(t.quantity || 0);
+            const qty = Math.max(0, Number(t.quantity || 0));
+            const isZero = qty === 0;
             const isLow = qty > 0 && qty <= 4;
             const sizeValue = formatTyreSizeValue(t.size) || t.size;
             const size = esc(sizeValue);
             const location = esc(t.location || "No location");
-            const stockClass = isLow ? "stock-low" : "stock-ok";
+            const stockClass = isZero || isLow ? "stock-low" : "stock-ok";
             const stockText = isLow
               ? tr("leftText", { qty })
               : tr("inStockText", { qty });
@@ -8773,11 +9167,11 @@
               mode === "modal"
                 ? `selectTyreFromSearchHub('${safeId}','${safeSize}')`
                 : `selectTyre('${safeId}','${safeSize}')`;
-            const style = isLow
+            const style = isZero || isLow
               ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
               : "";
-            const sizeStyle = isLow ? ' style="color:var(--gold);"' : "";
-            const btnStyle = isLow
+            const sizeStyle = isZero || isLow ? ' style="color:var(--gold);"' : "";
+            const btnStyle = isZero || isLow
               ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
               : "";
             return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${btnStyle} onclick="${action}">${esc(tr("selectLabel"))}</button></div></div>`;
@@ -8800,7 +9194,6 @@
         const source = await ensureInventoryLoaded();
         const qKey = normalizeTyreKey(q);
         const data = source
-          .filter((t) => Number(t.quantity || 0) > 0)
           .filter((t) => {
             const size = t.size || "";
             const sizeKey = normalizeTyreKey(size);
@@ -11648,6 +12041,2781 @@
       })();
     </script>
 
+
+    <script id="qpx-luxury-multiwarehouse-patch">
+      (() => {
+        Object.assign(I18N.en, {
+          totalTyresLabel: "Total Tyres",
+          autoWarehouseFillMsg: "The remaining quantity was completed automatically from other warehouses",
+          autoWarehouseFillDetail: "Completed from: {value}",
+          notEnoughStockDetailed: "Not enough stock. Total available for {size}: {qty}",
+          luxuryStockSub: "Available sizes with a premium summary print",
+        });
+
+        Object.assign(I18N.ar, {
+          totalTyresLabel: "إجمالي الإطارات",
+          autoWarehouseFillMsg: "تم إكمال الكمية المتبقية تلقائياً من مخازن أخرى",
+          autoWarehouseFillDetail: "تم الإكمال من: {value}",
+          notEnoughStockDetailed: "لا يوجد مخزون كافٍ. إجمالي المتوفر للمقاس {size}: {qty}",
+          luxuryStockSub: "المقاسات المتوفرة مع طباعة مختصرة بشكل أفخم",
+        });
+
+        function ensureLuxuryPatchStyles() {
+          if (document.getElementById('qpx-luxury-patch-styles')) return;
+          const style = document.createElement('style');
+          style.id = 'qpx-luxury-patch-styles';
+          style.textContent = [
+            '.quick-actions .qa-btn,.dashboard-qa-grid .qa-btn,.inventory-qa-grid .qa-btn{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg,rgba(20,28,42,.96),rgba(12,18,28,.96));box-shadow:0 14px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);}',
+            '.quick-actions .qa-btn::before,.dashboard-qa-grid .qa-btn::before,.inventory-qa-grid .qa-btn::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(248,210,110,.55),rgba(94,236,208,.24),rgba(96,165,250,.38));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}',
+            '.quick-actions .qa-btn:hover,.dashboard-qa-grid .qa-btn:hover,.inventory-qa-grid .qa-btn:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,.34),0 0 0 1px rgba(248,210,110,.14) inset;}',
+            '.quick-actions .qa-btn-icon,.dashboard-qa-grid .qa-btn-icon,.inventory-qa-grid .qa-btn-icon{width:42px;height:42px;border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 22px rgba(0,0,0,.22);margin-bottom:10px;}',
+            '.quick-actions .qa-btn-label,.dashboard-qa-grid .qa-btn-label,.inventory-qa-grid .qa-btn-label{font-size:13px;font-weight:800;letter-spacing:.01em;}',
+            '.quick-actions .qa-btn-sub,.dashboard-qa-grid .qa-btn-sub,.inventory-qa-grid .qa-btn-sub{font-size:11px;line-height:1.5;color:#9fb1c7;}',
+            '#page-service .quick-actions .qa-btn,#page-dashboard .dashboard-qa-grid .qa-btn,#page-inventory .inventory-qa-grid .qa-btn{min-height:118px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;}',
+            '.service-autofill-note{margin:10px 0 0;padding:10px 12px;border-radius:14px;border:1px dashed rgba(248,210,110,.28);background:rgba(248,210,110,.06);font-size:11px;line-height:1.6;color:#e7edf7;}',
+            '.service-autofill-note strong{color:var(--gold);display:block;margin-bottom:4px;}',
+          ].join('');
+          document.head.appendChild(style);
+        }
+
+        function qpxTotalTyres(tx, meta = getTransactionMeta(tx)) {
+          if (meta?.mode === 'two_sizes') {
+            return Math.max(0, Number(meta.frontQty || 0)) + Math.max(0, Number(meta.rearQty || 0));
+          }
+          return Math.max(0, Number(meta?.frontQty || tx?.quantity || 0)) || 1;
+        }
+
+        function qpxSourceSummary(sources = []) {
+          return (sources || [])
+            .filter(Boolean)
+            .map((item) => {
+              const loc = String(item.location || '').trim() || tr('noWarehouseValue');
+              return `${loc} × ${Number(item.qty || item.take || 0)}`;
+            })
+            .join(currentLang === 'ar' ? '، ' : ', ');
+        }
+
+        async function qpxGetFulfillmentPlan(sizeValue, requiredQty, preferredId) {
+          const targetQty = Math.max(0, Number(requiredQty || 0));
+          const source = await ensureInventoryLoaded();
+          const key = normalizeTyreKey(sizeValue || '');
+          const matches = (source || [])
+            .filter((item) => normalizeTyreKey(item.size) === key && Number(item.quantity || 0) > 0)
+            .sort((a, b) => {
+              if (a.id === preferredId) return -1;
+              if (b.id === preferredId) return 1;
+              return (Number(b.quantity || 0) - Number(a.quantity || 0));
+            });
+          let remaining = targetQty;
+          const plan = [];
+          for (const row of matches) {
+            const available = Math.max(0, Number(row.quantity || 0));
+            if (!available || remaining <= 0) continue;
+            const take = Math.min(available, remaining);
+            plan.push({
+              id: row.id,
+              size: row.size,
+              location: row.location || '',
+              take,
+              currentQty: available,
+            });
+            remaining -= take;
+          }
+          return {
+            enough: remaining <= 0,
+            totalAvailable: plan.reduce((sum, item) => sum + Number(item.take || 0), 0),
+            plan,
+            remaining,
+          };
+        }
+
+        async function qpxApplyFulfillmentPlan(plan = []) {
+          const applied = [];
+          for (const item of plan) {
+            const nextQty = Math.max(0, Number(item.currentQty || 0) - Number(item.take || 0));
+            await updateInventoryQty(item.id, nextQty);
+            applied.push({ ...item, previousQty: Number(item.currentQty || 0) });
+          }
+          return applied;
+        }
+
+        async function qpxRestoreFulfillmentPlan(plan = []) {
+          for (const item of plan) {
+            if (!item?.id) continue;
+            const current = await fetchInventoryById(item.id);
+            if (!current) continue;
+            await updateInventoryQty(item.id, Number(current.quantity || 0) + Number(item.qty || item.take || 0));
+          }
+        }
+
+        window.qpxGetFulfillmentPlan = qpxGetFulfillmentPlan;
+        window.qpxApplyFulfillmentPlan = qpxApplyFulfillmentPlan;
+        window.qpxRestoreFulfillmentPlan = qpxRestoreFulfillmentPlan;
+
+        function qpxBuildNotEnoughMessage(sizeValue, planResult) {
+          return tr('notEnoughStockDetailed', {
+            size: formatTyreSizeValue(sizeValue) || sizeValue || '-',
+            qty: Number(planResult?.totalAvailable || 0),
+          });
+        }
+
+        function qpxAttachAutoFillHint() {
+          const form = document.getElementById('service-form');
+          if (!form || document.getElementById('service-autofill-note')) return;
+          const note = document.createElement('div');
+          note.id = 'service-autofill-note';
+          note.className = 'service-autofill-note';
+          note.innerHTML = `<strong>${currentLang === 'ar' ? 'معلومة ذكية' : 'Smart stock help'}</strong>${currentLang === 'ar' ? 'إذا كانت الكمية غير مكتملة في المخزن المختار فسيتم إكمالها تلقائياً من نفس المقاس في مخزن آخر إن كان متوفراً.' : 'If the selected warehouse does not have enough quantity, the system will complete it automatically from the same size in other warehouses when available.'}`;
+          const body = form.querySelector('.card-body');
+          body?.appendChild(note);
+        }
+
+        function qpxFixQuickStockButtons() {
+          const serviceBtn = document.getElementById('qa-stock-label')?.closest('button');
+          if (serviceBtn) {
+            serviceBtn.removeAttribute('onclick');
+            serviceBtn.onclick = () => openServiceQuickFullStock();
+          }
+          const stockSub = document.getElementById('qa-stock-sub');
+          if (stockSub) stockSub.textContent = tr('luxuryStockSub');
+          const dashboardBtns = Array.from(document.querySelectorAll('.dashboard-qa-grid .qa-btn'));
+          dashboardBtns.forEach((btn) => {
+            const label = btn.querySelector('.qa-btn-label')?.textContent || '';
+            if (label.includes(tr('dashPrintStockLabel'))) {
+              btn.removeAttribute('onclick');
+              btn.onclick = () => openServiceQuickFullStock();
+              const sub = btn.querySelector('.qa-btn-sub');
+              if (sub) sub.textContent = tr('luxuryStockSub');
+            }
+          });
+        }
+
+        window.openServiceQuickFullStock = function () {
+          if (typeof printAvailableStockSummary === 'function') return printAvailableStockSummary();
+          return printInventoryStock({ reportMode: 'audit', stockFilter: 'available', sortMode: 'size_asc' });
+        };
+
+        formatInvoiceShareText = function (tx) {
+          const meta = getTransactionMeta(tx);
+          const createdAt = tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString();
+          const noteText = getTransactionNoteText(tx);
+          const condition = tx?.tyre_condition === 'new'
+            ? (currentLang === 'ar' ? 'جديد' : 'New')
+            : tx?.tyre_condition === 'old'
+              ? (currentLang === 'ar' ? 'مستعمل' : 'Used')
+              : '-';
+          const totalQty = qpxTotalTyres(tx, meta);
+          const active = new Set(getTransactionPositions(tx).map((p) => p.key));
+          const frontCodes = ['front_right', 'front_left']
+            .map((key) => TYRE_POSITION_META.find((item) => item.key === key))
+            .filter((item) => item && active.has(item.key))
+            .map((item) => item.short);
+          const rearCodes = ['rear_left', 'rear_right']
+            .map((key) => TYRE_POSITION_META.find((item) => item.key === key))
+            .filter((item) => item && active.has(item.key))
+            .map((item) => item.short);
+          const compactPosition = [frontCodes.join('-'), rearCodes.join('-')].filter(Boolean).join('/') || '-';
+          const sizeLines = meta?.mode === 'two_sizes' && meta.frontSize && meta.rearSize
+            ? (currentLang === 'ar'
+                ? [
+                    `المقاس الأمامي: ${meta.frontSize} × ${Number(meta.frontQty) || Number(tx.quantity) || 1}`,
+                    `المقاس الخلفي: ${meta.rearSize} × ${Number(meta.rearQty) || Number(tx.quantity) || 1}`,
+                  ]
+                : [
+                    `Front Size: ${meta.frontSize} × ${Number(meta.frontQty) || Number(tx.quantity) || 1}`,
+                    `Rear Size: ${meta.rearSize} × ${Number(meta.rearQty) || Number(tx.quantity) || 1}`,
+                  ])
+            : [currentLang === 'ar'
+                ? `مقاس الكفر: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`
+                : `Tyre Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`];
+          const lines = currentLang === 'ar'
+            ? [
+                'تفاصيل الخدمة:',
+                `التاريخ: ${createdAt}`,
+                `رقم اللوحة: ${tx?.plate_number || '-'}`,
+                ...sizeLines,
+                `المكان: ${compactPosition}`,
+                `النوع: ${meta?.mode === 'service' ? tr('modeService') : condition}`,
+                `${tr('totalTyresLabel')}: ${totalQty}`,
+              ]
+            : [
+                'Service details:',
+                `Date: ${createdAt}`,
+                `Plate: ${tx?.plate_number || '-'}`,
+                ...sizeLines,
+                `Position: ${compactPosition}`,
+                `Type: ${meta?.mode === 'service' ? tr('modeService') : condition}`,
+                `${tr('totalTyresLabel')}: ${totalQty}`,
+              ];
+          if (meta?.mode === 'service' && meta?.serviceType) {
+            lines.push(currentLang === 'ar' ? `الخدمة: ${serviceOptionLabel(meta.serviceType)}` : `Service: ${serviceOptionLabel(meta.serviceType)}`);
+          } else if (tx?.repair_type) {
+            lines.push(currentLang === 'ar' ? `الإصلاح: ${tx.repair_type}` : `Repair: ${tx.repair_type}`);
+          }
+          if (meta?.mode === 'two_sizes') lines.push(tr('twoDifferentSizesNote'));
+          if (noteText && noteText !== tr('noServiceNote')) {
+            lines.push(currentLang === 'ar' ? `الملاحظة: ${noteText}` : `Note: ${noteText}`);
+          }
+          lines.push(currentLang === 'ar' ? `الموظف: ${tx?.operator || '-'}` : `Operator: ${tx?.operator || '-'}`);
+          return lines.join('\n');
+        };
+
+        createInvoiceShareCard = async function (tx) {
+          const meta = getTransactionMeta(tx);
+          const photoFile = await getInvoicePhotoFile(tx);
+          let bitmap = null;
+          if (photoFile && 'createImageBitmap' in window) {
+            try { bitmap = await createImageBitmap(photoFile); } catch (err) { bitmap = null; }
+          }
+          const width = 1080;
+          const padding = 40;
+          const contentWidth = width - padding * 2;
+          const headerHeight = 130;
+          const photoHeight = bitmap ? Math.round(contentWidth * (bitmap.height / bitmap.width)) : 260;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          ctx.font = '36px sans-serif';
+          const totalQty = qpxTotalTyres(tx, meta);
+          const active = new Set(getTransactionPositions(tx).map((p) => p.key));
+          const frontCodes = ['front_right', 'front_left']
+            .map((key) => TYRE_POSITION_META.find((item) => item.key === key))
+            .filter((item) => item && active.has(item.key))
+            .map((item) => item.short);
+          const rearCodes = ['rear_left', 'rear_right']
+            .map((key) => TYRE_POSITION_META.find((item) => item.key === key))
+            .filter((item) => item && active.has(item.key))
+            .map((item) => item.short);
+          const compactPosition = [frontCodes.join('-'), rearCodes.join('-')].filter(Boolean).join('/') || '-';
+          const infoLinesRaw = meta?.mode === 'two_sizes' && meta.frontSize && meta.rearSize
+            ? [
+                `${currentLang === 'ar' ? 'رقم اللوحة' : 'Plate'}: ${tx?.plate_number || '-'}`,
+                `${currentLang === 'ar' ? 'المقاس الأمامي' : 'Front Size'}: ${meta.frontSize} × ${Number(meta.frontQty) || 1}`,
+                `${currentLang === 'ar' ? 'المقاس الخلفي' : 'Rear Size'}: ${meta.rearSize} × ${Number(meta.rearQty) || 1}`,
+                `${currentLang === 'ar' ? 'المكان' : 'Position'}: ${compactPosition}`,
+                `${tr('totalTyresLabel')}: ${totalQty}`,
+                `${currentLang === 'ar' ? 'النوع' : 'Type'}: ${tx?.tyre_condition === 'new' ? (currentLang === 'ar' ? 'جديد' : 'New') : tx?.tyre_condition === 'old' ? (currentLang === 'ar' ? 'مستعمل' : 'Used') : '-'}`,
+                `${currentLang === 'ar' ? 'الموظف' : 'Operator'}: ${tx?.operator || '-'}`,
+                `${currentLang === 'ar' ? 'الوقت' : 'Time'}: ${tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString()}`,
+                `${currentLang === 'ar' ? 'الملاحظة' : 'Note'}: ${getTransactionNoteText(tx)}`,
+              ]
+            : [
+                `${currentLang === 'ar' ? 'رقم اللوحة' : 'Plate'}: ${tx?.plate_number || '-'}`,
+                `${currentLang === 'ar' ? 'المقاس' : 'Tyre Size'}: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+                `${currentLang === 'ar' ? 'المكان' : 'Position'}: ${compactPosition}`,
+                `${tr('totalTyresLabel')}: ${totalQty}`,
+                `${currentLang === 'ar' ? 'النوع' : 'Type'}: ${tx?.tyre_condition === 'new' ? (currentLang === 'ar' ? 'جديد' : 'New') : tx?.tyre_condition === 'old' ? (currentLang === 'ar' ? 'مستعمل' : 'Used') : '-'}`,
+                `${currentLang === 'ar' ? 'الموظف' : 'Operator'}: ${tx?.operator || '-'}`,
+                `${currentLang === 'ar' ? 'الوقت' : 'Time'}: ${tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString()}`,
+                `${currentLang === 'ar' ? 'الملاحظة' : 'Note'}: ${getTransactionNoteText(tx)}`,
+              ];
+          const infoLines = infoLinesRaw.flatMap((line) => wrapCanvasText(ctx, line, contentWidth));
+          const lineHeight = 44;
+          const footerHeight = 50;
+          canvas.width = width;
+          canvas.height = headerHeight + photoHeight + 30 + infoLines.length * lineHeight + footerHeight;
+          ctx.fillStyle = '#0b0f16';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#f0a500';
+          ctx.fillRect(0, 0, canvas.width, 12);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 56px sans-serif';
+          ctx.fillText('QUALITY PART X', padding, 76);
+          ctx.font = '28px sans-serif';
+          ctx.fillStyle = '#c8d0df';
+          ctx.fillText(currentLang === 'ar' ? 'بطاقة مشاركة الخدمة' : 'Tyre Service Share Card', padding, 112);
+          const photoY = headerHeight;
+          if (bitmap) {
+            ctx.drawImage(bitmap, padding, photoY, contentWidth, photoHeight);
+          } else {
+            ctx.fillStyle = '#151c26';
+            ctx.fillRect(padding, photoY, contentWidth, photoHeight);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '32px sans-serif';
+            ctx.fillText(currentLang === 'ar' ? 'لا توجد صورة سيارة' : 'No car photo available', padding + 30, photoY + 80);
+          }
+          let y = photoY + photoHeight + 50;
+          ctx.font = '34px sans-serif';
+          ctx.fillStyle = '#f8fafc';
+          infoLines.forEach((line) => {
+            ctx.fillText(line, padding, y);
+            y += lineHeight;
+          });
+          return await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92)).then((blob) => new File([blob], `invoice_${tx?.id || Date.now()}.jpg`, { type: 'image/jpeg' }));
+        };
+
+        submitService = async function (event) {
+          if (!selTyreId) {
+            showToast(tr('selectTyreFirstMsg'), 'error');
+            return;
+          }
+          const plate = document.getElementById('svc-plate').value.trim().toUpperCase();
+          const frontQty = Math.max(1, parseInt(document.getElementById('svc-qty').value, 10) || 1);
+          const rearQty = serviceActionMode === 'two_sizes'
+            ? Math.max(1, parseInt(document.getElementById('svc-rear-qty')?.value, 10) || rearTyreQuantity || 1)
+            : 0;
+          const notes = document.getElementById('svc-notes').value.trim();
+          const btn = event?.target?.closest('button') || event?.target;
+          if (!plate) {
+            showToast(tr('plateRequiredMsg'), 'error');
+            return;
+          }
+          if (serviceActionMode === 'service' && !selectedServiceOption) {
+            showToast(tr('selectServiceTypeMsg'), 'error');
+            return;
+          }
+          if (serviceActionMode !== 'service' && !selTyreType) {
+            showToast(currentLang === 'ar' ? 'اختر حالة الكفر' : 'Select tyre condition', 'error');
+            return;
+          }
+          if (serviceActionMode === 'two_sizes' && !rearTyreSelection?.id) {
+            showToast(tr('selectRearTyreMsg'), 'error');
+            return;
+          }
+          setServiceSubmitButton(btn, true);
+          try {
+            const frontInv = await fetchInventoryById(selTyreId);
+            if (!frontInv) {
+              showToast(tr('tyreNotFoundMsg'), 'error');
+              return;
+            }
+            let rearInv = null;
+            if (serviceActionMode === 'two_sizes') {
+              rearInv = await fetchInventoryById(rearTyreSelection.id);
+              if (!rearInv) {
+                showToast(tr('tyreNotFoundMsg'), 'error');
+                return;
+              }
+            }
+            let frontPlan = { plan: [], enough: true, totalAvailable: frontQty };
+            let rearPlan = { plan: [], enough: true, totalAvailable: rearQty };
+            if (serviceActionMode !== 'service') {
+              frontPlan = await qpxGetFulfillmentPlan(frontInv.size, frontQty, frontInv.id);
+              if (!frontPlan.enough) {
+                showToast(qpxBuildNotEnoughMessage(frontInv.size, frontPlan), 'error');
+                return;
+              }
+              if (rearInv) {
+                rearPlan = await qpxGetFulfillmentPlan(rearInv.size, rearQty, rearInv.id);
+                if (!rearPlan.enough) {
+                  showToast(qpxBuildNotEnoughMessage(rearInv.size, rearPlan), 'error');
+                  return;
+                }
+              }
+            }
+            const meta = {
+              mode: serviceActionMode === 'service' ? 'service' : serviceActionMode === 'two_sizes' ? 'two_sizes' : 'change',
+              frontTyreId: frontInv.id,
+              frontSize: formatTyreSizeValue(frontInv.size) || frontInv.size,
+              frontQty: serviceActionMode === 'service' ? 0 : frontQty,
+              frontSources: frontPlan.plan.map((item) => ({ id: item.id, location: item.location || '', qty: Number(item.take || 0) })),
+              rearTyreId: rearInv?.id || null,
+              rearSize: rearInv ? (formatTyreSizeValue(rearInv.size) || rearInv.size) : null,
+              rearQty: rearInv ? rearQty : 0,
+              rearSources: rearPlan.plan.map((item) => ({ id: item.id, location: item.location || '', qty: Number(item.take || 0) })),
+              serviceType: serviceActionMode === 'service' ? selectedServiceOption : null,
+              specialNote: serviceActionMode === 'two_sizes' ? tr('twoDifferentSizesNote') : '',
+            };
+            const payload = {
+              tyre_size: formatTyreSizeValue(frontInv.size) || frontInv.size,
+              plate_number: plate,
+              front_left: selPositions.includes('front_left'),
+              front_right: selPositions.includes('front_right'),
+              rear_left: selPositions.includes('rear_left'),
+              rear_right: selPositions.includes('rear_right'),
+              repair_type: serviceActionMode === 'change' || serviceActionMode === 'two_sizes' ? selRepair || null : null,
+              tyre_condition: serviceActionMode === 'service' ? null : selTyreType || null,
+              notes: packTransactionNotes(notes, meta),
+              operator: currentUser.username,
+              photo_url: null,
+              quantity: frontQty,
+              brand: frontInv.brand || null,
+            };
+            const { data: insertedTxn, error: txnErr } = await db.from('transactions').insert(payload).select().single();
+            if (txnErr || !insertedTxn) {
+              showToast(txnErr?.message || (currentLang === 'ar' ? 'تعذر حفظ الخدمة' : 'Unable to save service'), 'error');
+              return;
+            }
+            const appliedUpdates = [];
+            try {
+              if (serviceActionMode !== 'service') {
+                appliedUpdates.push(...await qpxApplyFulfillmentPlan(frontPlan.plan));
+                if (rearInv) appliedUpdates.push(...await qpxApplyFulfillmentPlan(rearPlan.plan));
+              }
+            } catch (stockError) {
+              await db.from('transactions').delete().eq('id', insertedTxn.id);
+              for (const item of appliedUpdates.reverse()) {
+                try { await updateInventoryQty(item.id, item.previousQty); } catch (restoreError) {}
+              }
+              showToast(stockError?.message || tr('notEnoughStockMsg'), 'error');
+              return;
+            }
+            let photoUploaded = false;
+            if (capturedPhotoDataUrl) {
+              const uploadedPhotoUrl = await uploadServicePhoto(capturedPhotoDataUrl, plate);
+              if (uploadedPhotoUrl) {
+                photoUploaded = true;
+                const photoPath = extractStoragePathFromUrl(uploadedPhotoUrl);
+                const nextMeta = { ...meta, photoPath };
+                await db.from('transactions').update({ photo_url: uploadedPhotoUrl, notes: packTransactionNotes(notes, nextMeta) }).eq('id', insertedTxn.id);
+                insertedTxn.photo_url = uploadedPhotoUrl;
+              }
+            }
+            const artifactInventoryId = serviceActionMode === 'two_sizes' ? null : selTyreId;
+            await storeServiceArtifacts(insertedTxn.id, artifactInventoryId, capturedPhotoDataUrl);
+            if (capturedPhotoDataUrl && !photoUploaded) {
+              showToast(tr('photoUploadWarning'), 'error');
+            } else if (capturedPhotoDataUrl && photoUploaded) {
+              showToast(tr('photoSyncedMsg'), 'success');
+            }
+            const usedExtraSources = [...frontPlan.plan.slice(1), ...rearPlan.plan.slice(1)].filter(Boolean);
+            showToast(serviceActionMode === 'service' ? tr('serviceRecordedMsg') : tr('serviceSavedMsg'), 'success');
+            if (usedExtraSources.length) {
+              setTimeout(() => {
+                showToast(tr('autoWarehouseFillDetail', { value: qpxSourceSummary(usedExtraSources.map((item) => ({ location: item.location, qty: item.take }))) }), 'success');
+              }, 450);
+            }
+            clearSvc();
+            await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+            if (document.getElementById('page-dashboard')?.classList.contains('active')) loadDashboard();
+          } finally {
+            setServiceSubmitButton(btn, false);
+          }
+        };
+
+        deleteService = async function (txId) {
+          if (!txId) return;
+          const { data: tx, error: txError } = await db.from('transactions').select('*').eq('id', txId).maybeSingle();
+          if (txError || !tx) {
+            showToast(tr('tyreNotFoundMsg'), 'error');
+            return;
+          }
+          if (!confirm(getServiceDeletePrompt(tx))) return;
+          const meta = getTransactionMeta(tx);
+          const restored = [];
+          try {
+            if (meta?.mode !== 'service') {
+              if (Array.isArray(meta?.frontSources) && meta.frontSources.length) {
+                await restoreFulfillmentPlanSafe(meta.frontSources);
+                restored.push(...meta.frontSources);
+              } else if (meta?.frontTyreId) {
+                const front = await fetchInventoryById(meta.frontTyreId);
+                if (!front) throw new Error(tr('tyreNotFoundMsg'));
+                await updateInventoryQty(front.id, Number(front.quantity || 0) + Number(meta.frontQty || tx.quantity || 1));
+                restored.push({ id: front.id, qty: Number(meta.frontQty || tx.quantity || 1) });
+              }
+              if (meta?.mode === 'two_sizes') {
+                if (Array.isArray(meta?.rearSources) && meta.rearSources.length) {
+                  await restoreFulfillmentPlanSafe(meta.rearSources);
+                  restored.push(...meta.rearSources);
+                } else if (meta?.rearTyreId) {
+                  const rear = await fetchInventoryById(meta.rearTyreId);
+                  if (!rear) throw new Error(tr('tyreNotFoundMsg'));
+                  await updateInventoryQty(rear.id, Number(rear.quantity || 0) + Number(meta.rearQty || tx.quantity || 1));
+                  restored.push({ id: rear.id, qty: Number(meta.rearQty || tx.quantity || 1) });
+                }
+              }
+            }
+            const { error: deleteErr } = await db.from('transactions').delete().eq('id', txId);
+            if (deleteErr) throw deleteErr;
+            await removeServicePhotoFromCloud(tx);
+          } catch (error) {
+            showToast(error?.message || tr('tyreNotFoundMsg'), 'error');
+            return;
+          }
+          await removeServiceArtifacts(txId);
+          showToast(meta?.mode === 'service' ? tr('serviceDeletedMsg') : tr('qtyRestoredMsg'), 'success');
+          await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+          if (document.getElementById('page-dashboard')?.classList.contains('active')) loadDashboard();
+          if (document.getElementById('page-report')?.classList.contains('active')) {
+            loadReport();
+            loadStockRep();
+          }
+        };
+
+        const __qpxApplyLanguageLuxury = applyLanguage;
+        applyLanguage = function () {
+          __qpxApplyLanguageLuxury();
+          ensureLuxuryPatchStyles();
+          qpxAttachAutoFillHint();
+          qpxFixQuickStockButtons();
+        };
+
+        const __qpxShowPageLuxury = showPage;
+        showPage = function (name) {
+          __qpxShowPageLuxury(name);
+          ensureLuxuryPatchStyles();
+          qpxAttachAutoFillHint();
+          qpxFixQuickStockButtons();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+          ensureLuxuryPatchStyles();
+          qpxAttachAutoFillHint();
+          qpxFixQuickStockButtons();
+        });
+      })();
+    </script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+    <script id="qpx-manual-warehouse-photo-nav-fix">
+      (() => {
+        Object.assign(I18N.en, {
+          manualWarehouseTitle: "Source warehouse selection",
+          manualWarehouseRearTitle: "Rear source warehouse selection",
+          manualWarehouseHint:
+            "Distribute the quantity manually by warehouse. Nothing will be deducted automatically from another warehouse.",
+          warehouseAvailableLabel: "Available",
+          warehouseAllocateLabel: "Deduct",
+          warehouseAllocatedSummary: "Allocated {allocated} of {requested}",
+          warehouseAllocationMismatch:
+            "Complete the warehouse allocation first. Allocated {allocated} of {requested}",
+          warehouseSelectionRequired: "Choose at least one warehouse",
+          warehouseAllocationEmpty: "Select a tyre first to choose the warehouse",
+          warehouseSelectionSection: "Warehouse",
+          warehouseSelectionRearSection: "Rear warehouse",
+          warehousePhotoCleanupDone: "Expired service photos were cleaned automatically",
+          warehouseSyncError: "Unable to refresh shared data",
+          manualWarehouseToggle: "Other warehouse",
+          manualWarehouseToggleHint: "Optional split",
+          manualWarehouseToggleActive: "Warehouses selected",
+        });
+
+        Object.assign(I18N.ar, {
+          manualWarehouseTitle: "اختيار مخزن السحب",
+          manualWarehouseRearTitle: "اختيار مخزن السحب للخلفي",
+          manualWarehouseHint:
+            "وزع الكمية يدويًا على المخازن. لن يتم الخصم تلقائيًا من أي مخزن آخر.",
+          warehouseAvailableLabel: "المتوفر",
+          warehouseAllocateLabel: "الخصم",
+          warehouseAllocatedSummary: "تم توزيع {allocated} من {requested}",
+          warehouseAllocationMismatch:
+            "أكمل توزيع الكمية على المخازن أولاً. الموزع {allocated} من {requested}",
+          warehouseSelectionRequired: "اختر مخزنًا واحدًا على الأقل",
+          warehouseAllocationEmpty: "اختر الكفر أولاً ثم حدد المخزن",
+          warehouseSelectionSection: "المخزن",
+          warehouseSelectionRearSection: "مخزن الخلفي",
+          warehousePhotoCleanupDone: "تم حذف صور الخدمات القديمة تلقائيًا",
+          warehouseSyncError: "تعذر تحديث البيانات المشتركة",
+          manualWarehouseToggle: "مخزن مختلف",
+          manualWarehouseToggleHint: "اختياري",
+          manualWarehouseToggleActive: "تم اختيار مخازن",
+        });
+
+        const MANUAL_WAREHOUSE_STATE = { front: [], rear: [] };
+        const MANUAL_WAREHOUSE_LAST_KEY = {
+          front: "",
+          rear: "",
+        };
+        const PHOTO_CLEANUP_DAY_KEY = "qpx-photo-cleanup-day-v3";
+        let qpxNavBound = false;
+        let qpxSyncStarted = false;
+        let qpxSyncRunning = false;
+        let qpxLastNavTouchTs = 0;
+        let manualWarehousePickerVisible = false;
+
+        const applyFulfillmentPlanSafe = async (plan = []) => {
+          if (typeof window.qpxApplyFulfillmentPlan === "function") {
+            return window.qpxApplyFulfillmentPlan(plan);
+          }
+          const applied = [];
+          for (const item of plan || []) {
+            const nextQty = Math.max(
+              0,
+              Number(item.currentQty || 0) - Number(item.take || 0),
+            );
+            await updateInventoryQty(item.id, nextQty);
+            applied.push({ ...item, previousQty: Number(item.currentQty || 0) });
+          }
+          return applied;
+        };
+
+        const restoreFulfillmentPlanSafe = async (plan = []) => {
+          if (typeof window.qpxRestoreFulfillmentPlan === "function") {
+            return window.qpxRestoreFulfillmentPlan(plan);
+          }
+          for (const item of plan || []) {
+            if (!item?.id) continue;
+            const current = await fetchInventoryById(item.id);
+            if (!current) continue;
+            await updateInventoryQty(
+              item.id,
+              Number(current.quantity || 0) + Number(item.qty || item.take || 0),
+            );
+          }
+        };
+
+        function ensureManualWarehouseStyles() {
+          if (document.getElementById("qpx-manual-warehouse-styles")) return;
+          const style = document.createElement("style");
+          style.id = "qpx-manual-warehouse-styles";
+          style.textContent = [
+            ".bottom-nav{z-index:1400 !important;}",
+            ".bottom-nav .nav-item{touch-action:manipulation;-webkit-tap-highlight-color:transparent;pointer-events:auto;}",
+            ".modal-overlay:not(.open){pointer-events:none !important;}",
+            ".service-manual-warehouse-wrap{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding:14px;border-radius:18px;border:1px solid rgba(96,165,250,.18);background:rgba(96,165,250,.06);}",
+            ".service-manual-warehouse-wrap[hidden]{display:none !important;}",
+            ".service-manual-warehouse-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;color:var(--text);font-size:12px;}",
+            ".service-manual-warehouse-title .badge{font-size:10px;}",
+            ".service-manual-warehouse-hint{font-size:11px;line-height:1.5;color:var(--text-muted);}",
+            ".service-manual-warehouse-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}",
+            ".service-manual-warehouse-card{background:rgba(5,12,24,.45);border:1px solid var(--stroke);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;}",
+            ".service-manual-warehouse-card strong{font-size:12px;color:var(--text);word-break:break-word;}",
+            ".service-manual-warehouse-meta{font-size:11px;color:var(--text-muted);display:flex;justify-content:space-between;gap:8px;}",
+            ".service-manual-warehouse-card input{width:100%;min-height:42px;border-radius:12px;border:1px solid var(--stroke);background:var(--bg-input);color:var(--text);padding:10px 12px;}",
+            ".service-manual-warehouse-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);font-size:11px;color:var(--text-muted);}",
+            ".service-manual-warehouse-summary.ok{border:1px solid rgba(74,222,128,.28);color:var(--success);background:rgba(74,222,128,.08);}",
+            ".service-manual-warehouse-summary.warn{border:1px solid rgba(248,210,110,.32);color:var(--gold);background:rgba(248,210,110,.08);}",
+            ".service-manual-warehouse-summary strong{font-size:12px;}",
+          ].join("");
+          document.head.appendChild(style);
+        }
+
+        function ensureManualWarehouseUi() {
+          ensureManualWarehouseStyles();
+          const serviceBody = document.querySelector("#service-form .card-body");
+          const qtyRow = document.querySelector("#service-form .form-row");
+          if (serviceBody && qtyRow && !document.getElementById("svc-front-warehouse-wrap")) {
+            const wrap = document.createElement("div");
+            wrap.id = "svc-front-warehouse-wrap";
+            wrap.className = "service-manual-warehouse-wrap";
+            qtyRow.insertAdjacentElement("afterend", wrap);
+          }
+          const rearPanel = document.getElementById("svc-rear-panel");
+          if (rearPanel && !document.getElementById("svc-rear-warehouse-wrap")) {
+            const wrap = document.createElement("div");
+            wrap.id = "svc-rear-warehouse-wrap";
+            wrap.className = "service-manual-warehouse-wrap";
+            const marker = document.getElementById("svc-rear-results");
+            if (marker) marker.insertAdjacentElement("beforebegin", wrap);
+            else rearPanel.appendChild(wrap);
+          }
+        }
+
+        function getRequestedQtyForKind(kind) {
+          if (kind === "rear") {
+            return Math.max(
+              1,
+              parseInt(document.getElementById("svc-rear-qty")?.value, 10) ||
+                rearTyreQuantity ||
+                1,
+            );
+          }
+          return Math.max(
+            1,
+            parseInt(document.getElementById("svc-qty")?.value, 10) || 1,
+          );
+        }
+
+        function getSelectedTyreForKind(kind) {
+          if (kind === "rear") {
+            return rearTyreSelection?.id && rearTyreSelection?.size
+              ? {
+                  id: rearTyreSelection.id,
+                  size: rearTyreSelection.size,
+                }
+              : null;
+          }
+          return selTyreId && selTyreSize
+            ? {
+                id: selTyreId,
+                size: selTyreSize,
+              }
+            : null;
+        }
+
+        async function getWarehouseRowsForSize(sizeValue) {
+          const source = await ensureInventoryLoaded();
+          const sizeKey = normalizeTyreKey(sizeValue || "");
+          return (source || [])
+            .filter(
+              (item) =>
+                normalizeTyreKey(item.size) === sizeKey &&
+                Number(item.quantity || 0) > 0,
+            )
+            .sort((a, b) => {
+              const locA = String(a.location || "").trim().toLowerCase();
+              const locB = String(b.location || "").trim().toLowerCase();
+              if (locA !== locB) return locA.localeCompare(locB);
+              return String(a.id || "").localeCompare(String(b.id || ""));
+            });
+        }
+
+        function allocationWrapId(kind) {
+          return kind === "rear"
+            ? "svc-rear-warehouse-wrap"
+            : "svc-front-warehouse-wrap";
+        }
+
+        function getWarehouseTitle(kind) {
+          return tr(
+            kind === "rear"
+              ? "manualWarehouseRearTitle"
+              : "manualWarehouseTitle",
+          );
+        }
+
+        function updateManualWarehouseToggleButton() {
+          const btn = document.getElementById("svc-action-warehouse");
+          if (!btn) return;
+          btn.classList.toggle("active", manualWarehousePickerVisible);
+          btn.disabled = serviceActionMode === "service";
+          const badgeKey = manualWarehousePickerVisible
+            ? "manualWarehouseToggleActive"
+            : "manualWarehouseToggleHint";
+          btn.innerHTML = `${esc(tr("manualWarehouseToggle"))}<span class="mini-badge">${esc(tr(badgeKey))}</span>`;
+        }
+
+        window.toggleManualWarehousePicker = async function (forceOpen) {
+          if (serviceActionMode === "service") return;
+          if (!selTyreId || !selTyreSize) {
+            showToast(tr("selectTyreFirstMsg"), "error");
+            return;
+          }
+          manualWarehousePickerVisible =
+            typeof forceOpen === "boolean"
+              ? forceOpen
+              : !manualWarehousePickerVisible;
+          updateManualWarehouseToggleButton();
+          if (manualWarehousePickerVisible) {
+            await refreshManualWarehouseState("front");
+            if (serviceActionMode === "two_sizes" && rearTyreSelection?.id) {
+              await refreshManualWarehouseState("rear");
+            } else {
+              renderManualWarehouseSection("rear");
+            }
+          } else {
+            renderManualWarehouseSection("front");
+            renderManualWarehouseSection("rear");
+          }
+        };
+
+        function renderManualWarehouseSection(kind) {
+          ensureManualWarehouseUi();
+          const wrap = document.getElementById(allocationWrapId(kind));
+          if (!wrap) return;
+          const shouldHide =
+            !manualWarehousePickerVisible ||
+            !getSelectedTyreForKind(kind) ||
+            (kind === "front" && serviceActionMode === "service") ||
+            (kind === "rear" && serviceActionMode !== "two_sizes");
+          if (shouldHide) {
+            wrap.hidden = true;
+            wrap.innerHTML = "";
+            return;
+          }
+
+          const rows = MANUAL_WAREHOUSE_STATE[kind] || [];
+          const requested = getRequestedQtyForKind(kind);
+          const allocated = rows.reduce(
+            (sum, item) => sum + Math.max(0, Number(item.qty || 0)),
+            0,
+          );
+          const summaryClass =
+            allocated === requested ? "ok" : allocated === 0 ? "" : "warn";
+          const summaryText = tr("warehouseAllocatedSummary", {
+            allocated,
+            requested,
+          });
+          wrap.hidden = false;
+
+          if (!rows.length) {
+            wrap.innerHTML = `
+              <div class="service-manual-warehouse-title">
+                <span>${esc(getWarehouseTitle(kind))}</span>
+                <span class="badge badge-orange">${esc(tr(kind === "rear" ? "warehouseSelectionRearSection" : "warehouseSelectionSection"))}</span>
+              </div>
+              <div class="service-manual-warehouse-hint">${esc(tr("manualWarehouseHint"))}</div>
+              <div class="empty-state">${esc(tr("warehouseAllocationEmpty"))}</div>
+            `;
+            return;
+          }
+
+          wrap.innerHTML = `
+            <div class="service-manual-warehouse-title">
+              <span>${esc(getWarehouseTitle(kind))}</span>
+              <span class="badge badge-blue">${esc(
+                kind === "rear"
+                  ? tr("warehouseSelectionRearSection")
+                  : tr("warehouseSelectionSection"),
+              )}</span>
+            </div>
+            <div class="service-manual-warehouse-hint">${esc(tr("manualWarehouseHint"))}</div>
+            <div class="service-manual-warehouse-grid">
+              ${rows
+                .map((row) => {
+                  const available = Math.max(0, Number(row.available || 0));
+                  const current = Math.max(0, Number(row.qty || 0));
+                  return `
+                    <div class="service-manual-warehouse-card">
+                      <strong>${esc(
+                        row.location || tr("noWarehouseValue"),
+                      )}</strong>
+                      <div class="service-manual-warehouse-meta">
+                        <span>${esc(tr("warehouseAvailableLabel"))}</span>
+                        <span>${available}</span>
+                      </div>
+                      <div class="service-manual-warehouse-meta">
+                        <span>${esc(tr("warehouseAllocateLabel"))}</span>
+                        <span>${current}</span>
+                      </div>
+                      <input
+                        type="number"
+                        min="0"
+                        max="${available}"
+                        value="${current}"
+                        oninput="updateManualWarehouseQty('${kind}','${String(
+                          row.id,
+                        ).replace(/'/g, "&#39;")}', this.value)"
+                      />
+                    </div>
+                  `;
+                })
+                .join("")}
+            </div>
+            <div class="service-manual-warehouse-summary ${summaryClass}">
+              <span>${esc(summaryText)}</span>
+              <strong>${allocated === requested ? "✓" : Math.max(0, requested - allocated)}</strong>
+            </div>
+          `;
+        }
+
+        async function refreshManualWarehouseState(kind) {
+          ensureManualWarehouseUi();
+          const tyre = getSelectedTyreForKind(kind);
+          const hideBecauseMode =
+            !manualWarehousePickerVisible ||
+            !tyre ||
+            (kind === "front" && serviceActionMode === "service") ||
+            (kind === "rear" && serviceActionMode !== "two_sizes");
+          if (hideBecauseMode) {
+            MANUAL_WAREHOUSE_STATE[kind] = [];
+            MANUAL_WAREHOUSE_LAST_KEY[kind] = "";
+            renderManualWarehouseSection(kind);
+            return;
+          }
+          const requested = getRequestedQtyForKind(kind);
+          const key = `${normalizeTyreKey(tyre.size)}::${requested}::${tyre.id}`;
+          const previousMap = new Map(
+            (MANUAL_WAREHOUSE_STATE[kind] || []).map((item) => [
+              String(item.id),
+              Math.max(0, Number(item.qty || 0)),
+            ]),
+          );
+          const rows = await getWarehouseRowsForSize(tyre.size);
+          const sameContext = MANUAL_WAREHOUSE_LAST_KEY[kind] === key;
+          let defaultApplied = false;
+          MANUAL_WAREHOUSE_STATE[kind] = rows.map((row) => {
+            const available = Math.max(0, Number(row.quantity || 0));
+            let qty = sameContext
+              ? Math.min(available, previousMap.get(String(row.id)) || 0)
+              : 0;
+            if (!sameContext && !defaultApplied && String(row.id) === String(tyre.id)) {
+              qty = Math.min(requested, available);
+              defaultApplied = true;
+            }
+            return {
+              id: row.id,
+              size: row.size,
+              location: String(row.location || "").trim(),
+              available,
+              qty,
+            };
+          });
+          MANUAL_WAREHOUSE_LAST_KEY[kind] = key;
+          renderManualWarehouseSection(kind);
+        }
+
+        window.updateManualWarehouseQty = function (kind, id, value) {
+          const rows = MANUAL_WAREHOUSE_STATE[kind] || [];
+          const target = rows.find((item) => String(item.id) === String(id));
+          if (!target) return;
+          const available = Math.max(0, Number(target.available || 0));
+          const next = Math.max(
+            0,
+            Math.min(available, parseInt(value, 10) || 0),
+          );
+          target.qty = next;
+          renderManualWarehouseSection(kind);
+        };
+
+        async function buildManualWarehousePlan(kind) {
+          const requested = getRequestedQtyForKind(kind);
+          const tyre = getSelectedTyreForKind(kind);
+          if (!requested || !tyre?.id) {
+            return {
+              enough: true,
+              totalAvailable: 0,
+              plan: [],
+              remaining: 0,
+            };
+          }
+
+          if (!manualWarehousePickerVisible) {
+            const autoPlan =
+              typeof window.qpxGetFulfillmentPlan === "function"
+                ? await window.qpxGetFulfillmentPlan(tyre.size, requested, tyre.id)
+                : {
+                    enough: true,
+                    totalAvailable: requested,
+                    plan: [
+                      {
+                        id: tyre.id,
+                        size: tyre.size,
+                        location: "",
+                        take: requested,
+                        currentQty: requested,
+                      },
+                    ],
+                    remaining: 0,
+                  };
+            if (!autoPlan?.enough) {
+              throw new Error(
+                tr("notEnoughStockDetailed", {
+                  size: formatTyreSizeValue(tyre.size) || tyre.size || "-",
+                  qty: Number(autoPlan?.totalAvailable || 0),
+                }),
+              );
+            }
+            return autoPlan;
+          }
+
+          const source = await ensureInventoryLoaded();
+          const currentRows = new Map(
+            (source || []).map((item) => [String(item.id), item]),
+          );
+          const selected = (MANUAL_WAREHOUSE_STATE[kind] || []).filter(
+            (item) => Number(item.qty || 0) > 0,
+          );
+          if (!selected.length) {
+            throw new Error(tr("warehouseSelectionRequired"));
+          }
+          const allocated = selected.reduce(
+            (sum, item) => sum + Math.max(0, Number(item.qty || 0)),
+            0,
+          );
+          if (allocated !== requested) {
+            throw new Error(
+              tr("warehouseAllocationMismatch", {
+                allocated,
+                requested,
+              }),
+            );
+          }
+          const plan = selected.map((item) => {
+            const fresh = currentRows.get(String(item.id));
+            if (!fresh) throw new Error(tr("tyreNotFoundMsg"));
+            const currentQty = Math.max(0, Number(fresh.quantity || 0));
+            const take = Math.max(0, Number(item.qty || 0));
+            if (take > currentQty) {
+              throw new Error(
+                tr("notEnoughStockDetailed", {
+                  size: formatTyreSizeValue(fresh.size) || fresh.size || "-",
+                  qty: currentQty,
+                }),
+              );
+            }
+            return {
+              id: fresh.id,
+              size: fresh.size,
+              location: fresh.location || "",
+              take,
+              currentQty,
+            };
+          });
+          return {
+            enough: true,
+            totalAvailable: allocated,
+            plan,
+            remaining: 0,
+          };
+        }
+
+        function cleanPhotoMetaFromTransaction(tx) {
+          const payload =
+            typeof unpackTransactionPayload === "function"
+              ? unpackTransactionPayload(tx)
+              : { meta: getTransactionMeta(tx), note: getTransactionNoteText(tx) };
+          const nextMeta = { ...(payload.meta || {}) };
+          delete nextMeta.photoPath;
+          return packTransactionNotes(payload.note || "", nextMeta);
+        }
+
+        async function cleanupExpiredServicePhotos(force = false) {
+          if (!currentUser) return;
+          const today = new Date().toISOString().split("T")[0];
+          if (!force && localStorage.getItem(PHOTO_CLEANUP_DAY_KEY) === today) {
+            return;
+          }
+          const { data, error } = await db
+            .from("transactions")
+            .select("*")
+            .lt("created_at", `${today}T00:00:00`);
+          if (error) return;
+          for (const tx of data || []) {
+            const meta = getTransactionMeta(tx);
+            if (!tx?.photo_url && !meta?.photoPath) continue;
+            await removeServicePhotoFromCloud(tx);
+            try {
+              await db
+                .from("transactions")
+                .update({
+                  photo_url: null,
+                  notes: cleanPhotoMetaFromTransaction(tx),
+                })
+                .eq("id", tx.id);
+            } catch (cleanupError) {}
+            await removeServiceArtifacts(tx.id).catch(() => {});
+          }
+          localStorage.setItem(PHOTO_CLEANUP_DAY_KEY, today);
+        }
+
+        getTransactionPhotoSource = async function (tx) {
+          return tx?.photo_url || "";
+        };
+
+        const __manualOriginalSelectTyre = selectTyre;
+        selectTyre = function (id, size) {
+          __manualOriginalSelectTyre(id, size);
+          setTimeout(() => {
+            refreshManualWarehouseState("front");
+            renderManualWarehouseSection("rear");
+          }, 0);
+        };
+
+        const __manualOriginalClearSvc = clearSvc;
+        clearSvc = function () {
+          MANUAL_WAREHOUSE_STATE.front = [];
+          MANUAL_WAREHOUSE_STATE.rear = [];
+          MANUAL_WAREHOUSE_LAST_KEY.front = "";
+          MANUAL_WAREHOUSE_LAST_KEY.rear = "";
+          manualWarehousePickerVisible = false;
+          __manualOriginalClearSvc();
+          updateManualWarehouseToggleButton();
+          renderManualWarehouseSection("front");
+          renderManualWarehouseSection("rear");
+        };
+
+        const __manualOriginalClearRearSearch = clearRearSearch;
+        clearRearSearch = function () {
+          MANUAL_WAREHOUSE_STATE.rear = [];
+          MANUAL_WAREHOUSE_LAST_KEY.rear = "";
+          __manualOriginalClearRearSearch();
+          renderManualWarehouseSection("rear");
+        };
+
+        const __manualOriginalSelectRearTyre = selectRearTyre;
+        selectRearTyre = function (id, size) {
+          __manualOriginalSelectRearTyre(id, size);
+          setTimeout(() => refreshManualWarehouseState("rear"), 0);
+        };
+
+        const __manualOriginalSetServiceActionMode = setServiceActionMode;
+        setServiceActionMode = function (mode) {
+          __manualOriginalSetServiceActionMode(mode);
+          if (mode === "service") {
+            manualWarehousePickerVisible = false;
+          }
+          updateManualWarehouseToggleButton();
+          setTimeout(() => {
+            refreshManualWarehouseState("front");
+            refreshManualWarehouseState("rear");
+          }, 0);
+        };
+
+        submitService = async function (event) {
+          if (!selTyreId) {
+            showToast(tr("selectTyreFirstMsg"), "error");
+            return;
+          }
+          const plate = document.getElementById("svc-plate").value.trim().toUpperCase();
+          const frontQty = getRequestedQtyForKind("front");
+          const rearQty =
+            serviceActionMode === "two_sizes" ? getRequestedQtyForKind("rear") : 0;
+          const notes = document.getElementById("svc-notes").value.trim();
+          const btn = event?.target?.closest("button") || event?.target;
+          if (!plate) {
+            showToast(tr("plateRequiredMsg"), "error");
+            return;
+          }
+          if (serviceActionMode === "service" && !selectedServiceOption) {
+            showToast(tr("selectServiceTypeMsg"), "error");
+            return;
+          }
+          if (serviceActionMode !== "service" && !selTyreType) {
+            showToast(
+              currentLang === "ar" ? "اختر حالة الكفر" : "Select tyre condition",
+              "error",
+            );
+            return;
+          }
+          if (serviceActionMode === "two_sizes" && !rearTyreSelection?.id) {
+            showToast(tr("selectRearTyreMsg"), "error");
+            return;
+          }
+
+          setServiceSubmitButton(btn, true);
+          try {
+            const frontInv = await fetchInventoryById(selTyreId);
+            if (!frontInv) {
+              showToast(tr("tyreNotFoundMsg"), "error");
+              return;
+            }
+            let rearInv = null;
+            if (serviceActionMode === "two_sizes") {
+              rearInv = await fetchInventoryById(rearTyreSelection.id);
+              if (!rearInv) {
+                showToast(tr("tyreNotFoundMsg"), "error");
+                return;
+              }
+            }
+
+            let frontPlan = { enough: true, totalAvailable: 0, plan: [], remaining: 0 };
+            let rearPlan = { enough: true, totalAvailable: 0, plan: [], remaining: 0 };
+            if (serviceActionMode !== "service") {
+              frontPlan = await buildManualWarehousePlan("front");
+              if (rearInv) {
+                rearPlan = await buildManualWarehousePlan("rear");
+              }
+            }
+
+            const meta = {
+              mode:
+                serviceActionMode === "service"
+                  ? "service"
+                  : serviceActionMode === "two_sizes"
+                    ? "two_sizes"
+                    : "change",
+              frontTyreId: frontInv.id,
+              frontSize: formatTyreSizeValue(frontInv.size) || frontInv.size,
+              frontQty: serviceActionMode === "service" ? 0 : frontQty,
+              frontSources: frontPlan.plan.map((item) => ({
+                id: item.id,
+                location: item.location || "",
+                qty: Number(item.take || 0),
+              })),
+              rearTyreId: rearInv?.id || null,
+              rearSize: rearInv
+                ? formatTyreSizeValue(rearInv.size) || rearInv.size
+                : null,
+              rearQty: rearInv ? rearQty : 0,
+              rearSources: rearPlan.plan.map((item) => ({
+                id: item.id,
+                location: item.location || "",
+                qty: Number(item.take || 0),
+              })),
+              serviceType: serviceActionMode === "service" ? selectedServiceOption : null,
+              specialNote:
+                serviceActionMode === "two_sizes" ? tr("twoDifferentSizesNote") : "",
+            };
+
+            const payload = {
+              tyre_size: formatTyreSizeValue(frontInv.size) || frontInv.size,
+              plate_number: plate,
+              front_left: selPositions.includes("front_left"),
+              front_right: selPositions.includes("front_right"),
+              rear_left: selPositions.includes("rear_left"),
+              rear_right: selPositions.includes("rear_right"),
+              repair_type:
+                serviceActionMode === "change" || serviceActionMode === "two_sizes"
+                  ? selRepair || null
+                  : null,
+              tyre_condition: serviceActionMode === "service" ? null : selTyreType || null,
+              notes: packTransactionNotes(notes, meta),
+              operator: currentUser.username,
+              photo_url: null,
+              quantity: frontQty,
+              brand: frontInv.brand || null,
+            };
+
+            const { data: insertedTxn, error: txnErr } = await db
+              .from("transactions")
+              .insert(payload)
+              .select()
+              .single();
+            if (txnErr || !insertedTxn) {
+              showToast(
+                txnErr?.message ||
+                  (currentLang === "ar" ? "تعذر حفظ الخدمة" : "Unable to save service"),
+                "error",
+              );
+              return;
+            }
+
+            const appliedUpdates = [];
+            try {
+              if (serviceActionMode !== "service") {
+                appliedUpdates.push(...(await applyFulfillmentPlanSafe(frontPlan.plan)));
+                if (rearInv) {
+                  appliedUpdates.push(...(await applyFulfillmentPlanSafe(rearPlan.plan)));
+                }
+              }
+            } catch (stockError) {
+              await db.from("transactions").delete().eq("id", insertedTxn.id);
+              for (const item of appliedUpdates.reverse()) {
+                try {
+                  await updateInventoryQty(item.id, item.previousQty);
+                } catch (restoreError) {}
+              }
+              showToast(stockError?.message || tr("notEnoughStockMsg"), "error");
+              return;
+            }
+
+            let photoUploaded = false;
+            if (capturedPhotoDataUrl) {
+              const uploadedPhotoUrl = await uploadServicePhoto(capturedPhotoDataUrl, plate);
+              if (uploadedPhotoUrl) {
+                photoUploaded = true;
+                const photoPath = extractStoragePathFromUrl(uploadedPhotoUrl);
+                const nextMeta = { ...meta, photoPath };
+                await db
+                  .from("transactions")
+                  .update({
+                    photo_url: uploadedPhotoUrl,
+                    notes: packTransactionNotes(notes, nextMeta),
+                  })
+                  .eq("id", insertedTxn.id);
+                insertedTxn.photo_url = uploadedPhotoUrl;
+              }
+            }
+
+            const artifactInventoryId =
+              serviceActionMode === "two_sizes"
+                ? null
+                : frontPlan.plan[0]?.id || selTyreId;
+            await storeServiceArtifacts(insertedTxn.id, artifactInventoryId, capturedPhotoDataUrl);
+
+            if (capturedPhotoDataUrl && !photoUploaded) {
+              showToast(tr("photoUploadWarning"), "error");
+            } else if (capturedPhotoDataUrl && photoUploaded) {
+              showToast(tr("photoSyncedMsg"), "success");
+            }
+
+            showToast(
+              serviceActionMode === "service"
+                ? tr("serviceRecordedMsg")
+                : tr("serviceSavedMsg"),
+              "success",
+            );
+            clearSvc();
+            await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+            if (document.getElementById("page-dashboard")?.classList.contains("active")) {
+              loadDashboard();
+            }
+          } catch (error) {
+            showToast(error?.message || tr("notEnoughStockMsg"), "error");
+          } finally {
+            setServiceSubmitButton(btn, false);
+          }
+        };
+
+        deleteService = async function (txId) {
+          if (!txId) return;
+          const { data: tx, error: txError } = await db
+            .from("transactions")
+            .select("*")
+            .eq("id", txId)
+            .maybeSingle();
+          if (txError || !tx) {
+            showToast(tr("tyreNotFoundMsg"), "error");
+            return;
+          }
+          if (!confirm(getServiceDeletePrompt(tx))) return;
+          const meta = getTransactionMeta(tx);
+          try {
+            if (meta?.mode !== "service") {
+              if (Array.isArray(meta?.frontSources) && meta.frontSources.length) {
+                await qpxRestoreFulfillmentPlan(meta.frontSources);
+              } else if (meta?.frontTyreId) {
+                const front = await fetchInventoryById(meta.frontTyreId);
+                if (!front) throw new Error(tr("tyreNotFoundMsg"));
+                await updateInventoryQty(
+                  front.id,
+                  Number(front.quantity || 0) + Number(meta.frontQty || tx.quantity || 1),
+                );
+              }
+              if (meta?.mode === "two_sizes") {
+                if (Array.isArray(meta?.rearSources) && meta.rearSources.length) {
+                  await qpxRestoreFulfillmentPlan(meta.rearSources);
+                } else if (meta?.rearTyreId) {
+                  const rear = await fetchInventoryById(meta.rearTyreId);
+                  if (!rear) throw new Error(tr("tyreNotFoundMsg"));
+                  await updateInventoryQty(
+                    rear.id,
+                    Number(rear.quantity || 0) + Number(meta.rearQty || tx.quantity || 1),
+                  );
+                }
+              }
+            }
+            const { error: deleteErr } = await db
+              .from("transactions")
+              .delete()
+              .eq("id", txId);
+            if (deleteErr) throw deleteErr;
+            await removeServicePhotoFromCloud(tx);
+          } catch (error) {
+            showToast(error?.message || tr("tyreNotFoundMsg"), "error");
+            return;
+          }
+          await removeServiceArtifacts(txId);
+          showToast(
+            meta?.mode === "service" ? tr("serviceDeletedMsg") : tr("qtyRestoredMsg"),
+            "success",
+          );
+          await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+          if (document.getElementById("page-dashboard")?.classList.contains("active")) {
+            loadDashboard();
+          }
+          if (document.getElementById("page-report")?.classList.contains("active")) {
+            loadReport();
+            loadStockRep();
+          }
+        };
+
+        function safeShowPageFallback(name) {
+          document.querySelectorAll(".page").forEach((page) => page.classList.remove("active"));
+          document.querySelectorAll(".nav-item[data-page]").forEach((item) =>
+            item.classList.remove("active"),
+          );
+          const page = document.getElementById(`page-${name}`);
+          if (page) page.classList.add("active");
+          const activeTab = document.querySelector(`.nav-item[data-page="${name}"]`);
+          if (activeTab) activeTab.classList.add("active");
+        }
+
+        function bindReliableBottomNav() {
+          if (qpxNavBound) return;
+          qpxNavBound = true;
+          const nav = document.querySelector(".bottom-nav");
+          if (!nav) return;
+          const handler = (event) => {
+            const btn = event.target.closest(".nav-item");
+            if (!btn || !nav.contains(btn)) return;
+            if (event.type === "click" && Date.now() - qpxLastNavTouchTs < 700) {
+              return;
+            }
+            if (event.type === "touchend") qpxLastNavTouchTs = Date.now();
+            event.preventDefault();
+            event.stopPropagation();
+            const page = btn.dataset.page;
+            try {
+              if (btn.id === "nav-search-center") {
+                openSearchHub();
+                return;
+              }
+              if (page) showPage(page);
+            } catch (error) {
+              if (page) safeShowPageFallback(page);
+            }
+          };
+          nav.addEventListener("touchend", handler, {
+            capture: true,
+            passive: false,
+          });
+          nav.addEventListener("click", handler, true);
+        }
+
+        async function refreshSharedData() {
+          if (!currentUser || qpxSyncRunning) return;
+          qpxSyncRunning = true;
+          try {
+            await cleanupExpiredServicePhotos();
+            await Promise.all([loadTodayStats(), loadTodayCards(), loadInventory()]);
+            if (document.getElementById("page-dashboard")?.classList.contains("active")) {
+              await loadDashboard();
+            }
+            if (document.getElementById("page-report")?.classList.contains("active")) {
+              await loadStockRep();
+            }
+          } catch (error) {
+            console.warn("Shared refresh failed", error);
+          } finally {
+            qpxSyncRunning = false;
+          }
+        }
+
+        function startSharedSync() {
+          if (qpxSyncStarted) return;
+          qpxSyncStarted = true;
+          bindReliableBottomNav();
+          refreshSharedData();
+          window.addEventListener("focus", () => {
+            refreshSharedData();
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") refreshSharedData();
+          });
+          setInterval(() => {
+            if (document.visibilityState === "visible") refreshSharedData();
+          }, 30000);
+        }
+
+        const __manualOriginalLogin = login;
+        login = async function () {
+          await __manualOriginalLogin();
+          if (currentUser) {
+            startSharedSync();
+            setTimeout(() => refreshManualWarehouseState("front"), 0);
+          }
+        };
+
+        const __manualOriginalApplyLanguage = applyLanguage;
+        applyLanguage = function () {
+          __manualOriginalApplyLanguage();
+          ensureManualWarehouseUi();
+          updateManualWarehouseToggleButton();
+          renderManualWarehouseSection("front");
+          renderManualWarehouseSection("rear");
+        };
+
+        document.addEventListener("input", (event) => {
+          if (event.target?.id === "svc-qty") {
+            refreshManualWarehouseState("front");
+          }
+          if (event.target?.id === "svc-rear-qty") {
+            refreshManualWarehouseState("rear");
+          }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+          ensureManualWarehouseUi();
+          bindReliableBottomNav();
+          updateManualWarehouseToggleButton();
+          renderManualWarehouseSection("front");
+          renderManualWarehouseSection("rear");
+        });
+      })();
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script id="qpx-hotfix-photo-search-order">
+  (() => {
+    async function qpxGetLocalServicePhotoFile(tx) {
+      if (!tx?.id || typeof getServiceArtifacts !== "function") return null;
+      try {
+        const meta = await getServiceArtifacts(tx.id);
+        if (!meta?.photoKey || typeof idbGet !== "function") return null;
+        const localPhoto = await idbGet(LOCAL_PHOTO_STORE, meta.photoKey);
+        if (!localPhoto?.dataUrl || typeof dataUrlToBlob !== "function") return null;
+        const converted = dataUrlToBlob(localPhoto.dataUrl);
+        const blob = converted?.blob;
+        const mime = converted?.mime || "image/jpeg";
+        if (!blob) return null;
+        const ext = (mime.split("/")[1] || "jpg").replace(/[^a-z0-9]/gi, "") || "jpg";
+        return new File([blob], `service_${tx.id}.${ext}`, { type: mime });
+      } catch (error) {
+        console.warn("Local service photo fallback failed", error);
+        return null;
+      }
+    }
+
+    const qpxOriginalGetInvoicePhotoFile = typeof getInvoicePhotoFile === "function"
+      ? getInvoicePhotoFile
+      : null;
+
+    getInvoicePhotoFile = async function (tx) {
+      const localFile = await qpxGetLocalServicePhotoFile(tx);
+      if (localFile) return localFile;
+      if (qpxOriginalGetInvoicePhotoFile) return qpxOriginalGetInvoicePhotoFile(tx);
+      return null;
+    };
+
+    getTransactionPhotoSource = async function (tx) {
+      const localFile = await qpxGetLocalServicePhotoFile(tx);
+      if (localFile) {
+        try {
+          return await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result || "");
+            reader.onerror = () => reject(reader.error || new Error("photo_read_error"));
+            reader.readAsDataURL(localFile);
+          });
+        } catch (error) {
+          console.warn("Service card local photo preview failed", error);
+        }
+      }
+      return tx?.photo_url || "";
+    };
+
+    function qpxSearchPriority(item, query) {
+      const q = String(query || "").trim();
+      const qKey = typeof normalizeTyreKey === "function" ? normalizeTyreKey(q) : q;
+      const sizeRaw = String(item?.size || "");
+      const sizeFormatted = typeof formatTyreSizeValue === "function"
+        ? formatTyreSizeValue(sizeRaw) || sizeRaw
+        : sizeRaw;
+      const sizeKey = typeof normalizeTyreKey === "function" ? normalizeTyreKey(sizeRaw) : sizeRaw;
+      if (!q && !qKey) return 0;
+      if (qKey && sizeKey === qKey) return 400;
+      if (q && sizeFormatted === q) return 380;
+      if (qKey && sizeKey.startsWith(qKey)) return 260;
+      if (q && sizeFormatted.startsWith(q)) return 240;
+      if (qKey && sizeKey.includes(qKey)) return 160;
+      if (q && sizeFormatted.includes(q)) return 140;
+      return 0;
+    }
+
+    function qpxSortMatchedSizes(rows, query) {
+      return [...(rows || [])].sort((a, b) => {
+        const scoreDiff = qpxSearchPriority(b, query) - qpxSearchPriority(a, query);
+        if (scoreDiff !== 0) return scoreDiff;
+        const qtyDiff = (Number(b?.quantity) || 0) - (Number(a?.quantity) || 0);
+        if (qtyDiff !== 0) return qtyDiff;
+        if (typeof compareTyreSizeValues === "function") {
+          return compareTyreSizeValues(a?.size, b?.size, "asc");
+        }
+        return String(a?.size || "").localeCompare(String(b?.size || ""), undefined, {
+          numeric: true,
+          sensitivity: "base",
+        });
+      });
+    }
+
+    runTyreSearch = async function (query, containerId, options = {}) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const q = String(query || "").trim();
+      if (!q) {
+        container.innerHTML = options.emptyHtml || "";
+        return;
+      }
+      const source = await ensureInventoryLoaded();
+      const qKey = normalizeTyreKey(q);
+      const matches = source.filter((t) => {
+        const size = t.size || "";
+        const sizeKey = normalizeTyreKey(size);
+        return sizeKey.includes(qKey) || String(size).toLowerCase().includes(q.toLowerCase());
+      });
+      const data = qpxSortMatchedSizes(matches, q);
+      if (!data.length) {
+        container.innerHTML = '<div class="empty-state">No tyres found</div>';
+        return;
+      }
+      container.innerHTML = getTyreSearchMarkup(data, options);
+    };
+
+    filterInv = function () {
+      const input = document.getElementById("inv-search");
+      const q = String(input?.value || "").toLowerCase();
+      const qKey = normalizeTyreKey(q);
+      const rows = allInv.filter((i) => {
+        const size = String(i.size || "");
+        return (
+          size.toLowerCase().includes(q) ||
+          normalizeTyreKey(size).includes(qKey) ||
+          String(i.location || "").toLowerCase().includes(q)
+        );
+      });
+      renderInv(q ? qpxSortMatchedSizes(rows, q) : rows);
+    };
+  })();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+<script id="qpx-damaged-clean-patch">
+(() => {
+  const DAMAGE_FLAG = '__qpxDamagedModeActive';
+  const STOCK_LOG_PREFIX = '[[QPX_STOCK:';
+
+  Object.assign(I18N.en, {
+    modeDamaged: 'Damaged tyre',
+    damagedAction: 'Damaged tyre',
+    damagedActionHint: 'Deduct from stock',
+    damagedTyreLabel: 'Damaged tyre',
+    damagedNoteRequiredMsg: 'Write a note for the damaged tyre',
+    damagedPhotoRequiredMsg: 'Capture a photo of the damaged tyre',
+    damagedSubmitLabel: 'Save damaged tyre & deduct stock',
+    damagedPhotoLabel: 'Problem Photo',
+    damagedPhotoPlaceholder: 'Tap to capture the damaged tyre photo',
+    damagedReportOption: 'Damaged tyres',
+    reportDamagedTitle: 'Damaged Tyres Report',
+    reportNoDamaged: 'No damaged tyres found for this period',
+    totalDamagedLabel: 'Total damaged tyres',
+    damagedIssueLabel: 'Issue note',
+    reportCardSub: 'Choose a period and print services, damaged tyres, added quantities, or transferred quantities.',
+  });
+
+  Object.assign(I18N.ar, {
+    modeDamaged: 'إطار تالف',
+    damagedAction: 'إطار تالف',
+    damagedActionHint: 'خصم من المخزون',
+    damagedTyreLabel: 'إطار تالف',
+    damagedNoteRequiredMsg: 'اكتب ملاحظة عن الإطار التالف',
+    damagedPhotoRequiredMsg: 'التقط صورة للإطار التالف',
+    damagedSubmitLabel: 'حفظ الإطار التالف وخصم الكمية',
+    damagedPhotoLabel: 'صورة المشكلة',
+    damagedPhotoPlaceholder: 'اضغط لالتقاط صورة الإطار التالف',
+    damagedReportOption: 'الإطارات التالفة',
+    reportDamagedTitle: 'تقرير الإطارات التالفة',
+    reportNoDamaged: 'لا توجد إطارات تالفة في هذه الفترة',
+    totalDamagedLabel: 'إجمالي الإطارات التالفة',
+    damagedIssueLabel: 'ملاحظة التلف',
+    reportCardSub: 'اختر الفترة ثم اطبع الخدمات أو الإطارات التالفة أو الكميات المضافة أو الكميات المنقولة.',
+  });
+
+  function isDamagedUiMode() {
+    return Boolean(window[DAMAGE_FLAG]);
+  }
+
+  function isDamagedTx(tx) {
+    return String(tx?.tyre_condition || '').toLowerCase() === 'damaged';
+  }
+
+  function isStockLogTx(tx) {
+    return String(tx?.notes || '').startsWith(STOCK_LOG_PREFIX);
+  }
+
+  function decodeBase64Json(encoded) {
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(encoded || ''))));
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function extractStockLogMetaGlobal(tx) {
+    const raw = String(tx?.notes || '');
+    const match = raw.match(/^\[\[QPX_STOCK:([^\]]+)\]\](?:\n)?/);
+    if (!match) return null;
+    return decodeBase64Json(match[1]);
+  }
+
+  function getDamagedConditionLabel() {
+    return tr('modeDamaged');
+  }
+
+  function getTxConditionLabel(tx) {
+    if (isDamagedTx(tx)) return getDamagedConditionLabel();
+    if (tx?.tyre_condition === 'new') return currentLang === 'ar' ? '✨ جديد' : '✨ New';
+    if (tx?.tyre_condition === 'old') return currentLang === 'ar' ? '🔄 مستعمل' : '🔄 Used';
+    return '—';
+  }
+
+  function ensureDamagedStyles() {
+    if (document.getElementById('qpx-damaged-clean-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'qpx-damaged-clean-styles';
+    style.textContent = [
+      '#service-action-wrap .service-action-row{grid-template-columns:repeat(5,minmax(0,1fr));}',
+      '#service-action-wrap .service-mini-btn.damage-active{background:linear-gradient(135deg,#ef4444,#b91c1c);border-color:transparent;color:#fff;box-shadow:0 10px 24px rgba(239,68,68,.24);}',
+      '#service-form[data-damaged="1"] .damage-hide{display:none !important;}',
+      '#service-form[data-damaged="1"] .damage-wide{grid-column:1 / -1 !important;}',
+      '#page-report .damage-note-cell{max-width:320px;white-space:pre-wrap;}',
+      '@media (max-width:640px){#service-action-wrap .service-action-row{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function applyNumericKeyboards() {
+    ['sale-search', 'quick-restock-search', 'search-hub-input', 'svc-rear-search', 'inv-search'].forEach((id) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('pattern', '[0-9]*');
+      input.setAttribute('autocomplete', 'off');
+    });
+  }
+
+  function ensureDamagedActionButton() {
+    ensureDamagedStyles();
+    const row = document.querySelector('#service-action-wrap .service-action-row');
+    if (!row || document.getElementById('svc-action-damaged')) return;
+    const warehouseBtn = document.getElementById('svc-action-warehouse');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'service-mini-btn';
+    btn.id = 'svc-action-damaged';
+    btn.onclick = () => setServiceActionMode('damaged');
+    if (warehouseBtn) row.insertBefore(btn, warehouseBtn);
+    else row.appendChild(btn);
+  }
+
+  function updateDamagedUi() {
+    ensureDamagedActionButton();
+    applyNumericKeyboards();
+    const form = document.getElementById('service-form');
+    if (!form) return;
+    const damaged = isDamagedUiMode();
+    form.setAttribute('data-damaged', damaged ? '1' : '0');
+
+    const plateGroup = document.getElementById('svc-plate')?.closest('.field-group');
+    const qtyGroup = document.getElementById('svc-qty')?.closest('.field-group');
+    const conditionLabel = document.getElementById('svc-condition-label');
+    const conditionGroup = conditionLabel?.nextElementSibling;
+    const repairLabel = document.getElementById('svc-repair-label');
+    const repairGroup = repairLabel?.nextElementSibling;
+    const positionLabel = document.getElementById('svc-position-label');
+    const positionGroup = positionLabel?.nextElementSibling;
+    const submitLabel = document.getElementById('svc-complete-label');
+    const photoLabel = document.getElementById('svc-photo-label');
+    const photoPlaceholder = document.getElementById('svc-photo-placeholder');
+
+    [plateGroup, conditionLabel, conditionGroup, repairLabel, repairGroup, positionLabel, positionGroup].forEach((el) => {
+      if (!el) return;
+      el.classList.add('damage-hide');
+      el.style.display = damaged ? 'none' : '';
+    });
+
+    if (qtyGroup) {
+      qtyGroup.classList.add('damage-wide');
+      qtyGroup.style.gridColumn = damaged ? '1 / -1' : '';
+    }
+
+    if (submitLabel) {
+      submitLabel.textContent = damaged
+        ? tr('damagedSubmitLabel')
+        : (currentLang === 'ar' ? 'إكمال الخدمة وخصم المخزون' : 'Complete Service & Deduct Stock');
+    }
+    if (photoLabel) {
+      photoLabel.textContent = damaged
+        ? tr('damagedPhotoLabel')
+        : (currentLang === 'ar' ? 'صورة السيارة' : 'Car Photo');
+    }
+    if (photoPlaceholder) {
+      photoPlaceholder.textContent = damaged
+        ? tr('damagedPhotoPlaceholder')
+        : (currentLang === 'ar' ? 'اضغط لالتقاط صورة السيارة' : 'Tap to capture car photo');
+    }
+
+    const damageBtn = document.getElementById('svc-action-damaged');
+    document.querySelectorAll('#service-action-wrap .service-mini-btn').forEach((btn) => btn.classList.remove('damage-active'));
+    if (damageBtn) {
+      damageBtn.innerHTML = `${esc(tr('damagedAction'))}<span class="mini-badge">${esc(tr('damagedActionHint'))}</span>`;
+      if (damaged) damageBtn.classList.add('active', 'damage-active');
+    }
+  }
+
+  function ensureDamagedReportUi() {
+    ensureDamagedStyles();
+    const reportPage = document.getElementById('page-report');
+    if (!reportPage) return;
+    const firstCard = reportPage.querySelector('.card');
+    const row = firstCard?.querySelector('.row');
+    if (!firstCard || !row) return;
+    row.classList.add('report-filter-row');
+    let select = document.getElementById('rep-type');
+    if (!select) {
+      const wrap = document.createElement('div');
+      wrap.className = 'form-group report-type-wrap';
+      wrap.innerHTML = `
+        <label id="rep-type-label"></label>
+        <select id="rep-type" class="table-select" onchange="loadReport()">
+          <option value="services"></option>
+          <option value="damaged"></option>
+          <option value="additions"></option>
+          <option value="transfers"></option>
+        </select>
+      `;
+      row.insertBefore(wrap, row.lastElementChild);
+      select = wrap.querySelector('select');
+    }
+    if (!select.querySelector('option[value="damaged"]')) {
+      const opt = document.createElement('option');
+      opt.value = 'damaged';
+      select.insertBefore(opt, select.querySelector('option[value="additions"]') || null);
+    }
+    const label = document.getElementById('rep-type-label');
+    if (label) label.textContent = tr('reportTypeLabel');
+    const map = {
+      services: tr('reportServicesOption'),
+      damaged: tr('damagedReportOption'),
+      additions: tr('reportAdditionsOption'),
+      transfers: tr('reportTransfersOption'),
+    };
+    Array.from(select.querySelectorAll('option')).forEach((opt) => {
+      if (map[opt.value]) opt.textContent = map[opt.value];
+    });
+    const rowButton = row.querySelector('.btn.btn-ghost.btn-sm');
+    if (rowButton) rowButton.textContent = tr('reportFilter');
+  }
+
+  function selectedReportType() {
+    return document.getElementById('rep-type')?.value || 'services';
+  }
+
+  function reportRange() {
+    return {
+      from: document.getElementById('rep-from')?.value || '',
+      to: document.getElementById('rep-to')?.value || '',
+    };
+  }
+
+  function updateReportHeaderUi(type) {
+    ensureDamagedReportUi();
+    const title = document.querySelector('#page-report .card .card-title');
+    const sub = document.querySelector('#page-report .card .panel-subtitle');
+    const thead = document.querySelector('#rep-table')?.closest('table')?.querySelector('thead');
+    const cardButtons = document.querySelectorAll('#page-report .card .report-actions .btn');
+    if (title) {
+      title.textContent = type === 'damaged'
+        ? tr('reportDamagedTitle')
+        : type === 'additions'
+          ? tr('reportAddedTitle')
+          : type === 'transfers'
+            ? tr('reportTransferredTitle')
+            : tr('reportServicesTitle');
+    }
+    if (sub) sub.textContent = tr('reportCardSub');
+    if (cardButtons[0]) cardButtons[0].textContent = `🔄 ${tr('reportLoad')}`;
+    if (cardButtons[1]) cardButtons[1].textContent = `🖨 ${tr('reportPrint')}`;
+    if (!thead) return;
+    if (type === 'damaged') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('damagedIssueLabel')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th><th>${tr('actions')}</th></tr>`;
+    } else if (type === 'additions') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${tr('movementType')}</th><th>${currentLang === 'ar' ? 'السبب' : 'Reason'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+    } else if (type === 'transfers') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('fromWarehouse')}</th><th>${tr('toWarehouse')}</th><th>${tr('movementType')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+    } else {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${currentLang === 'ar' ? 'اللوحة' : 'Plate'}</th><th>${currentLang === 'ar' ? 'الحالة' : 'Condition'}</th><th>${currentLang === 'ar' ? 'المكان' : 'Position'}</th><th>${tr('notes')}</th><th>${currentLang === 'ar' ? 'الإصلاح' : 'Repair'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th><th>${tr('actions')}</th></tr>`;
+    }
+  }
+
+  function buildReportRows(records, type) {
+    if (type === 'damaged') {
+      return records.filter((tx) => !isStockLogTx(tx) && isDamagedTx(tx));
+    }
+    if (type === 'services') {
+      return records.filter((tx) => !isStockLogTx(tx) && !isDamagedTx(tx));
+    }
+    return records
+      .map((tx) => ({ tx, meta: extractStockLogMetaGlobal(tx) }))
+      .filter((entry) => entry.meta && entry.meta.type === (type === 'transfers' ? 'transfer' : 'addition'))
+      .map((entry) => ({ ...entry.tx, __meta: entry.meta }));
+  }
+
+  const originalGetServiceUsedCount = getServiceUsedCount;
+  getServiceUsedCount = function (tx) {
+    if (isDamagedTx(tx)) return Number(tx?.quantity || 0);
+    return originalGetServiceUsedCount(tx);
+  };
+
+  const originalGetServiceDeletePrompt = getServiceDeletePrompt;
+  getServiceDeletePrompt = function (tx) {
+    if (isDamagedTx(tx)) {
+      const sizeLabel = formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-';
+      return currentLang === 'ar'
+        ? `حذف سجل الإطار التالف ${sizeLabel}؟ سيتم إرجاع الكمية إلى المخزون.`
+        : `Delete damaged tyre record ${sizeLabel}? The quantity will be restored to stock.`;
+    }
+    return originalGetServiceDeletePrompt(tx);
+  };
+
+  const originalSetServiceActionMode = setServiceActionMode;
+  setServiceActionMode = function (mode) {
+    if (mode === 'damaged') {
+      window[DAMAGE_FLAG] = true;
+      originalSetServiceActionMode('change');
+      selectedServiceOption = '';
+      rearTyreSelection = null;
+      selTyreType = 'damaged';
+      selRepair = '';
+      selPositions = [];
+      document.querySelectorAll('.repair-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.tyre-type-btn').forEach((b) => b.classList.remove('active-new', 'active-old', 'active-teal', 'active-muted'));
+      document.querySelectorAll('.pos-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('#service-action-wrap .service-mini-btn').forEach((b) => b.classList.remove('active'));
+      document.getElementById('svc-action-damaged')?.classList.add('active', 'damage-active');
+      updateServiceTitle();
+      updateDamagedUi();
+      setTimeout(() => document.getElementById('svc-qty')?.focus(), 80);
+      return;
+    }
+    window[DAMAGE_FLAG] = false;
+    originalSetServiceActionMode(mode);
+    updateDamagedUi();
+  };
+
+  const originalUpdateServiceTitle = updateServiceTitle;
+  updateServiceTitle = function () {
+    if (!isDamagedUiMode()) {
+      originalUpdateServiceTitle();
+      return;
+    }
+    const title = document.getElementById('svc-title');
+    if (!title) return;
+    if (!selTyreSize) {
+      title.textContent = currentLang === 'ar' ? 'تفاصيل الخدمة' : 'Service Details';
+      return;
+    }
+    const frontSize = formatTyreSizeValue(selTyreSize) || selTyreSize;
+    title.innerHTML = `${esc(currentLang === 'ar' ? 'تفاصيل الخدمة' : 'Service Details')} <span class="badge badge-teal" style="font-family:'DM Mono',monospace;font-size:10px;">${esc(frontSize)}</span> <span class="badge" style="font-size:10px;background:rgba(239,68,68,.14);color:#ef4444;border-color:rgba(239,68,68,.28);">${esc(tr('modeDamaged'))}</span>`;
+  };
+
+  const originalRefreshServiceEnhancementTexts = refreshServiceEnhancementTexts;
+  refreshServiceEnhancementTexts = function () {
+    originalRefreshServiceEnhancementTexts();
+    ensureDamagedActionButton();
+    updateDamagedUi();
+    ensureDamagedReportUi();
+  };
+
+  const originalSelectTyre = selectTyre;
+  selectTyre = function (id, size) {
+    window[DAMAGE_FLAG] = false;
+    originalSelectTyre(id, size);
+    updateDamagedUi();
+  };
+
+  const originalClearSvc = clearSvc;
+  clearSvc = function () {
+    window[DAMAGE_FLAG] = false;
+    originalClearSvc();
+    updateDamagedUi();
+  };
+
+  const originalSubmitService = submitService;
+  submitService = async function (event) {
+    if (!isDamagedUiMode()) {
+      return originalSubmitService(event);
+    }
+    const noteText = document.getElementById('svc-notes')?.value.trim() || '';
+    if (!noteText) {
+      showToast(tr('damagedNoteRequiredMsg'), 'error');
+      return;
+    }
+    if (!capturedPhotoDataUrl) {
+      showToast(tr('damagedPhotoRequiredMsg'), 'error');
+      return;
+    }
+    const plateInput = document.getElementById('svc-plate');
+    const previousPlate = plateInput?.value || '';
+    const previousType = selTyreType;
+    const previousRepair = selRepair;
+    const previousPositions = Array.isArray(selPositions) ? [...selPositions] : [];
+    try {
+      if (plateInput) plateInput.value = 'DAMAGED';
+      selTyreType = 'damaged';
+      selRepair = '';
+      selPositions = [];
+      return await originalSubmitService(event);
+    } finally {
+      if (document.getElementById('service-form')?.style.display !== 'none') {
+        window[DAMAGE_FLAG] = true;
+        if (plateInput) plateInput.value = previousPlate;
+        selTyreType = previousType || 'damaged';
+        selRepair = previousRepair || '';
+        selPositions = previousPositions;
+        updateServiceTitle();
+        updateDamagedUi();
+      }
+    }
+  };
+
+  const originalLoadTodayCards = loadTodayCards;
+  loadTodayCards = async function () {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+    const container = document.getElementById('today-cards');
+    if (!container) return;
+    if (!data?.length) {
+      container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`;
+      return;
+    }
+    const cards = await Promise.all((data || []).map(async (t) => {
+      const meta = getTransactionMeta(t);
+      const damaged = isDamagedTx(t);
+      const isOld = t.tyre_condition === 'old';
+      const time = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const photoSrc = await getTransactionPhotoSource(t);
+      const noteText = getTransactionNoteText(t);
+      const noteLines = [];
+      if (meta?.mode === 'two_sizes') noteLines.push(tr('twoDifferentSizesNote'));
+      if (damaged) noteLines.push(tr('modeDamaged'));
+      if (noteText && noteText !== tr('noServiceNote')) noteLines.push(noteText);
+      const photoMarkup = photoSrc
+        ? `<button class="svc-photo-btn" type="button" data-photo="${esc(photoSrc)}" onclick="openImageLightbox(this.dataset.photo)"><img class="svc-photo" src="${esc(photoSrc)}" alt="Service photo" loading="lazy" decoding="async"><span class="svc-photo-zoom"><i class="fas fa-expand"></i>${esc(tr('viewPhoto'))}</span></button>`
+        : `<div class="svc-photo-empty"><i class="fas fa-camera"></i><span>${esc(tr('noPhotoCard'))}</span></div>`;
+      const sizeBlock = meta?.mode === 'two_sizes' && meta.frontSize && meta.rearSize
+        ? renderServiceCardSizeBlock(t, meta)
+        : `<div class="svc-card-size" ${damaged ? 'style="color:#ef4444;"' : isOld ? 'style="color:var(--gold);"' : ''}>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</div>`;
+      const actionLabel = damaged ? tr('modeDamaged') : esc(getServiceModeMetaLabel(meta));
+      const actionRow = `<div class="svc-card-row"><span class="label">${esc(tr('actionTypeLabel'))}</span><span class="val">${esc(actionLabel)}</span></div>`;
+      const typeRow = `<div class="svc-card-row"><span class="label">${esc(tr('typeLabel'))}</span><span class="val">${esc(getTxConditionLabel(t))}</span></div>`;
+      const qtyValue = meta?.mode === 'two_sizes'
+        ? `${Number(meta.frontQty) || Number(t.quantity) || 1} / ${Number(meta.rearQty) || Number(t.quantity) || 1}`
+        : Number(t.quantity) || 1;
+      const qtyRow = `<div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الكمية' : 'Qty')}</span><span class="val">${esc(String(qtyValue))}</span></div>`;
+      const positionValue = damaged ? '—' : renderPositionSummary(t);
+      const positionRow = `<div class="svc-card-row svc-card-row-position"><span class="label">${esc(tr('positionLabelShort'))}</span><span class="val">${positionValue}</span></div>`;
+      let serviceRow = '';
+      if (damaged) {
+        serviceRow = `<div class="svc-card-row"><span class="label">${esc(tr('damagedTyreLabel'))}</span><span class="val">${esc(tr('modeDamaged'))}</span></div>`;
+      } else if (meta?.mode === 'service' && meta?.serviceType) {
+        serviceRow = `<div class="svc-card-row"><span class="label">${esc(tr('serviceTypeCardLabel'))}</span><span class="val">${esc(serviceOptionLabel(meta.serviceType))}</span></div>`;
+      } else if (t.repair_type) {
+        serviceRow = `<div class="svc-card-row"><span class="label">${esc(tr('repairLabelShort'))}</span><span class="val">${esc(t.repair_type)}</span></div>`;
+      }
+      const noteBlock = noteLines.length
+        ? `<div class="svc-card-note service-note-stack"><strong>${esc(tr('noteTitle'))}</strong>${noteLines.map((line) => `<span>${esc(line)}</span>`).join('')}</div>`
+        : '';
+      const plateValue = damaged ? tr('damagedTyreLabel') : (t.plate_number || '—');
+      const cardStyle = damaged
+        ? 'style="border-color:rgba(239,68,68,.28);"'
+        : isOld
+          ? 'style="border-color:rgba(248,210,110,0.25);"'
+          : '';
+      const headStyle = damaged
+        ? 'style="background:rgba(239,68,68,.10);"'
+        : isOld
+          ? 'style="background:var(--gold-dim);"'
+          : '';
+      return `<div class="svc-card" ${cardStyle}><div class="svc-card-hd" ${headStyle}>${sizeBlock}<div class="time-chip">${time}</div></div>${photoMarkup}<div class="svc-card-body">${actionRow}${typeRow}${qtyRow}${positionRow}${serviceRow}<div class="svc-card-row"><span class="label">${esc(tr('byLabel'))}</span><span class="val">${esc(t.operator || '—')}</span></div><div class="svc-card-plate">${esc(plateValue)}</div>${noteBlock}<div class="svc-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></div></div>`;
+    }));
+    container.innerHTML = cards.join('');
+  };
+
+  const originalFormatInvoiceShareText = formatInvoiceShareText;
+  formatInvoiceShareText = function (tx) {
+    if (!isDamagedTx(tx)) return originalFormatInvoiceShareText(tx);
+    const createdAt = tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString();
+    const noteText = getTransactionNoteText(tx);
+    const qty = Number(tx?.quantity || 1) || 1;
+    const lines = currentLang === 'ar'
+      ? [
+          'تفاصيل الإطار التالف:',
+          `التاريخ: ${createdAt}`,
+          `المقاس: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+          `الكمية: ${qty}`,
+          `الحالة: ${tr('modeDamaged')}`,
+          `الموظف: ${tx?.operator || '-'}`,
+        ]
+      : [
+          'Damaged tyre details:',
+          `Date: ${createdAt}`,
+          `Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+          `Qty: ${qty}`,
+          `Status: ${tr('modeDamaged')}`,
+          `Operator: ${tx?.operator || '-'}`,
+        ];
+    if (noteText && noteText !== tr('noServiceNote')) {
+      lines.push(currentLang === 'ar' ? `الملاحظة: ${noteText}` : `Note: ${noteText}`);
+    }
+    return lines.join('\n');
+  };
+
+  loadReport = async function () {
+    ensureDamagedReportUi();
+    const { from, to } = reportRange();
+    const type = selectedReportType();
+    updateReportHeaderUi(type);
+    if (!from || !to) {
+      showToast(currentLang === 'ar' ? 'اختر الفترة' : 'Select date range', 'error');
+      return;
+    }
+    const { data } = await db.from('transactions').select('*').gte('created_at', from + 'T00:00:00').lte('created_at', to + 'T23:59:59').order('created_at', { ascending: false });
+    currentReportData = buildReportRows(data || [], type);
+    const tbody = document.getElementById('rep-table');
+    if (!tbody) return;
+    if (!currentReportData.length) {
+      const msgKey = type === 'damaged' ? 'reportNoDamaged' : type === 'additions' ? 'reportNoAdditions' : type === 'transfers' ? 'reportNoTransfers' : 'reportNoServices';
+      const colspan = type === 'services' ? 9 : type === 'damaged' ? 6 : 7;
+      tbody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty-state">${esc(tr(msgKey))}</div></td></tr>`;
+      return;
+    }
+    if (type === 'damaged') {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const time = new Date(t.created_at).toLocaleString();
+        return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(t.quantity) || 0}</td><td class="damage-note-cell">${esc(getTransactionNoteText(t))}</td><td>${esc(t.operator || '-')}</td><td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></td></tr>`;
+      }).join('');
+    } else if (type === 'additions') {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        const time = new Date(t.created_at).toLocaleString();
+        return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.location || tr('noWarehouseValue'))}</td><td>${esc(tr('addedLabel'))}</td><td>${esc(meta.reason || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+    } else if (type === 'transfers') {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        const time = new Date(t.created_at).toLocaleString();
+        return `<tr><td style="white-space:nowrap;">${esc(time)}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.from || tr('noWarehouseValue'))}</td><td>${esc(meta.to || tr('noWarehouseValue'))}</td><td>${esc(tr('transferredLabel'))}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+    } else {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const time = new Date(t.created_at).toLocaleString();
+        return `<tr><td data-label="Time" style="white-space:nowrap;">${esc(time)}</td><td data-label="${esc(tr('size'))}"><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td data-label="Plate">${esc(t.plate_number || '-')}</td><td data-label="Condition">${esc(getTxConditionLabel(t))}</td><td data-label="Position">${esc(getPositionShortCodes(t))}</td><td data-label="${esc(tr('notes'))}">${esc(getTransactionNoteText(t))}</td><td data-label="Repair">${esc(t.repair_type || '-')}</td><td data-label="Operator">${esc(t.operator || '-')}</td><td data-label="${esc(tr('actions'))}"><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></td></tr>`;
+      }).join('');
+    }
+    showToast(tr('reportReady', { count: currentReportData.length }), 'success');
+  };
+
+  printReport = async function () {
+    if (!currentReportData.length) await loadReport();
+    if (!currentReportData.length) {
+      showToast(tr('reportPrintNoData'), 'error');
+      return;
+    }
+    const type = selectedReportType();
+    const { from, to } = reportRange();
+    const title = type === 'damaged' ? tr('reportDamagedTitle') : type === 'additions' ? tr('reportAddedTitle') : type === 'transfers' ? tr('reportTransferredTitle') : tr('reportServicesTitle');
+    let head = '';
+    let body = '';
+    let totalLabel = tr('totalServicesReportLabel');
+    let totalQty = currentReportData.length;
+    if (type === 'damaged') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('damagedIssueLabel')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(t.quantity) || 0}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.operator || '-')}</td></tr>`).join('');
+      totalQty = currentReportData.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+      totalLabel = tr('totalDamagedLabel');
+    } else if (type === 'additions') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${currentLang === 'ar' ? 'السبب' : 'Reason'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.location || tr('noWarehouseValue'))}</td><td>${esc(meta.reason || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+      totalQty = currentReportData.reduce((sum, item) => sum + Number(item.__meta?.quantity || item.quantity || 0), 0);
+      totalLabel = tr('totalAddedLabel');
+    } else if (type === 'transfers') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('fromWarehouse')}</th><th>${tr('toWarehouse')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.from || tr('noWarehouseValue'))}</td><td>${esc(meta.to || tr('noWarehouseValue'))}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+      totalQty = currentReportData.reduce((sum, item) => sum + Number(item.__meta?.quantity || item.quantity || 0), 0);
+      totalLabel = tr('totalTransferredLabel');
+    } else {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${currentLang === 'ar' ? 'اللوحة' : 'Plate'}</th><th>${currentLang === 'ar' ? 'الحالة' : 'Condition'}</th><th>${currentLang === 'ar' ? 'المكان' : 'Position'}</th><th>${tr('notes')}</th><th>${currentLang === 'ar' ? 'الإصلاح' : 'Repair'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${esc(t.plate_number || '-')}</td><td>${esc(getTxConditionLabel(t))}</td><td>${esc(getPositionShortCodes(t))}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`).join('');
+    }
+    const html = `<!DOCTYPE html><html><head><title>${esc(title)}</title>${buildPrintStyle()}</head><body><div class="header"><div class="company">QUALITY PART X</div><div>TYRE SERVICES · DUNSTABLE</div><div class="meta">${esc(title)}<br>${esc(from)} → ${esc(to)}<br>${esc(tr('generatedAtLabel'))}: ${esc(new Date().toLocaleString())}<br>${esc(tr('operatorLabel'))}: ${esc(currentUser?.username || '-')}</div></div><table><thead>${head}</thead><tbody>${body}</tbody></table><div class="total">${esc(totalLabel)}: ${totalQty}</div></body></html>`;
+    const win = openPrintShell(title);
+    if (!win) return;
+    finishPrintShell(win, html);
+  };
+
+  searchRearTyre = async function () {
+    const input = document.getElementById('svc-rear-search');
+    if (!input) return;
+    const q = formatTyreSizeField(input).trim();
+    const container = document.getElementById('svc-rear-results');
+    if (!container) return;
+    if (!q) {
+      container.innerHTML = `<div class="empty-state">${esc(tr('rearSearchEmpty'))}</div>`;
+      return;
+    }
+    const source = await ensureInventoryLoaded();
+    const qKey = normalizeTyreKey(q);
+    const matches = source
+      .filter((t) => String(t.id) !== String(selTyreId))
+      .filter((t) => {
+        const size = t.size || '';
+        const sizeKey = normalizeTyreKey(size);
+        return sizeKey.includes(qKey) || String(size).toLowerCase().includes(q.toLowerCase());
+      });
+    const sorter = typeof qpxSortMatchedSizes === 'function'
+      ? qpxSortMatchedSizes(matches, q)
+      : matches.sort((a, b) => (Number(b.quantity) || 0) - (Number(a.quantity) || 0));
+    renderRearSearchResults(sorter);
+  };
+
+  const originalApplyLanguage = applyLanguage;
+  applyLanguage = function () {
+    originalApplyLanguage();
+    ensureDamagedActionButton();
+    ensureDamagedReportUi();
+    applyNumericKeyboards();
+    updateDamagedUi();
+    updateReportHeaderUi(selectedReportType());
+  };
+
+  const originalShowPage = showPage;
+  showPage = function (name) {
+    originalShowPage(name);
+    if (name === 'report') {
+      ensureDamagedReportUi();
+      updateReportHeaderUi(selectedReportType());
+    }
+    if (name === 'service' || name === 'inventory') {
+      applyNumericKeyboards();
+      updateDamagedUi();
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    ensureDamagedActionButton();
+    ensureDamagedReportUi();
+    applyNumericKeyboards();
+    updateDamagedUi();
+    updateReportHeaderUi(selectedReportType());
+  });
+})();
+</script>
+
+
+<script id="qpx-damaged-ui-report-patch">
+(() => {
+  const qpxOriginalSetServiceActionMode = setServiceActionMode;
+  const qpxOriginalRefreshServiceEnhancementTexts = refreshServiceEnhancementTexts;
+  const qpxOriginalUpdateServiceTitle = updateServiceTitle;
+  const qpxOriginalSubmitService = submitService;
+  const qpxOriginalApplyLanguage = applyLanguage;
+  const qpxOriginalShowPage = showPage;
+  const STOCK_LOG_PREFIX = '[[QPX_STOCK:';
+  let qpxDamagedModeActive = false;
+
+  Object.assign(I18N.en, {
+    modeDamaged: 'Damaged tyre',
+    damagedAction: 'Damaged tyre',
+    damagedActionHint: 'Deduct with photo',
+    damagedNoteRequiredMsg: 'Write a note for the damaged tyre',
+    damagedPhotoRequiredMsg: 'Capture a photo of the damaged tyre',
+    damagedSubmitLabel: 'Save damaged tyre & deduct stock',
+    damagedPhotoLabel: 'Problem Photo',
+    damagedPhotoPlaceholder: 'Tap to capture the damaged tyre photo',
+    damagedReportOption: 'Damaged tyres',
+    reportDamagedTitle: 'Damaged Tyres Report',
+    reportNoDamaged: 'No damaged tyres found for this period',
+    totalDamagedLabel: 'Total damaged tyres',
+    damagedIssueLabel: 'Issue note',
+    damagedPlateValue: 'DAMAGED',
+  });
+  Object.assign(I18N.ar, {
+    modeDamaged: 'إطار تالف',
+    damagedAction: 'إطار تالف',
+    damagedActionHint: 'خصم مع صورة',
+    damagedNoteRequiredMsg: 'اكتب ملاحظة عن التلف',
+    damagedPhotoRequiredMsg: 'التقط صورة للإطار التالف',
+    damagedSubmitLabel: 'حفظ الإطار التالف وخصم الكمية',
+    damagedPhotoLabel: 'صورة المشكلة',
+    damagedPhotoPlaceholder: 'اضغط لالتقاط صورة الإطار التالف',
+    damagedReportOption: 'الإطارات التالفة',
+    reportDamagedTitle: 'تقرير الإطارات التالفة',
+    reportNoDamaged: 'لا توجد إطارات تالفة في هذه الفترة',
+    totalDamagedLabel: 'إجمالي الإطارات التالفة',
+    damagedIssueLabel: 'الملاحظة',
+    damagedPlateValue: 'تالف',
+  });
+
+  function qpxIsStockLog(tx) {
+    return String(tx?.notes || '').startsWith(STOCK_LOG_PREFIX);
+  }
+
+  function qpxIsDamagedTx(tx) {
+    return String(tx?.tyre_condition || '').toLowerCase() === 'damaged';
+  }
+
+  function qpxDamageLabel() {
+    return tr('modeDamaged');
+  }
+
+  function qpxConditionLabel(tx, meta) {
+    if (qpxIsDamagedTx(tx)) return qpxDamageLabel();
+    if (meta?.mode === 'service') return tr('modeService');
+    if (tx?.tyre_condition === 'new') return currentLang === 'ar' ? '✨ جديد' : '✨ New';
+    if (tx?.tyre_condition === 'old') return currentLang === 'ar' ? '🔄 مستعمل' : '🔄 Used';
+    return '—';
+  }
+
+  function qpxInjectDamageStyles() {
+    if (document.getElementById('qpx-damage-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'qpx-damage-styles';
+    style.textContent = [
+      '#service-action-wrap .service-action-row{grid-template-columns:repeat(5,minmax(0,1fr));}',
+      '#svc-action-damaged.damage-active{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border-color:transparent;box-shadow:0 10px 24px rgba(239,68,68,.24);}',
+      '#service-form[data-qpx-damaged="1"] .qpx-damaged-hidden{display:none !important;}',
+      '#service-form[data-qpx-damaged="1"] .qpx-damaged-wide{grid-column:1 / -1 !important;}',
+      '#page-report .report-note-cell{max-width:320px;white-space:pre-wrap;}',
+      '@media (max-width:640px){#service-action-wrap .service-action-row{grid-template-columns:repeat(2,minmax(0,1fr));}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function qpxApplyNumericKeyboards() {
+    ['sale-search', 'quick-restock-search', 'search-hub-input', 'svc-rear-search', 'inv-search'].forEach((id) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('pattern', '[0-9]*');
+      input.setAttribute('autocomplete', 'off');
+    });
+  }
+
+  function qpxEnsureDamageButton() {
+    qpxInjectDamageStyles();
+    const row = document.querySelector('#service-action-wrap .service-action-row');
+    if (!row || document.getElementById('svc-action-damaged')) return;
+    const warehouseBtn = document.getElementById('svc-action-warehouse');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'service-mini-btn';
+    btn.id = 'svc-action-damaged';
+    btn.addEventListener('click', () => setServiceActionMode('damaged'));
+    if (warehouseBtn) row.insertBefore(btn, warehouseBtn);
+    else row.appendChild(btn);
+  }
+
+  function qpxUpdateDamageUi() {
+    qpxEnsureDamageButton();
+    qpxApplyNumericKeyboards();
+    const form = document.getElementById('service-form');
+    if (!form) return;
+    form.dataset.qpxDamaged = qpxDamagedModeActive ? '1' : '0';
+    const plateGroup = document.getElementById('svc-plate')?.closest('.field-group');
+    const qtyGroup = document.getElementById('svc-qty')?.closest('.field-group');
+    const conditionLabel = document.getElementById('svc-condition-label');
+    const conditionGroup = conditionLabel?.nextElementSibling;
+    const repairLabel = document.getElementById('svc-repair-label');
+    const repairGroup = repairLabel?.nextElementSibling;
+    const positionLabel = document.getElementById('svc-position-label');
+    const positionGroup = positionLabel?.nextElementSibling;
+    [plateGroup, conditionLabel, conditionGroup, repairLabel, repairGroup, positionLabel, positionGroup].forEach((el) => {
+      if (!el) return;
+      el.classList.add('qpx-damaged-hidden');
+      el.style.display = qpxDamagedModeActive ? 'none' : '';
+    });
+    if (qtyGroup) {
+      qtyGroup.classList.add('qpx-damaged-wide');
+      qtyGroup.style.gridColumn = qpxDamagedModeActive ? '1 / -1' : '';
+    }
+    const photoLabel = document.getElementById('svc-photo-label');
+    if (photoLabel) photoLabel.textContent = qpxDamagedModeActive ? tr('damagedPhotoLabel') : (currentLang === 'ar' ? 'صورة السيارة' : 'Car Photo');
+    const photoPlaceholder = document.getElementById('svc-photo-placeholder');
+    if (photoPlaceholder) photoPlaceholder.textContent = qpxDamagedModeActive ? tr('damagedPhotoPlaceholder') : (currentLang === 'ar' ? 'اضغط لالتقاط صورة السيارة' : 'Tap to capture car photo');
+    const submitLabel = document.getElementById('svc-complete-label');
+    if (submitLabel) submitLabel.textContent = qpxDamagedModeActive ? tr('damagedSubmitLabel') : (currentLang === 'ar' ? 'إكمال الخدمة وخصم المخزون' : 'Complete Service & Deduct Stock');
+    const damageBtn = document.getElementById('svc-action-damaged');
+    if (damageBtn) {
+      damageBtn.innerHTML = `${esc(tr('damagedAction'))}<span class="mini-badge">${esc(tr('damagedActionHint'))}</span>`;
+      damageBtn.classList.toggle('active', qpxDamagedModeActive);
+      damageBtn.classList.toggle('damage-active', qpxDamagedModeActive);
+    }
+  }
+
+  function qpxActivateDamagedMode() {
+    qpxDamagedModeActive = true;
+    qpxOriginalSetServiceActionMode('change');
+    selTyreType = 'damaged';
+    selRepair = '';
+    selPositions = [];
+    document.querySelectorAll('.repair-btn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.tyre-type-btn').forEach((b) => b.classList.remove('active-new', 'active-old', 'active-teal', 'active-muted'));
+    document.querySelectorAll('.pos-btn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('#service-action-wrap .service-mini-btn').forEach((b) => {
+      if (b.id !== 'svc-action-warehouse') b.classList.remove('active');
+    });
+    qpxUpdateDamageUi();
+    updateServiceTitle();
+    setTimeout(() => document.getElementById('svc-qty')?.focus(), 80);
+  }
+
+  refreshServiceEnhancementTexts = function () {
+    qpxOriginalRefreshServiceEnhancementTexts();
+    qpxUpdateDamageUi();
+    qpxEnsureReportTypeUi();
+  };
+
+  setServiceActionMode = function (mode) {
+    if (mode === 'damaged') {
+      qpxActivateDamagedMode();
+      return;
+    }
+    qpxDamagedModeActive = false;
+    qpxOriginalSetServiceActionMode(mode);
+    qpxUpdateDamageUi();
+  };
+
+  updateServiceTitle = function () {
+    if (!qpxDamagedModeActive || !selTyreSize) {
+      qpxOriginalUpdateServiceTitle();
+      return;
+    }
+    const title = document.getElementById('svc-title');
+    if (!title) return;
+    const frontSize = formatTyreSizeValue(selTyreSize) || selTyreSize;
+    title.innerHTML = `${esc(currentLang === 'ar' ? 'تفاصيل الخدمة' : 'Service Details')} <span class="badge badge-teal" style="font-family:'DM Mono',monospace;font-size:10px;">${esc(frontSize)}</span> <span class="badge" style="font-size:10px;background:rgba(239,68,68,.14);color:#ef4444;border-color:rgba(239,68,68,.28);">${esc(tr('modeDamaged'))}</span>`;
+  };
+
+  const qpxOriginalGetServiceUsedCount = getServiceUsedCount;
+  getServiceUsedCount = function (tx) {
+    if (qpxIsDamagedTx(tx)) return Number(tx?.quantity || 0);
+    return qpxOriginalGetServiceUsedCount(tx);
+  };
+
+  const qpxOriginalGetServiceDeletePrompt = getServiceDeletePrompt;
+  getServiceDeletePrompt = function (tx) {
+    if (qpxIsDamagedTx(tx)) {
+      const sizeLabel = formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-';
+      return currentLang === 'ar'
+        ? `حذف سجل الإطار التالف ${sizeLabel}؟ سيتم إرجاع الكمية إلى المخزون.`
+        : `Delete damaged tyre record ${sizeLabel}? The quantity will be restored to stock.`;
+    }
+    return qpxOriginalGetServiceDeletePrompt(tx);
+  };
+
+  submitService = async function (event) {
+    if (!qpxDamagedModeActive) return qpxOriginalSubmitService(event);
+    const notes = document.getElementById('svc-notes')?.value.trim() || '';
+    if (!notes) {
+      showToast(tr('damagedNoteRequiredMsg'), 'error');
+      return;
+    }
+    if (!capturedPhotoDataUrl) {
+      showToast(tr('damagedPhotoRequiredMsg'), 'error');
+      return;
+    }
+    const plateInput = document.getElementById('svc-plate');
+    const oldPlate = plateInput?.value || '';
+    const oldType = selTyreType;
+    const oldRepair = selRepair;
+    const oldPositions = Array.isArray(selPositions) ? [...selPositions] : [];
+    if (plateInput) plateInput.value = tr('damagedPlateValue');
+    selTyreType = 'damaged';
+    selRepair = '';
+    selPositions = [];
+    try {
+      return await qpxOriginalSubmitService(event);
+    } finally {
+      const formVisible = document.getElementById('service-form')?.style.display !== 'none';
+      if (formVisible) {
+        qpxDamagedModeActive = true;
+        if (plateInput) plateInput.value = oldPlate;
+        selTyreType = 'damaged';
+        selRepair = oldRepair || '';
+        selPositions = [];
+        qpxUpdateDamageUi();
+        updateServiceTitle();
+      } else {
+        selTyreType = oldType;
+        selRepair = oldRepair;
+        selPositions = oldPositions;
+      }
+    }
+  };
+
+  const qpxOriginalClearSvc = clearSvc;
+  clearSvc = function () {
+    qpxDamagedModeActive = false;
+    qpxOriginalClearSvc();
+    qpxUpdateDamageUi();
+  };
+
+  const qpxOriginalSelectTyre = selectTyre;
+  selectTyre = function (id, size) {
+    qpxDamagedModeActive = false;
+    qpxOriginalSelectTyre(id, size);
+    qpxUpdateDamageUi();
+  };
+
+  const qpxOriginalFormatInvoiceShareText = formatInvoiceShareText;
+  formatInvoiceShareText = function (tx) {
+    if (!qpxIsDamagedTx(tx)) return qpxOriginalFormatInvoiceShareText(tx);
+    const createdAt = tx?.created_at ? new Date(tx.created_at).toLocaleString() : new Date().toLocaleString();
+    const qty = Number(tx?.quantity || 1) || 1;
+    const noteText = getTransactionNoteText(tx);
+    const lines = currentLang === 'ar'
+      ? [
+          'تفاصيل الإطار التالف:',
+          `التاريخ: ${createdAt}`,
+          `المقاس: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+          `الكمية: ${qty}`,
+          `الحالة: ${tr('modeDamaged')}`,
+          `الموظف: ${tx?.operator || '-'}`,
+        ]
+      : [
+          'Damaged tyre details:',
+          `Date: ${createdAt}`,
+          `Size: ${formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-'}`,
+          `Qty: ${qty}`,
+          `Status: ${tr('modeDamaged')}`,
+          `Operator: ${tx?.operator || '-'}`,
+        ];
+    if (noteText && noteText !== tr('noServiceNote')) lines.push(currentLang === 'ar' ? `الملاحظة: ${noteText}` : `Note: ${noteText}`);
+    return lines.join('\n');
+  };
+
+  loadTodayCards = async function () {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+    const container = document.getElementById('today-cards');
+    if (!container) return;
+    if (!data?.length) {
+      container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`;
+      return;
+    }
+    const cards = await Promise.all((data || []).map(async (t) => {
+      const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(t) : {};
+      const isDamaged = qpxIsDamagedTx(t);
+      const isOld = t.tyre_condition === 'old';
+      const time = new Date(t.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const photoSrc = await getTransactionPhotoSource(t);
+      const noteText = getTransactionNoteText(t);
+      const noteLines = [];
+      if (meta?.mode === 'two_sizes') noteLines.push(tr('twoDifferentSizesNote'));
+      if (isDamaged) noteLines.push(tr('modeDamaged'));
+      if (noteText && noteText !== tr('noServiceNote')) noteLines.push(noteText);
+      const photoMarkup = photoSrc
+        ? `<button class="svc-photo-btn" type="button" data-photo="${esc(photoSrc)}" onclick="openImageLightbox(this.dataset.photo)"><img class="svc-photo" src="${esc(photoSrc)}" alt="Service photo" loading="lazy" decoding="async"><span class="svc-photo-zoom"><i class="fas fa-expand"></i>${esc(tr('viewPhoto'))}</span></button>`
+        : `<div class="svc-photo-empty"><i class="fas fa-camera"></i><span>${esc(tr('noPhotoCard'))}</span></div>`;
+      const sizeBlock = meta?.mode === 'two_sizes' && meta.frontSize && meta.rearSize
+        ? renderServiceCardSizeBlock(t, meta)
+        : `<div class="svc-card-size" ${isDamaged ? 'style="color:#ef4444;"' : isOld ? 'style="color:var(--gold);"' : ''}>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</div>`;
+      const actionText = isDamaged ? tr('modeDamaged') : getServiceModeMetaLabel(meta);
+      const actionRow = `<div class="svc-card-row"><span class="label">${esc(tr('actionTypeLabel'))}</span><span class="val">${esc(actionText)}</span></div>`;
+      const typeRow = `<div class="svc-card-row"><span class="label">${esc(tr('typeLabel'))}</span><span class="val">${esc(qpxConditionLabel(t, meta))}</span></div>`;
+      const qtyValue = meta?.mode === 'two_sizes' ? `${Number(meta.frontQty) || Number(t.quantity) || 1} / ${Number(meta.rearQty) || Number(t.quantity) || 1}` : Number(t.quantity) || 1;
+      const qtyRow = `<div class="svc-card-row"><span class="label">${esc(currentLang === 'ar' ? 'الكمية' : 'Qty')}</span><span class="val">${esc(String(qtyValue))}</span></div>`;
+      const positionValue = isDamaged ? '—' : renderPositionSummary(t);
+      const positionRow = `<div class="svc-card-row svc-card-row-position"><span class="label">${esc(tr('positionLabelShort'))}</span><span class="val">${positionValue}</span></div>`;
+      let serviceOrRepair = '';
+      let serviceLabel = tr('repairLabelShort');
+      if (meta?.mode === 'service') {
+        serviceOrRepair = serviceOptionLabel(meta.serviceType);
+        serviceLabel = tr('serviceTypeCardLabel');
+      } else if (isDamaged) {
+        serviceOrRepair = tr('modeDamaged');
+        serviceLabel = tr('damagedIssueLabel');
+      } else if (t.repair_type) {
+        serviceOrRepair = t.repair_type;
+      }
+      const serviceRow = serviceOrRepair ? `<div class="svc-card-row"><span class="label">${esc(serviceLabel)}</span><span class="val">${esc(serviceOrRepair)}</span></div>` : '';
+      const noteBlock = noteLines.length ? `<div class="svc-card-note service-note-stack"><strong>${esc(tr('noteTitle'))}</strong>${noteLines.map((line) => `<span>${esc(line)}</span>`).join('')}</div>` : '';
+      const plateText = isDamaged ? tr('modeDamaged') : (t.plate_number || '—');
+      const cardStyle = isDamaged ? 'style="border-color:rgba(239,68,68,.28);"' : isOld ? 'style="border-color:rgba(248,210,110,0.25);"' : '';
+      const headStyle = isDamaged ? 'style="background:rgba(239,68,68,.10);"' : isOld ? 'style="background:var(--gold-dim);"' : '';
+      return `<div class="svc-card" ${cardStyle}><div class="svc-card-hd" ${headStyle}>${sizeBlock}<div class="time-chip">${time}</div></div>${photoMarkup}<div class="svc-card-body">${actionRow}${typeRow}${qtyRow}${positionRow}${serviceRow}<div class="svc-card-row"><span class="label">${esc(tr('byLabel'))}</span><span class="val">${esc(t.operator || '—')}</span></div><div class="svc-card-plate">${esc(plateText)}</div>${noteBlock}<div class="svc-card-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></div></div>`;
+    }));
+    container.innerHTML = cards.join('');
+  };
+
+  function qpxGetSelectedReportType() {
+    return document.getElementById('rep-type')?.value || 'services';
+  }
+
+  function qpxGetReportDateRange() {
+    return {
+      from: document.getElementById('rep-from')?.value || '',
+      to: document.getElementById('rep-to')?.value || '',
+    };
+  }
+
+  function qpxUpdateReportHeaders(type) {
+    const title = document.querySelector('#page-report .card .card-title');
+    const sub = document.querySelector('#page-report .card .panel-subtitle');
+    const thead = document.querySelector('#rep-table')?.closest('table')?.querySelector('thead');
+    const cardButtons = document.querySelectorAll('#page-report .card .report-actions .btn');
+    if (title) {
+      title.textContent = type === 'damaged'
+        ? tr('reportDamagedTitle')
+        : type === 'additions'
+          ? tr('reportAddedTitle')
+          : type === 'transfers'
+            ? tr('reportTransferredTitle')
+            : tr('reportServicesTitle');
+    }
+    if (sub) sub.textContent = currentLang === 'ar'
+      ? 'اختر الفترة ثم اطبع الخدمات أو الإطارات التالفة أو الكميات المضافة أو الكميات المنقولة.'
+      : 'Choose a period and print services, damaged tyres, added quantities, or transferred quantities.';
+    if (cardButtons[0]) cardButtons[0].textContent = `🔄 ${tr('reportLoad')}`;
+    if (cardButtons[1]) cardButtons[1].textContent = `🖨 ${tr('reportPrint')}`;
+    if (!thead) return;
+    if (type === 'additions') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${currentLang === 'ar' ? 'السبب' : 'Reason'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+    } else if (type === 'transfers') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('fromWarehouse')}</th><th>${tr('toWarehouse')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+    } else if (type === 'damaged') {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('damagedIssueLabel')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th><th>${tr('actions')}</th></tr>`;
+    } else {
+      thead.innerHTML = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${currentLang === 'ar' ? 'اللوحة' : 'Plate'}</th><th>${currentLang === 'ar' ? 'الحالة' : 'Condition'}</th><th>${currentLang === 'ar' ? 'المكان' : 'Position'}</th><th>${tr('notes')}</th><th>${currentLang === 'ar' ? 'الإصلاح' : 'Repair'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th><th>${tr('actions')}</th></tr>`;
+    }
+  }
+
+  function qpxEnsureReportTypeUi() {
+    qpxInjectDamageStyles();
+    const reportPage = document.getElementById('page-report');
+    const firstCard = reportPage?.querySelector('.card');
+    const row = firstCard?.querySelector('.row');
+    if (!reportPage || !firstCard || !row) return;
+    row.classList.add('report-filter-row');
+    if (!document.getElementById('rep-type')) {
+      const wrap = document.createElement('div');
+      wrap.className = 'form-group report-type-wrap';
+      wrap.innerHTML = `
+        <label id="rep-type-label"></label>
+        <select id="rep-type" class="table-select" onchange="loadReport()">
+          <option value="services"></option>
+          <option value="damaged"></option>
+          <option value="additions"></option>
+          <option value="transfers"></option>
+        </select>`;
+      row.insertBefore(wrap, row.lastElementChild);
+    }
+    const label = document.getElementById('rep-type-label');
+    if (label) label.textContent = tr('reportTypeLabel');
+    const select = document.getElementById('rep-type');
+    if (select) {
+      const map = {
+        services: tr('reportServicesOption'),
+        damaged: tr('damagedReportOption'),
+        additions: tr('reportAdditionsOption'),
+        transfers: tr('reportTransfersOption'),
+      };
+      Array.from(select.options).forEach((opt) => {
+        opt.textContent = map[opt.value] || opt.value;
+      });
+    }
+    const filterBtn = row.querySelector('.btn.btn-ghost.btn-sm');
+    if (filterBtn) filterBtn.textContent = tr('reportFilter');
+    qpxUpdateReportHeaders(qpxGetSelectedReportType());
+  }
+
+  function qpxExtractStockLogMeta(tx) {
+    const raw = String(tx?.notes || '');
+    const match = raw.match(/^\[\[QPX_STOCK:([^\]]+)\]\]/);
+    if (!match) return null;
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(match[1]))));
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function qpxBuildReportRows(records, type) {
+    if (type === 'damaged') {
+      return (records || []).filter((tx) => !qpxIsStockLog(tx) && qpxIsDamagedTx(tx));
+    }
+    if (type === 'services') {
+      return (records || []).filter((tx) => !qpxIsStockLog(tx) && !qpxIsDamagedTx(tx));
+    }
+    return (records || [])
+      .map((tx) => ({ tx, meta: qpxExtractStockLogMeta(tx) }))
+      .filter((entry) => entry.meta && entry.meta.type === (type === 'transfers' ? 'transfer' : 'addition'))
+      .map((entry) => ({ ...entry.tx, __meta: entry.meta }));
+  }
+
+  loadReport = async function () {
+    qpxEnsureReportTypeUi();
+    const { from, to } = qpxGetReportDateRange();
+    const type = qpxGetSelectedReportType();
+    qpxUpdateReportHeaders(type);
+    if (!from || !to) {
+      showToast(currentLang === 'ar' ? 'اختر الفترة' : 'Select date range', 'error');
+      return;
+    }
+    const { data } = await db.from('transactions').select('*').gte('created_at', from + 'T00:00:00').lte('created_at', to + 'T23:59:59').order('created_at', { ascending: false });
+    currentReportData = qpxBuildReportRows(data || [], type);
+    const tbody = document.getElementById('rep-table');
+    if (!tbody) return;
+    if (!currentReportData.length) {
+      const msgKey = type === 'damaged' ? 'reportNoDamaged' : type === 'additions' ? 'reportNoAdditions' : type === 'transfers' ? 'reportNoTransfers' : 'reportNoServices';
+      const colspan = type === 'services' ? 9 : type === 'damaged' ? 6 : 6;
+      tbody.innerHTML = `<tr><td colspan="${colspan}"><div class="empty-state">${esc(tr(msgKey))}</div></td></tr>`;
+      return;
+    }
+    if (type === 'additions') {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        return `<tr><td style="white-space:nowrap;">${esc(new Date(t.created_at).toLocaleString())}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.location || tr('noWarehouseValue'))}</td><td>${esc(meta.reason || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+    } else if (type === 'transfers') {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const meta = t.__meta || {};
+        return `<tr><td style="white-space:nowrap;">${esc(new Date(t.created_at).toLocaleString())}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(meta.quantity || t.quantity || 0)}</td><td>${esc(meta.from || tr('noWarehouseValue'))}</td><td>${esc(meta.to || tr('noWarehouseValue'))}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+    } else if (type === 'damaged') {
+      tbody.innerHTML = currentReportData.map((t) => `<tr><td style="white-space:nowrap;">${esc(new Date(t.created_at).toLocaleString())}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${Number(t.quantity || 0)}</td><td class="report-note-cell">${esc(getTransactionNoteText(t))}</td><td>${esc(t.operator || '-')}</td><td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></td></tr>`).join('');
+    } else {
+      tbody.innerHTML = currentReportData.map((t) => {
+        const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(t) : {};
+        return `<tr><td style="white-space:nowrap;">${esc(new Date(t.created_at).toLocaleString())}</td><td><b>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</b></td><td>${esc(t.plate_number || '-')}</td><td>${esc(qpxConditionLabel(t, meta))}</td><td>${esc(getPositionShortCodes(t))}</td><td class="report-note-cell">${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td><td><div class="report-actions"><button class="btn btn-success btn-sm" onclick="shareInvoiceToWhatsApp('${t.id}')">${esc(tr('share'))}</button><button class="btn btn-danger btn-sm" onclick="deleteService('${t.id}')">🗑 ${esc(tr('deleteLabel'))}</button></div></td></tr>`;
+      }).join('');
+    }
+    showToast(tr('reportReady', { count: currentReportData.length }), 'success');
+  };
+
+  printReport = async function () {
+    if (!currentReportData.length) await loadReport();
+    if (!currentReportData.length) {
+      showToast(tr('reportPrintNoData'), 'error');
+      return;
+    }
+    const type = qpxGetSelectedReportType();
+    const { from, to } = qpxGetReportDateRange();
+    const title = type === 'damaged' ? tr('reportDamagedTitle') : type === 'additions' ? tr('reportAddedTitle') : type === 'transfers' ? tr('reportTransferredTitle') : tr('reportServicesTitle');
+    let head = '';
+    let body = '';
+    let totalLabel = tr('totalServicesReportLabel');
+    let totalQty = currentReportData.length;
+    if (type === 'additions') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('warehouse')}</th><th>${currentLang === 'ar' ? 'السبب' : 'Reason'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(t.__meta?.quantity || t.quantity || 0)}</td><td>${esc(t.__meta?.location || tr('noWarehouseValue'))}</td><td>${esc(t.__meta?.reason || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`).join('');
+      totalQty = currentReportData.reduce((sum, t) => sum + Number(t.__meta?.quantity || t.quantity || 0), 0);
+      totalLabel = tr('totalAddedLabel');
+    } else if (type === 'transfers') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('fromWarehouse')}</th><th>${tr('toWarehouse')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(t.__meta?.quantity || t.quantity || 0)}</td><td>${esc(t.__meta?.from || tr('noWarehouseValue'))}</td><td>${esc(t.__meta?.to || tr('noWarehouseValue'))}</td><td>${esc(t.operator || '-')}</td></tr>`).join('');
+      totalQty = currentReportData.reduce((sum, t) => sum + Number(t.__meta?.quantity || t.quantity || 0), 0);
+      totalLabel = tr('totalTransferredLabel');
+    } else if (type === 'damaged') {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${tr('qty')}</th><th>${tr('damagedIssueLabel')}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${Number(t.quantity || 0)}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.operator || '-')}</td></tr>`).join('');
+      totalQty = currentReportData.reduce((sum, t) => sum + Number(t.quantity || 0), 0);
+      totalLabel = tr('totalDamagedLabel');
+    } else {
+      head = `<tr><th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th><th>${tr('size')}</th><th>${currentLang === 'ar' ? 'اللوحة' : 'Plate'}</th><th>${currentLang === 'ar' ? 'الحالة' : 'Condition'}</th><th>${currentLang === 'ar' ? 'المكان' : 'Position'}</th><th>${tr('notes')}</th><th>${currentLang === 'ar' ? 'الإصلاح' : 'Repair'}</th><th>${currentLang === 'ar' ? 'الموظف' : 'Operator'}</th></tr>`;
+      body = currentReportData.map((t) => {
+        const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(t) : {};
+        return `<tr><td>${esc(new Date(t.created_at).toLocaleString())}</td><td>${esc(formatTyreSizeValue(t.tyre_size) || t.tyre_size)}</td><td>${esc(t.plate_number || '-')}</td><td>${esc(qpxConditionLabel(t, meta))}</td><td>${esc(getPositionShortCodes(t))}</td><td>${esc(getTransactionNoteText(t))}</td><td>${esc(t.repair_type || '-')}</td><td>${esc(t.operator || '-')}</td></tr>`;
+      }).join('');
+    }
+    const html = `<!DOCTYPE html><html><head><title>${esc(title)}</title>${buildPrintStyle()}</head><body><div class="header"><div class="company">QUALITY PART X</div><div>TYRE SERVICES · DUNSTABLE</div><div class="meta">${esc(title)}<br>${esc(from)} → ${esc(to)}<br>${esc(tr('generatedAtLabel'))}: ${esc(new Date().toLocaleString())}<br>${esc(tr('operatorLabel'))}: ${esc(currentUser?.username || '-')}</div></div><table><thead>${head}</thead><tbody>${body}</tbody></table><div class="total">${esc(totalLabel)}: ${totalQty}</div></body></html>`;
+    const win = openPrintShell(title);
+    if (!win) return;
+    finishPrintShell(win, html);
+  };
+
+  searchRearTyre = async function () {
+    const input = document.getElementById('svc-rear-search');
+    if (!input) return;
+    const q = formatTyreSizeField(input).trim();
+    const container = document.getElementById('svc-rear-results');
+    if (!container) return;
+    if (!q) {
+      container.innerHTML = `<div class="empty-state">${esc(tr('rearSearchEmpty'))}</div>`;
+      return;
+    }
+    const source = await ensureInventoryLoaded();
+    const qKey = normalizeTyreKey(q);
+    const matches = (source || [])
+      .filter((t) => String(t.id) !== String(selTyreId))
+      .filter((t) => {
+        const size = t.size || '';
+        return normalizeTyreKey(size).includes(qKey) || String(size).toLowerCase().includes(q.toLowerCase());
+      });
+    const sorted = typeof qpxSortMatchedSizes === 'function' ? qpxSortMatchedSizes(matches, q) : matches.sort((a, b) => (Number(b.quantity || 0) - Number(a.quantity || 0)));
+    renderRearSearchResults(sorted);
+  };
+
+  applyLanguage = function () {
+    qpxOriginalApplyLanguage();
+    qpxEnsureDamageButton();
+    qpxEnsureReportTypeUi();
+    qpxApplyNumericKeyboards();
+    qpxUpdateDamageUi();
+  };
+
+  showPage = function (name) {
+    qpxOriginalShowPage(name);
+    if (name === 'report') qpxEnsureReportTypeUi();
+    if (name === 'service' || name === 'inventory' || name === 'search-center' || name === 'report') qpxApplyNumericKeyboards();
+    qpxUpdateDamageUi();
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    qpxEnsureDamageButton();
+    qpxEnsureReportTypeUi();
+    qpxApplyNumericKeyboards();
+    qpxUpdateDamageUi();
+  });
+
+  qpxEnsureDamageButton();
+  qpxEnsureReportTypeUi();
+  qpxApplyNumericKeyboards();
+  qpxUpdateDamageUi();
+})();
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
