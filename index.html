@@ -1752,6 +1752,9 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
       }
+      .service-stat-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
       .stat-pill {
         background: var(--bg-card);
         backdrop-filter: var(--blur-card);
@@ -3016,15 +3019,19 @@ a:hover {
             <div class="stat-strip service-stat-strip">
               <div class="stat-pill">
                 <div class="sv sv-teal" id="svc-stat-today">–</div>
-                <div class="sl" id="svc-stat-today-label">Services Today</div>
+                <div class="sl" id="svc-stat-today-label">Used Tyres (All Days)</div>
               </div>
               <div class="stat-pill">
                 <div class="sv sv-gold" id="svc-stat-stock">–</div>
-                <div class="sl" id="svc-stat-stock-label">Total Stock</div>
+                <div class="sl" id="svc-stat-stock-label">Available Tyres</div>
               </div>
               <div class="stat-pill">
                 <div class="sv sv-danger" id="svc-stat-out">–</div>
-                <div class="sl" id="svc-stat-out-label">Out of Stock</div>
+                <div class="sl" id="svc-stat-out-label">Services Today</div>
+              </div>
+              <div class="stat-pill">
+                <div class="sv sv-danger" id="svc-stat-damaged">–</div>
+                <div class="sl" id="svc-stat-damaged-label">Damaged Tyres</div>
               </div>
             </div>
 
@@ -4171,6 +4178,50 @@ a:hover {
             onclick="executeTransferStock()"
           >
             Transfer / نقل
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="warehouse-bulk-transfer-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Move All Stock / نقل كل المخزون</div>
+          <button
+            class="modal-close"
+            onclick="closeWarehouseBulkTransferModal()"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="form-group">
+          <label>Source warehouse / المخزن المصدر</label>
+          <input
+            type="text"
+            id="warehouse-bulk-transfer-source"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label>Destination warehouse / المخزن الهدف</label>
+          <select id="warehouse-bulk-transfer-destination"></select>
+        </div>
+        <div id="warehouse-bulk-transfer-summary" class="quick-restock-meta">
+          Choose a destination warehouse to move all stock / اختر المستودع الهدف لنقل كل المخزون
+        </div>
+        <div class="row">
+          <button
+            class="btn btn-ghost"
+            style="flex: 1"
+            onclick="closeWarehouseBulkTransferModal()"
+          >
+            Cancel / إلغاء</button
+          ><button
+            class="btn btn-primary"
+            style="flex: 2"
+            onclick="confirmWarehouseBulkTransfer()"
+          >
+            Move All / نقل الكل
           </button>
         </div>
       </div>
@@ -7867,9 +7918,11 @@ a:hover {
 
       function getWarehouseStats(location) {
         const rows = getWarehouseRows(location);
+        const activeRows = rows.filter((item) => Number(item.quantity || 0) > 0);
         return {
           rows,
-          totalQty: rows.reduce(
+          activeRows,
+          totalQty: activeRows.reduce(
             (sum, item) => sum + Number(item.quantity || 0),
             0,
           ),
@@ -7895,7 +7948,7 @@ a:hover {
         container.innerHTML = locations
           .map((loc) => {
             const stats = getWarehouseStats(loc);
-            return `<div class="warehouse-manager-item"><div><div><strong>${esc(loc)}</strong></div><div class="warehouse-manager-summary">${esc(uiText(`${stats.rows.length} مقاسات · ${stats.totalQty} كفر`, `${stats.rows.length} sizes · ${stats.totalQty} tyres`))}</div></div><div class="table-actions"><button class="btn btn-ghost btn-sm" onclick='renameWarehousePrompt(${JSON.stringify(loc)})'>✏️ ${esc(uiText("تعديل", "Rename"))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehousePrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText("حذف", "Delete"))}</button></div></div>`;
+            return `<div class="warehouse-manager-item"><div><div><strong>${esc(loc)}</strong></div><div class="warehouse-manager-summary">${esc(uiText(`${stats.activeRows.length} مقاسات متوفرة · ${stats.totalQty} كفر`, `${stats.activeRows.length} active sizes · ${stats.totalQty} tyres`))}</div></div><div class="table-actions"><button class="btn btn-info btn-sm" onclick='printWarehouseStock(${JSON.stringify(loc)})'>🖨️ ${esc(uiText("طباعة المخزون", "Print Stock"))}</button><button class="btn btn-warning btn-sm" onclick='transferWarehouseStockPrompt(${JSON.stringify(loc)})'>🔁 ${esc(uiText("نقل الكل", "Move All"))}</button><button class="btn btn-ghost btn-sm" onclick='renameWarehousePrompt(${JSON.stringify(loc)})'>✏️ ${esc(uiText("تعديل", "Rename"))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehousePrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText("حذف", "Delete"))}</button></div></div>`;
           })
           .join("");
       }
@@ -8000,6 +8053,424 @@ a:hover {
         populateTransferSelects();
         showToast(
           uiText("تم حذف المخزن من القائمة", "Warehouse removed from the list"),
+          "success",
+        );
+      }
+
+      function combineWarehouseNotes(values = []) {
+        const seen = new Map();
+        values
+          .map((value) => String(value || "").trim())
+          .filter(Boolean)
+          .forEach((note) => {
+            const key = note.toLowerCase();
+            if (!seen.has(key)) seen.set(key, note);
+          });
+        return Array.from(seen.values()).join(" | ");
+      }
+
+      function getWarehouseGroupedRows(location, options = {}) {
+        const settings = {
+          positiveOnly: false,
+          ...options,
+        };
+        const grouped = new Map();
+        getWarehouseRows(location).forEach((item) => {
+          const qty = Number(item.quantity || 0);
+          if (settings.positiveOnly && qty <= 0) return;
+          const rawSize = String(item.size || "").trim();
+          const key = normalizeTyreKey(rawSize) || rawSize.toLowerCase();
+          if (!key) return;
+          if (!grouped.has(key)) {
+            grouped.set(key, {
+              size: rawSize,
+              quantity: 0,
+              notes: [],
+            });
+          }
+          const entry = grouped.get(key);
+          if (!entry.size && rawSize) entry.size = rawSize;
+          entry.quantity += qty;
+          if (item.notes) entry.notes.push(item.notes);
+        });
+        return Array.from(grouped.values())
+          .map((item) => ({
+            ...item,
+            notes: combineWarehouseNotes(item.notes),
+          }))
+          .sort((a, b) => compareTyreSizeValues(a.size, b.size, "asc"));
+      }
+
+      async function printWarehouseStock(location) {
+        await loadInventory();
+        const rows = getWarehouseGroupedRows(location, { positiveOnly: true });
+        if (!rows.length) {
+          showToast(
+            uiText(
+              "لا توجد مقاسات متوفرة في هذا المخزن للطباعة",
+              "No available sizes in this warehouse to print",
+            ),
+            "error",
+          );
+          return;
+        }
+        const totalQty = rows.reduce(
+          (sum, item) => sum + Number(item.quantity || 0),
+          0,
+        );
+        const tableBody = rows
+          .map(
+            (item) =>
+              `<tr><td><b>${esc(formatTyreSizeValue(item.size) || item.size)}</b></td><td>${Number(item.quantity) || 0}</td><td>${esc(item.notes || "-")}</td></tr>`,
+          )
+          .join("");
+        const title = uiText("طباعة مخزون المستودع", "Warehouse Stock Report");
+        const subtitle = uiText(
+          "كل المقاسات المتوفرة في هذا المستودع مع الكمية والملاحظة",
+          "All available sizes in this warehouse with quantity and note",
+        );
+        const html = `<!DOCTYPE html>
+  <html>
+  <head>
+    <title>${title} - ${esc(location)}</title>
+    <style>
+      body { font-family: 'DM Sans', sans-serif; padding: 30px; color:#0f172a; }
+      .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f0a500; padding-bottom: 15px; }
+      .company { font-size: 28px; font-weight: bold; color: #f0a500; }
+      .subtitle { color:#475569; margin-top:8px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+      th { background: #f0a500; color: #000; }
+      .total { margin-top: 20px; font-weight: bold; text-align: right; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="company">QUALITY PART X</div>
+      <div>TYRE SERVICES · DUNSTABLE</div>
+      <div>${title}</div>
+      <div class="subtitle">${subtitle}</div>
+      <div>${uiText("المستودع", "Warehouse")}: ${esc(location)}</div>
+      <div>${new Date().toLocaleString()}</div>
+      <div>${uiText("المستخدم", "Operator")}: ${esc(currentUser?.username || "-")}</div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>${uiText("المقاس", "Size")}</th>
+          <th>${uiText("الكمية", "Qty")}</th>
+          <th>${uiText("الملاحظة", "Note")}</th>
+        </tr>
+      </thead>
+      <tbody>${tableBody}</tbody>
+    </table>
+    <div class="total">${uiText("إجمالي الكمية", "Total quantity")}: ${totalQty} | ${uiText("إجمالي المقاسات", "Total sizes")}: ${rows.length}</div>
+  </body>
+  </html>`;
+        const win = window.open("", "_blank");
+        if (!win) return;
+        win.document.write(html);
+        win.document.close();
+        setTimeout(() => {
+          win.print();
+        }, 500);
+      }
+
+      function populateWarehouseBulkTransferSelect(sourceLocation, preferredDestination = "") {
+        const sourceInput = document.getElementById(
+          "warehouse-bulk-transfer-source",
+        );
+        const destinationSelect = document.getElementById(
+          "warehouse-bulk-transfer-destination",
+        );
+        const summary = document.getElementById(
+          "warehouse-bulk-transfer-summary",
+        );
+        if (!sourceInput || !destinationSelect || !summary) return;
+        const source = String(sourceLocation || "").trim();
+        sourceInput.value = source;
+        const destinations = getAllKnownLocations().filter(
+          (loc) => loc.toLowerCase() !== source.toLowerCase(),
+        );
+        destinationSelect.innerHTML = [
+          `<option value="">${esc(uiText("اختر المخزن الهدف", "Choose destination warehouse"))}</option>`,
+          ...destinations.map(
+            (loc) => `<option value="${esc(loc)}">${esc(loc)}</option>`,
+          ),
+        ].join("");
+        if (
+          preferredDestination &&
+          destinations.some(
+            (loc) => loc.toLowerCase() === preferredDestination.toLowerCase(),
+          )
+        ) {
+          destinationSelect.value =
+            destinations.find(
+              (loc) => loc.toLowerCase() === preferredDestination.toLowerCase(),
+            ) || preferredDestination;
+        }
+        const rows = getWarehouseGroupedRows(source, { positiveOnly: true });
+        const totalQty = rows.reduce(
+          (sum, item) => sum + Number(item.quantity || 0),
+          0,
+        );
+        summary.textContent = uiText(
+          `سيتم نقل ${rows.length} مقاسات بعدد ${totalQty} كفر من ${source}`,
+          `This will move ${rows.length} sizes with ${totalQty} tyres from ${source}`,
+        );
+      }
+
+      function closeWarehouseBulkTransferModal() {
+        const sourceInput = document.getElementById(
+          "warehouse-bulk-transfer-source",
+        );
+        const destinationSelect = document.getElementById(
+          "warehouse-bulk-transfer-destination",
+        );
+        const summary = document.getElementById(
+          "warehouse-bulk-transfer-summary",
+        );
+        if (sourceInput) sourceInput.value = "";
+        if (destinationSelect) {
+          destinationSelect.innerHTML = `<option value="">${esc(uiText("اختر المخزن الهدف", "Choose destination warehouse"))}</option>`;
+          destinationSelect.value = "";
+        }
+        if (summary) {
+          summary.textContent = uiText(
+            "اختر المستودع الهدف لنقل كل المخزون",
+            "Choose a destination warehouse to move all stock",
+          );
+        }
+        closeModal("warehouse-bulk-transfer-modal");
+      }
+
+      async function transferWarehouseStockPrompt(location) {
+        await loadInventory();
+        const rows = getWarehouseGroupedRows(location, { positiveOnly: true });
+        if (!rows.length) {
+          showToast(
+            uiText(
+              "لا توجد مقاسات متوفرة في هذا المخزن للنقل",
+              "No available sizes in this warehouse to move",
+            ),
+            "error",
+          );
+          return;
+        }
+        const destinations = getAllKnownLocations().filter(
+          (loc) => loc.toLowerCase() !== String(location || "").trim().toLowerCase(),
+        );
+        if (!destinations.length) {
+          showToast(
+            uiText(
+              "أضف مستودعاً آخر أولاً ثم أعد المحاولة",
+              "Add another warehouse first, then try again",
+            ),
+            "error",
+          );
+          return;
+        }
+        populateWarehouseBulkTransferSelect(location, destinations[0] || "");
+        document
+          .getElementById("warehouse-bulk-transfer-modal")
+          ?.classList.add("open");
+      }
+
+      async function confirmWarehouseBulkTransfer() {
+        const source = String(
+          document.getElementById("warehouse-bulk-transfer-source")?.value || "",
+        ).trim();
+        const destination = String(
+          document.getElementById("warehouse-bulk-transfer-destination")?.value || "",
+        ).trim();
+        if (!source) {
+          showToast(
+            uiText(
+              "اختر المخزن المصدر أولاً",
+              "Choose the source warehouse first",
+            ),
+            "error",
+          );
+          return;
+        }
+        if (!destination) {
+          showToast(
+            uiText(
+              "اختر المخزن الهدف من القائمة",
+              "Choose the destination warehouse from the list",
+            ),
+            "error",
+          );
+          return;
+        }
+        if (destination.toLowerCase() === source.toLowerCase()) {
+          showToast(
+            uiText(
+              "المخزن المصدر والهدف لا يمكن أن يكونا نفس المخزن",
+              "Source and destination cannot be the same warehouse",
+            ),
+            "error",
+          );
+          return;
+        }
+        await executeWarehouseBulkTransfer(source, destination);
+      }
+
+      async function executeWarehouseBulkTransfer(source, destination) {
+        const groupedRows = getWarehouseGroupedRows(source, { positiveOnly: true });
+        if (!groupedRows.length) {
+          showToast(
+            uiText(
+              "لا توجد مقاسات متوفرة في هذا المخزن للنقل",
+              "No available sizes in this warehouse to move",
+            ),
+            "error",
+          );
+          return;
+        }
+        const totalQty = groupedRows.reduce(
+          (sum, item) => sum + Number(item.quantity || 0),
+          0,
+        );
+        if (
+          !confirm(
+            uiText(
+              `سيتم نقل ${groupedRows.length} مقاسات بعدد ${totalQty} كفر من "${source}" إلى "${destination}". هل تريد المتابعة؟`,
+              `Move ${groupedRows.length} sizes with ${totalQty} tyres from "${source}" to "${destination}"?`,
+            ),
+          )
+        )
+          return;
+
+        let workingInventory = (allInv || []).map((item) => ({
+          ...item,
+          quantity: Number(item.quantity || 0),
+        }));
+        let movedTotal = 0;
+
+        try {
+          for (const group of groupedRows) {
+            const sourceRows = workingInventory.filter(
+              (item) =>
+                normalizeTyreKey(item.size) === normalizeTyreKey(group.size) &&
+                String(item.location || "").trim().toLowerCase() ===
+                  String(source || "").trim().toLowerCase() &&
+                Number(item.quantity || 0) > 0,
+            );
+            if (!sourceRows.length) continue;
+
+            const destinationRows = workingInventory.filter(
+              (item) =>
+                normalizeTyreKey(item.size) === normalizeTyreKey(group.size) &&
+                String(item.location || "").trim().toLowerCase() ===
+                  String(destination || "").trim().toLowerCase(),
+            );
+            const mergedQty =
+              destinationRows.reduce(
+                (sum, item) => sum + Number(item.quantity || 0),
+                0,
+              ) + Number(group.quantity || 0);
+            const mergedNotes = combineWarehouseNotes([
+              ...destinationRows.map((item) => item.notes),
+              group.notes,
+            ]);
+
+            if (destinationRows.length) {
+              const primary = destinationRows[0];
+              const { error: updateError } = await db
+                .from("inventory")
+                .update({
+                  quantity: mergedQty,
+                  notes: mergedNotes || null,
+                  location: destination,
+                })
+                .eq("id", primary.id);
+              if (updateError) throw updateError;
+              primary.quantity = mergedQty;
+              primary.notes = mergedNotes || null;
+              primary.location = destination;
+
+              const duplicateIds = destinationRows
+                .slice(1)
+                .map((item) => item.id)
+                .filter(Boolean);
+              if (duplicateIds.length) {
+                const { error: deleteError } = await db
+                  .from("inventory")
+                  .delete()
+                  .in("id", duplicateIds);
+                if (deleteError) throw deleteError;
+                workingInventory = workingInventory.filter(
+                  (item) => !duplicateIds.includes(item.id),
+                );
+              }
+            } else {
+              const payload = {
+                size: group.size,
+                location: destination,
+                quantity: Number(group.quantity || 0),
+                notes: group.notes || null,
+              };
+              const { data: created, error: createError } = await db
+                .from("inventory")
+                .insert(payload)
+                .select()
+                .single();
+              if (createError) throw createError;
+              workingInventory.push({
+                ...created,
+                quantity: Number(created.quantity || 0),
+              });
+            }
+
+            for (const sourceRow of sourceRows) {
+              const { error: sourceError } = await db
+                .from("inventory")
+                .update({ quantity: 0 })
+                .eq("id", sourceRow.id);
+              if (sourceError) throw sourceError;
+              sourceRow.quantity = 0;
+            }
+            movedTotal += Number(group.quantity || 0);
+          }
+        } catch (error) {
+          showToast(
+            error?.message ||
+              uiText(
+                "حدث خطأ أثناء نقل كل المقاسات",
+                "An error occurred while moving all sizes",
+              ),
+            "error",
+          );
+          return;
+        }
+
+        addSavedLocation(destination);
+        setLastQuickLocation(destination);
+        closeWarehouseBulkTransferModal();
+        await loadInventory();
+        populateTransferSelects(destination, destination);
+        if (
+          document
+            .getElementById("page-dashboard")
+            ?.classList.contains("active")
+        )
+          loadDashboard();
+        if (
+          document.getElementById("page-report")?.classList.contains("active")
+        )
+          loadStockRep();
+        if (
+          document
+            .getElementById("warehouse-manager-modal")
+            ?.classList.contains("open")
+        )
+          renderWarehouseManager();
+        showToast(
+          uiText(
+            `تم نقل ${movedTotal} كفر من ${source} إلى ${destination}`,
+            `Moved ${movedTotal} tyres from ${source} to ${destination}`,
+          ),
           "success",
         );
       }
@@ -11290,6 +11761,9 @@ a:hover {
       data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}'
       crossorigin="anonymous"
     ></script>
+
+
+
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
     <script id="qpx-custom-stock-reports-patch">
@@ -13047,26 +13521,6 @@ a:hover {
           if (!force && localStorage.getItem(PHOTO_CLEANUP_DAY_KEY) === today) {
             return;
           }
-          const { data, error } = await db
-            .from("transactions")
-            .select("*")
-            .lt("created_at", `${today}T00:00:00`);
-          if (error) return;
-          for (const tx of data || []) {
-            const meta = getTransactionMeta(tx);
-            if (!tx?.photo_url && !meta?.photoPath) continue;
-            await removeServicePhotoFromCloud(tx);
-            try {
-              await db
-                .from("transactions")
-                .update({
-                  photo_url: null,
-                  notes: cleanPhotoMetaFromTransaction(tx),
-                })
-                .eq("id", tx.id);
-            } catch (cleanupError) {}
-            await removeServiceArtifacts(tx.id).catch(() => {});
-          }
           localStorage.setItem(PHOTO_CLEANUP_DAY_KEY, today);
         }
 
@@ -14815,6 +15269,246 @@ a:hover {
 })();
 </script>
 
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script id="qpx-photo-sync-hotfix">
+(() => {
+  function qpxResolvePhotoPublicUrl(tx) {
+    try {
+      if (tx?.photo_url) return tx.photo_url;
+      const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(tx) : null;
+      const path = meta?.photoPath || '';
+      if (!path || !db?.storage) return '';
+      const { data } = db.storage.from('service-photos').getPublicUrl(path);
+      return data?.publicUrl || '';
+    } catch (error) {
+      console.warn('Photo public URL resolve failed', error);
+      return tx?.photo_url || '';
+    }
+  }
+
+  const qpxOriginalGetTransactionPhotoSource = typeof getTransactionPhotoSource === 'function'
+    ? getTransactionPhotoSource
+    : null;
+
+  getTransactionPhotoSource = async function (tx) {
+    const currentUrl = qpxResolvePhotoPublicUrl(tx);
+    if (currentUrl) return currentUrl;
+    if (qpxOriginalGetTransactionPhotoSource) {
+      try {
+        const fallback = await qpxOriginalGetTransactionPhotoSource(tx);
+        if (fallback) return fallback;
+      } catch (error) {
+        console.warn('Photo source fallback failed', error);
+      }
+    }
+    return '';
+  };
+
+  const qpxOriginalSubmitServicePhotoSync = typeof submitService === 'function'
+    ? submitService
+    : null;
+
+  submitService = async function (event) {
+    const result = await qpxOriginalSubmitServicePhotoSync(event);
+    return result;
+  };
+
+  const qpxOriginalUploadServicePhoto = typeof uploadServicePhoto === 'function'
+    ? uploadServicePhoto
+    : null;
+
+  uploadServicePhoto = async function (dataUrl, plate) {
+    const uploadedPhotoUrl = await qpxOriginalUploadServicePhoto(dataUrl, plate);
+    if (!uploadedPhotoUrl) {
+      console.warn('Service photo did not upload. Check service-photos bucket and storage policies.');
+    }
+    return uploadedPhotoUrl;
+  };
+
+  const qpxOriginalLoadTodayCardsPhotoSync = typeof loadTodayCards === 'function'
+    ? loadTodayCards
+    : null;
+
+  loadTodayCards = async function () {
+    return qpxOriginalLoadTodayCardsPhotoSync();
+  };
+
+  const qpxOriginalRefreshSharedData = typeof refreshSharedData === 'function'
+    ? refreshSharedData
+    : null;
+
+  window.qpxVerifyServicePhotoSync = async function (txId) {
+    if (!txId) return null;
+    try {
+      const { data: tx, error } = await db.from('transactions').select('*').eq('id', txId).maybeSingle();
+      if (error) throw error;
+      const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(tx) : null;
+      return {
+        txId,
+        hasPhotoUrl: !!tx?.photo_url,
+        photoUrl: tx?.photo_url || '',
+        photoPath: meta?.photoPath || '',
+        resolvedUrl: qpxResolvePhotoPublicUrl(tx),
+      };
+    } catch (error) {
+      console.warn('Photo verification failed', error);
+      return null;
+    }
+  };
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script id="qpx-service-stats-and-options-patch">
+(() => {
+  Object.assign(I18N.en, {
+    totalUsedTyresLabel: 'Used Tyres (All Days)',
+    availableTyresLabel: 'Available Tyres',
+    servicesTodayShortLabel: 'Services Today',
+    damagedTyresShortLabel: 'Damaged Tyres',
+    serviceSensorValveRubber: 'Change Sensor Valve Rubber',
+    serviceSensorValveChrome: 'Change Sensor Valve Chrome',
+    serviceSensorValveInstallReplace: 'Install or Replace Sensor Valve',
+  });
+
+  Object.assign(I18N.ar, {
+    totalUsedTyresLabel: 'الإطارات المستخدمة لكل الأيام',
+    availableTyresLabel: 'الإطارات الموجودة',
+    servicesTodayShortLabel: 'خدمات اليوم',
+    damagedTyresShortLabel: 'الإطارات التالفة',
+    serviceSensorValveRubber: 'تغيير بلف حساس ربل',
+    serviceSensorValveChrome: 'تغيير بلف حساس كروم',
+    serviceSensorValveInstallReplace: 'تركيب أو استبدال بلف حساس',
+  });
+
+  function qpxIsDamagedTyreTx(tx) {
+    if (typeof isDamagedTx === 'function') return isDamagedTx(tx);
+    return String(tx?.tyre_condition || '').toLowerCase() === 'damaged';
+  }
+
+  function qpxApplyServiceStatsLabels() {
+    const usedLabel = document.getElementById('svc-stat-today-label');
+    const stockLabel = document.getElementById('svc-stat-stock-label');
+    const servicesLabel = document.getElementById('svc-stat-out-label');
+    const damagedLabel = document.getElementById('svc-stat-damaged-label');
+    if (usedLabel) usedLabel.textContent = tr('totalUsedTyresLabel');
+    if (stockLabel) stockLabel.textContent = tr('availableTyresLabel');
+    if (servicesLabel) servicesLabel.textContent = tr('servicesTodayShortLabel');
+    if (damagedLabel) damagedLabel.textContent = tr('damagedTyresShortLabel');
+  }
+
+  serviceOptionLabel = function (value) {
+    const keyMap = {
+      Patch: 'servicePatch',
+      'Move Tire': 'serviceMoveTire',
+      Rotate: 'serviceRotate',
+      Balance: 'serviceBalance',
+      'Change Sensor Valve Rubber': 'serviceSensorValveRubber',
+      'Change Sensor Valve Chrome': 'serviceSensorValveChrome',
+      'Install or Replace Sensor Valve': 'serviceSensorValveInstallReplace',
+      Other: 'serviceOther',
+    };
+    return tr(keyMap[value] || 'serviceOther');
+  };
+
+  refreshServiceEnhancementTexts = function () {
+    qpxApplyServiceStatsLabels();
+    const changeBtn = document.getElementById('svc-action-change');
+    const serviceBtn = document.getElementById('svc-action-service');
+    const twoBtn = document.getElementById('svc-action-two');
+    const warehouseBtn = document.getElementById('svc-action-warehouse');
+    if (changeBtn)
+      changeBtn.innerHTML = `${esc(tr('changeTireAction'))}<span class="mini-badge">${esc(tr('modeChangeTire'))}</span>`;
+    if (serviceBtn)
+      serviceBtn.innerHTML = `${esc(tr('serviceAction'))}<span class="mini-badge">${esc(tr('serviceOptionLabel'))}</span>`;
+    if (twoBtn)
+      twoBtn.innerHTML = `${esc(tr('twoDifferentSizesAction'))}<span class="mini-badge">${esc(tr('rearSearchTitle'))}</span>`;
+    if (warehouseBtn)
+      warehouseBtn.innerHTML = `${esc(tr('manualWarehouseToggle'))}<span class="mini-badge">${esc(tr('manualWarehouseToggleHint'))}</span>`;
+
+    const serviceLabel = document.getElementById('svc-service-option-label');
+    if (serviceLabel) serviceLabel.textContent = tr('serviceOptionLabel');
+
+    const serviceSelect = document.getElementById('svc-service-type');
+    if (serviceSelect) {
+      const options = [
+        { value: '', key: 'serviceOptionPlaceholder' },
+        { value: 'Patch', key: 'servicePatch' },
+        { value: 'Move Tire', key: 'serviceMoveTire' },
+        { value: 'Rotate', key: 'serviceRotate' },
+        { value: 'Balance', key: 'serviceBalance' },
+        { value: 'Change Sensor Valve Rubber', key: 'serviceSensorValveRubber' },
+        { value: 'Change Sensor Valve Chrome', key: 'serviceSensorValveChrome' },
+        { value: 'Install or Replace Sensor Valve', key: 'serviceSensorValveInstallReplace' },
+        { value: 'Other', key: 'serviceOther' },
+      ];
+      serviceSelect.innerHTML = options
+        .map((item) => `<option value="${esc(item.value)}">${esc(tr(item.key))}</option>`)
+        .join('');
+      serviceSelect.value = selectedServiceOption || '';
+    }
+
+    const rearTitle = document.getElementById('svc-rear-title');
+    if (rearTitle) rearTitle.textContent = tr('rearSearchTitle');
+    const rearInput = document.getElementById('svc-rear-search');
+    if (rearInput) rearInput.placeholder = tr('rearSearchPlaceholder');
+    const rearHint = document.getElementById('svc-rear-hint');
+    if (rearHint)
+      rearHint.textContent = rearTyreSelection?.size
+        ? tr('selectedRearPrefix', {
+            size: formatTyreSizeValue(rearTyreSelection.size) || rearTyreSelection.size,
+          })
+        : tr('rearSearchHint');
+  };
+
+  loadTodayStats = async function () {
+    updateServiceDateBadge();
+    const today = new Date().toISOString().split('T')[0];
+    const [{ data: todayTxns }, { data: allTxns }, { data: inv }] = await Promise.all([
+      db.from('transactions').select('*').gte('created_at', today + 'T00:00:00'),
+      db.from('transactions').select('*'),
+      db.from('inventory').select('*'),
+    ]);
+
+    const todayRows = Array.isArray(todayTxns) ? todayTxns : [];
+    const allRows = Array.isArray(allTxns) ? allTxns : [];
+    const invRows = Array.isArray(inv) ? inv : [];
+
+    const usedAllDays = allRows
+      .filter((tx) => !qpxIsDamagedTyreTx(tx))
+      .reduce((sum, tx) => sum + (typeof getServiceUsedCount === 'function' ? getServiceUsedCount(tx) : Number(tx?.quantity || 0)), 0);
+
+    const availableTyres = invRows.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
+    const servicesToday = todayRows.filter((tx) => !qpxIsDamagedTyreTx(tx)).length;
+    const damagedTyres = allRows
+      .filter((tx) => qpxIsDamagedTyreTx(tx))
+      .reduce((sum, tx) => sum + Math.max(0, Number(tx?.quantity || 0)), 0);
+
+    const usedEl = document.getElementById('svc-stat-today');
+    const stockEl = document.getElementById('svc-stat-stock');
+    const servicesEl = document.getElementById('svc-stat-out');
+    const damagedEl = document.getElementById('svc-stat-damaged');
+
+    if (usedEl) usedEl.textContent = usedAllDays;
+    if (stockEl) stockEl.textContent = availableTyres;
+    if (servicesEl) servicesEl.textContent = servicesToday;
+    if (damagedEl) damagedEl.textContent = damagedTyres;
+
+    qpxApplyServiceStatsLabels();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      qpxApplyServiceStatsLabels();
+      loadTodayStats().catch((error) => console.warn('Service stats patch failed', error));
+    });
+  } else {
+    qpxApplyServiceStatsLabels();
+    loadTodayStats().catch((error) => console.warn('Service stats patch failed', error));
+  }
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
