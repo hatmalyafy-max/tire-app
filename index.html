@@ -1205,6 +1205,32 @@
         font-weight: 700;
         margin-top: 6px;
       }
+      .transfer-item-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .transfer-selection-wrap {
+        border-top: 1px solid var(--stroke);
+        margin-top: 8px;
+        padding-top: 12px;
+      }
+      .transfer-selection-wrap .quick-restock-list-head {
+        margin-bottom: 8px;
+      }
+      .transfer-selected-item {
+        background: rgba(98, 166, 255, 0.06);
+        border-color: rgba(98, 166, 255, 0.16);
+      }
+      .transfer-selected-size-list {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      .transfer-next-btn {
+        min-width: 108px;
+      }
       .service-position-wrap {
         display: inline-flex;
         align-items: center;
@@ -2876,6 +2902,54 @@ a:hover {
   }
 }
 
+      #app-screen .mobile-shell {
+        --app-topbar-offset: 0px;
+        padding-top: var(--app-topbar-offset);
+      }
+      #app-screen .topbar {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(430px, 100vw);
+        box-sizing: border-box;
+        z-index: 90;
+      }
+      .transfer-item-head {
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .transfer-item-meta {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .transfer-badge {
+        margin-top: 0;
+        flex-shrink: 0;
+      }
+      .transfer-item-controls {
+        width: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+      }
+      .transfer-item-controls .transfer-qty-input {
+        width: 100%;
+        min-width: 0;
+      }
+      .transfer-item-controls .btn,
+      .transfer-item-controls .transfer-next-btn {
+        width: auto;
+        min-width: 96px;
+      }
+      .transfer-selected-item .transfer-item-controls .btn {
+        min-width: 82px;
+      }
 </style>
 </head>
   <body>
@@ -4153,6 +4227,8 @@ a:hover {
             id="transfer-search"
             class="mono-input"
             inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="off"
             maxlength="9"
             placeholder="2155517"
             oninput="
@@ -4165,6 +4241,19 @@ a:hover {
           Select quantities then press Transfer / اختر الكميات ثم اضغط نقل
         </div>
         <div id="transfer-list" class="transfer-list"></div>
+        <div class="transfer-selection-wrap">
+          <div class="quick-restock-list-head">
+            <div>
+              <div class="card-title">Selected sizes / المقاسات المختارة</div>
+              <div id="transfer-selection-meta" class="quick-restock-meta">
+                Add sizes with Next, then review the quantities below / أضف المقاسات بزر التالي ثم راجع الكميات بالأسفل
+              </div>
+            </div>
+          </div>
+          <div id="transfer-selection-list" class="transfer-list">
+            <div class="empty-state">No sizes selected yet / لم يتم اختيار أي مقاس بعد</div>
+          </div>
+        </div>
         <div class="row">
           <button
             class="btn btn-ghost"
@@ -4318,6 +4407,7 @@ a:hover {
       };
       let quickRestockQueue = [];
       let quickWarehouseExpanded = false;
+      let transferSelectionQueue = [];
       let allEmployees = [];
       let selTyreId = null,
         selTyreSize = "",
@@ -5812,6 +5902,9 @@ a:hover {
         ]);
         applyLanguage();
         showPage("service");
+        if (typeof syncFixedTopbarOffset === "function") {
+          syncFixedTopbarOffset();
+        }
       }
 
       function logout() {
@@ -8533,6 +8626,8 @@ a:hover {
           document.getElementById("transfer-source-select")?.value || "",
           document.getElementById("transfer-destination-select")?.value || "",
         );
+        transferSelectionQueue = [];
+        renderTransferSelectionList();
         renderTransferRows();
       }
 
@@ -8543,6 +8638,164 @@ a:hover {
         if (Number.isNaN(value) || value < 0) value = 0;
         if (max >= 0 && value > max) value = max;
         input.value = String(value);
+      }
+
+      function getTransferSelectedEntries() {
+        if (Array.isArray(transferSelectionQueue) && transferSelectionQueue.length) {
+          return transferSelectionQueue
+            .map((item) => ({
+              id: item.id,
+              amount: Number(item.amount || 0),
+            }))
+            .filter((item) => item.amount > 0);
+        }
+        return Array.from(
+          document.querySelectorAll("#transfer-list .transfer-qty-input"),
+        )
+          .map((input) => ({
+            id: input.dataset.id,
+            amount: Number(input.value || 0),
+          }))
+          .filter((item) => item.amount > 0);
+      }
+
+      function renderTransferSelectionList() {
+        const container = document.getElementById("transfer-selection-list");
+        const meta = document.getElementById("transfer-selection-meta");
+        if (!container || !meta) return;
+        const items = Array.isArray(transferSelectionQueue)
+          ? transferSelectionQueue.filter((item) => Number(item.amount || 0) > 0)
+          : [];
+        if (!items.length) {
+          meta.textContent = uiText(
+            "أضف المقاسات بزر التالي ثم راجع الكميات بالأسفل",
+            "Add sizes with Next, then review the quantities below",
+          );
+          container.innerHTML = `<div class="empty-state">${esc(uiText("لم يتم اختيار أي مقاس بعد", "No sizes selected yet"))}</div>`;
+          return;
+        }
+        const totalQty = items.reduce(
+          (sum, item) => sum + Number(item.amount || 0),
+          0,
+        );
+        meta.textContent = uiText(
+          `تم اختيار ${items.length} مقاس · إجمالي ${totalQty} كفر`,
+          `${items.length} sizes selected · ${totalQty} tyres total`,
+        );
+        container.innerHTML = items
+          .map((item, index) => {
+            const itemId = esc(String(item.id || ""));
+            const qty = Number(item.amount || 0);
+            const available = Number(item.available || 0);
+            const noteMarkup = item.notes
+              ? `<div class="warehouse-manager-summary">📝 ${esc(item.notes)}</div>`
+              : "";
+            return `<div class="transfer-item transfer-selected-item"><div class="transfer-item-head"><div class="transfer-item-meta"><strong>${esc(formatTyreSizeValue(item.size) || item.size || "-")}</strong><div class="transfer-badge">${esc(uiText(`الكمية للنقل ${qty}`, `Transfer qty ${qty}`))}</div></div><div class="transfer-item-controls"><input type="number" class="table-select transfer-qty-input" data-id="${itemId}" min="1" max="${available}" value="${qty}" oninput="updateTransferSelectionAmount(this.dataset.id,this.value)"><button type="button" class="btn btn-ghost btn-sm" data-id="${itemId}" onclick="removeTransferSelection(this.dataset.id)">${esc(uiText("إزالة", "Remove"))}</button></div></div>${noteMarkup}<div class="transfer-selected-size-list">${esc(uiText(`الاختيار ${index + 1} · المتوفر ${available}`, `Selection ${index + 1} · ${available} available`))}</div></div>`;
+          })
+          .join("");
+      }
+
+      function updateTransferSelectionAmount(itemId, nextValue) {
+        const item = (transferSelectionQueue || []).find(
+          (entry) => String(entry.id) === String(itemId),
+        );
+        if (!item) return;
+        const max = Number(item.available || 0);
+        let value = parseInt(nextValue || item.amount || 1, 10);
+        if (Number.isNaN(value) || value < 1) value = 1;
+        if (max > 0 && value > max) value = max;
+        item.amount = value;
+        renderTransferSelectionList();
+        renderTransferRows();
+      }
+
+      function removeTransferSelection(itemId) {
+        transferSelectionQueue = (transferSelectionQueue || []).filter(
+          (entry) => String(entry.id) !== String(itemId),
+        );
+        renderTransferSelectionList();
+        renderTransferRows();
+      }
+
+      function addTransferSelection(itemId) {
+        const input = Array.from(
+          document.querySelectorAll("#transfer-list .transfer-qty-input"),
+        ).find((field) => String(field.dataset.id) === String(itemId));
+        if (!input) {
+          showToast(
+            uiText(
+              "لم يتم العثور على المقاس المطلوب",
+              "Unable to find the selected size",
+            ),
+            "error",
+          );
+          return;
+        }
+        normalizeTransferQty(input);
+        const amount = Number(input.value || 0);
+        if (amount <= 0) {
+          showToast(
+            uiText(
+              "أدخل كمية أكبر من صفر ثم اضغط التالي",
+              "Enter a quantity greater than zero, then press Next",
+            ),
+            "error",
+          );
+          input.focus();
+          return;
+        }
+        const source = String(
+          document.getElementById("transfer-source-select")?.value || "",
+        ).trim();
+        const sourceItem = (allInv || []).find(
+          (item) =>
+            String(item.id) === String(itemId) &&
+            String(item.location || "").trim().toLowerCase() ===
+              source.toLowerCase(),
+        );
+        if (!sourceItem) {
+          showToast(
+            uiText(
+              "المقاس لم يعد متوفراً في المخزن المصدر",
+              "This size is no longer available in the source warehouse",
+            ),
+            "error",
+          );
+          return;
+        }
+        const available = Number(sourceItem.quantity || 0);
+        const nextAmount = Math.min(amount, available);
+        const existing = (transferSelectionQueue || []).find(
+          (entry) => String(entry.id) === String(itemId),
+        );
+        if (existing) {
+          existing.amount = nextAmount;
+          existing.available = available;
+          existing.size = sourceItem.size;
+          existing.notes = sourceItem.notes || "";
+          existing.source = source;
+        } else {
+          transferSelectionQueue.push({
+            id: sourceItem.id,
+            size: sourceItem.size,
+            notes: sourceItem.notes || "",
+            available,
+            amount: nextAmount,
+            source,
+          });
+        }
+        renderTransferSelectionList();
+        renderTransferRows();
+        if (typeof focusTransferSearchField === "function") {
+          focusTransferSearchField();
+        }
+        showToast(
+          uiText(
+            `${formatTyreSizeValue(sourceItem.size) || sourceItem.size} تمت إضافته للقائمة`,
+            `${formatTyreSizeValue(sourceItem.size) || sourceItem.size} added to the list`,
+          ),
+          "success",
+        );
       }
 
       function renderTransferRows() {
@@ -8593,14 +8846,25 @@ a:hover {
           return;
         }
 
+        const pickedCount = Array.isArray(transferSelectionQueue)
+          ? transferSelectionQueue.length
+          : 0;
         summary.textContent = uiText(
-          `المخزن ${source}: ${rows.length} مقاسات متاحة`,
-          `${source}: ${rows.length} sizes available`,
+          `المخزن ${source}: ${rows.length} نتائج · المختار ${pickedCount}`,
+          `${source}: ${rows.length} matches · ${pickedCount} selected`,
         );
         container.innerHTML = rows
           .map((item) => {
             const qty = Number(item.quantity || 0);
-            return `<div class="transfer-item"><div class="transfer-item-head"><div><div><strong>${esc(formatTyreSizeValue(item.size) || item.size)}</strong></div><div class="transfer-badge">${esc(uiText(`المتوفر ${qty}`, `${qty} available`))}</div></div><input type="number" class="table-select transfer-qty-input" data-id="${item.id}" min="0" max="${qty}" value="0" oninput="normalizeTransferQty(this)"></div>${item.notes ? `<div class="warehouse-manager-summary">📝 ${esc(item.notes)}</div>` : ""}</div>`;
+            const itemId = esc(String(item.id || ""));
+            const selectedEntry = (transferSelectionQueue || []).find(
+              (entry) => String(entry.id) === String(item.id),
+            );
+            const selectedQty = selectedEntry ? Number(selectedEntry.amount || 0) : 0;
+            const actionLabel = selectedEntry
+              ? uiText("تحديث", "Update")
+              : uiText("التالي", "Next");
+            return `<div class="transfer-item"><div class="transfer-item-head"><div class="transfer-item-meta"><strong>${esc(formatTyreSizeValue(item.size) || item.size)}</strong><div class="transfer-badge">${esc(uiText(`المتوفر ${qty}`, `${qty} available`))}</div></div><div class="transfer-item-controls"><input type="number" class="table-select transfer-qty-input" data-id="${itemId}" min="0" max="${qty}" value="${selectedQty}" oninput="normalizeTransferQty(this)"><button type="button" class="btn btn-primary btn-sm transfer-next-btn" data-id="${itemId}" onclick="addTransferSelection(this.dataset.id)">${esc(actionLabel)}</button></div></div>${item.notes ? `<div class="warehouse-manager-summary">📝 ${esc(item.notes)}</div>` : ""}${selectedEntry ? `<div class="transfer-selected-size-list">${esc(uiText(`تمت إضافته للقائمة بكمية ${selectedQty}`, `Added to the list with qty ${selectedQty}`))}</div>` : ""}</div>`;
           })
           .join("");
       }
@@ -8608,11 +8872,13 @@ a:hover {
       async function openTransferModal() {
         await loadInventory();
         const last = getLastQuickLocation() || "";
+        transferSelectionQueue = [];
         populateTransferSelects(last, "");
         const search = document.getElementById("transfer-search");
         const next = document.getElementById("transfer-new-destination");
         if (search) search.value = "";
         if (next) next.value = "";
+        renderTransferSelectionList();
         renderTransferRows();
         document.getElementById("stock-transfer-modal")?.classList.add("open");
       }
@@ -8656,14 +8922,7 @@ a:hover {
           );
           return;
         }
-        const selected = Array.from(
-          document.querySelectorAll("#transfer-list .transfer-qty-input"),
-        )
-          .map((input) => ({
-            id: input.dataset.id,
-            amount: Number(input.value || 0),
-          }))
-          .filter((item) => item.amount > 0);
+        const selected = getTransferSelectedEntries();
         if (!selected.length) {
           showToast(
             uiText(
@@ -8763,6 +9022,8 @@ a:hover {
 
         addSavedLocation(destination);
         setLastQuickLocation(destination);
+        transferSelectionQueue = [];
+        renderTransferSelectionList();
         closeModal("stock-transfer-modal");
         await loadInventory();
         if (
@@ -14981,13 +15242,14 @@ a:hover {
   loadTodayCards = async function () {
     const today = new Date().toISOString().split('T')[0];
     const { data } = await db.from('transactions').select('*').gte('created_at', today + 'T00:00:00').order('created_at', { ascending: false });
+    const rows = (data || []).filter((tx) => !qpxIsStockLog(tx));
     const container = document.getElementById('today-cards');
     if (!container) return;
-    if (!data?.length) {
+    if (!rows.length) {
       container.innerHTML = `<div class="empty-state">${esc(tr('noServicesToday'))}</div>`;
       return;
     }
-    const cards = await Promise.all((data || []).map(async (t) => {
+    const cards = await Promise.all(rows.map(async (t) => {
       const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(t) : {};
       const isDamaged = qpxIsDamagedTx(t);
       const isOld = t.tyre_condition === 'old';
@@ -15473,14 +15735,16 @@ a:hover {
     const todayRows = Array.isArray(todayTxns) ? todayTxns : [];
     const allRows = Array.isArray(allTxns) ? allTxns : [];
     const invRows = Array.isArray(inv) ? inv : [];
+    const visibleTodayRows = todayRows.filter((tx) => !qpxIsStockLog(tx));
+    const visibleAllRows = allRows.filter((tx) => !qpxIsStockLog(tx));
 
-    const usedAllDays = allRows
+    const usedAllDays = visibleAllRows
       .filter((tx) => !qpxIsDamagedTyreTx(tx))
       .reduce((sum, tx) => sum + (typeof getServiceUsedCount === 'function' ? getServiceUsedCount(tx) : Number(tx?.quantity || 0)), 0);
 
     const availableTyres = invRows.reduce((sum, row) => sum + Number(row.quantity || 0), 0);
-    const servicesToday = todayRows.filter((tx) => !qpxIsDamagedTyreTx(tx)).length;
-    const damagedTyres = allRows
+    const servicesToday = visibleTodayRows.filter((tx) => !qpxIsDamagedTyreTx(tx)).length;
+    const damagedTyres = visibleAllRows
       .filter((tx) => qpxIsDamagedTyreTx(tx))
       .reduce((sum, tx) => sum + Math.max(0, Number(tx?.quantity || 0)), 0);
 
@@ -15508,6 +15772,62 @@ a:hover {
   }
 })();
 </script>
+<script>
+(function () {
+  function syncFixedTopbarOffset() {
+    const shell = document.querySelector('#app-screen .mobile-shell');
+    const topbar = document.querySelector('#app-screen .topbar');
+    if (!shell || !topbar) return;
+    const height = Math.ceil(topbar.getBoundingClientRect().height || 0);
+    shell.style.setProperty('--app-topbar-offset', `${height}px`);
+  }
+
+  function focusTransferSearchField() {
+    const search = document.getElementById('transfer-search');
+    if (!search) return;
+    search.value = '';
+    const activate = () => {
+      try {
+        search.focus({ preventScroll: true });
+      } catch (error) {
+        search.focus();
+      }
+      if (typeof search.setSelectionRange === 'function') {
+        const end = String(search.value || '').length;
+        search.setSelectionRange(end, end);
+      }
+    };
+    requestAnimationFrame(() => {
+      activate();
+      setTimeout(activate, 60);
+    });
+  }
+
+  window.syncFixedTopbarOffset = syncFixedTopbarOffset;
+  window.focusTransferSearchField = focusTransferSearchField;
+
+  const boot = () => {
+    syncFixedTopbarOffset();
+    const topbar = document.querySelector('#app-screen .topbar');
+    if (topbar && window.ResizeObserver && !topbar.dataset.fixedObserverBound) {
+      const observer = new ResizeObserver(syncFixedTopbarOffset);
+      observer.observe(topbar);
+      topbar.dataset.fixedObserverBound = '1';
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+  window.addEventListener('load', syncFixedTopbarOffset);
+  window.addEventListener('resize', syncFixedTopbarOffset);
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
