@@ -15831,5 +15831,266 @@ a:hover {
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<style>
+#app-screen .topbar.qpx-topbar-curtain {
+  transition: transform 0.28s ease, margin-bottom 0.28s ease, opacity 0.28s ease, box-shadow 0.28s ease;
+  will-change: transform;
+}
+#app-screen .topbar.qpx-topbar-curtain.is-hidden {
+  transform: translateY(calc(-1 * var(--app-topbar-offset, 100%)));
+  margin-bottom: calc(-1 * var(--app-topbar-offset, 0px));
+  opacity: 0.96;
+  pointer-events: none;
+}
+#app-screen #sale-search,
+#app-screen #search-hub-input,
+#app-screen #quick-restock-search,
+#app-screen #transfer-search,
+#app-screen #svc-rear-search,
+#app-screen #inv-search {
+  scroll-margin-top: calc(var(--app-topbar-offset, 0px) + 12px);
+}
+</style>
+<script>
+(function () {
+  const SIZE_SEARCH_IDS = [
+    'sale-search',
+    'search-hub-input',
+    'quick-restock-search',
+    'transfer-search',
+    'svc-rear-search',
+    'inv-search',
+  ];
+
+  function getTopbar() {
+    return document.querySelector('#app-screen .topbar');
+  }
+
+  function getMainContent() {
+    return document.querySelector('#app-screen .main-content');
+  }
+
+  function setNumericSearchAttrs(el) {
+    if (!el) return;
+    el.setAttribute('inputmode', 'numeric');
+    el.setAttribute('pattern', '[0-9]*');
+    el.setAttribute('autocomplete', 'off');
+    el.setAttribute('enterkeyhint', 'search');
+  }
+
+  function showTopbar() {
+    const topbar = getTopbar();
+    if (!topbar) return;
+    topbar.classList.remove('is-hidden');
+    if (typeof window.syncFixedTopbarOffset === 'function') {
+      window.syncFixedTopbarOffset();
+    }
+  }
+
+  function hideTopbar() {
+    const topbar = getTopbar();
+    if (!topbar) return;
+    topbar.classList.add('is-hidden');
+  }
+
+  function bindTopbarCurtain(target, key) {
+    if (!target) return;
+    const marker = `qpxCurtainBound${key}`;
+    if (target[marker]) return;
+    target[marker] = true;
+    let lastTop =
+      target === window
+        ? window.pageYOffset || document.documentElement.scrollTop || 0
+        : target.scrollTop || 0;
+    const onScroll = () => {
+      const currentTop =
+        target === window
+          ? window.pageYOffset || document.documentElement.scrollTop || 0
+          : target.scrollTop || 0;
+      const delta = currentTop - lastTop;
+      if (currentTop <= 8) {
+        showTopbar();
+      } else if (delta > 8) {
+        hideTopbar();
+      } else if (delta < -6) {
+        showTopbar();
+      }
+      lastTop = currentTop;
+    };
+    target.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  function findScrollContainer(el) {
+    return (
+      el.closest('.search-hub-body') ||
+      el.closest('.modal') ||
+      getMainContent() ||
+      document.scrollingElement ||
+      document.documentElement
+    );
+  }
+
+  function scrollSearchFieldToTop(el) {
+    if (!el) return;
+    showTopbar();
+    const topbar = getTopbar();
+    const topbarHeight = topbar
+      ? Math.ceil(topbar.getBoundingClientRect().height || 0)
+      : 0;
+    const extraOffset = 12;
+    const container = findScrollContainer(el);
+
+    if (
+      container &&
+      container !== window &&
+      container !== document.body &&
+      container !== document.documentElement &&
+      container !== document.scrollingElement
+    ) {
+      const containerRect = container.getBoundingClientRect();
+      const elementRect = el.getBoundingClientRect();
+      const nextTop =
+        container.scrollTop +
+        (elementRect.top - containerRect.top) -
+        topbarHeight -
+        extraOffset;
+      container.scrollTo({ top: Math.max(0, nextTop), behavior: 'smooth' });
+    }
+
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    } catch (error) {}
+
+    const nudgeViewport = () => {
+      const rect = el.getBoundingClientRect();
+      const absoluteTop =
+        (window.pageYOffset || document.documentElement.scrollTop || 0) +
+        rect.top -
+        topbarHeight -
+        extraOffset;
+      window.scrollTo({ top: Math.max(0, absoluteTop), behavior: 'smooth' });
+    };
+
+    requestAnimationFrame(nudgeViewport);
+    setTimeout(nudgeViewport, 120);
+  }
+
+  function handleSearchFieldInput(event) {
+    const el = event.target;
+    if (!el || !SIZE_SEARCH_IDS.includes(el.id)) return;
+    setNumericSearchAttrs(el);
+    const digits = String(el.value || '').replace(/\D/g, '');
+    if (!digits) {
+      delete el.dataset.qpxLiftedOnFirstDigit;
+      return;
+    }
+    if (digits.length === 1 && el.dataset.qpxLiftedOnFirstDigit !== '1') {
+      el.dataset.qpxLiftedOnFirstDigit = '1';
+      setTimeout(() => scrollSearchFieldToTop(el), 70);
+    }
+  }
+
+  function bindSizeSearchInputs() {
+    SIZE_SEARCH_IDS.forEach((id) => setNumericSearchAttrs(document.getElementById(id)));
+    if (!document.body.dataset.qpxNumericSearchBound) {
+      document.addEventListener('input', handleSearchFieldInput, true);
+      document.addEventListener(
+        'focusin',
+        (event) => {
+          const el = event.target;
+          if (el && SIZE_SEARCH_IDS.includes(el.id)) setNumericSearchAttrs(el);
+        },
+        true,
+      );
+      document.body.dataset.qpxNumericSearchBound = '1';
+    }
+  }
+
+  function buildSearchCard(t, options = {}) {
+    const qty = Math.max(0, Number(t.quantity || 0));
+    const isZero = qty === 0;
+    const sizeValue = formatTyreSizeValue(t.size) || t.size;
+    const size = esc(sizeValue);
+    const location = esc(t.location || 'No location');
+    const stockClass = isZero ? 'stock-low' : 'stock-ok';
+    const stockText = isZero
+      ? uiText('غير متوفر', 'Out of stock')
+      : tr('inStockText', { qty });
+    const safeId = String(t.id).replace(/'/g, '&#39;');
+    const safeSize = String(t.size).replace(/'/g, '&#39;');
+    const action =
+      options.mode === 'modal'
+        ? `selectTyreFromSearchHub('${safeId}','${safeSize}')`
+        : `selectTyre('${safeId}','${safeSize}')`;
+    const style = isZero
+      ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
+      : '';
+    const sizeStyle = isZero ? ' style="color:var(--gold);"' : '';
+    const btnStyle = isZero
+      ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
+      : '';
+    const buttonText = isZero ? uiText('غير متوفر', 'Unavailable') : esc(tr('selectLabel'));
+    return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${isZero && !options.allowZeroSelection ? 'disabled' : ''} ${btnStyle} onclick="${action}">${buttonText}</button></div></div>`;
+  }
+
+  function overrideSearchRenderers() {
+    window.getTyreSearchMarkup = function (data, options = {}) {
+      const countLabel = `<div class="sec-label">${esc(tr('resultsFound', { count: data.length }))}</div>`;
+      const cards = data.map((item) => buildSearchCard(item, options)).join('');
+      return countLabel + `<div style="display:flex;flex-direction:column;gap:10px;">${cards}</div>`;
+    };
+
+    window.renderRearSearchResults = function (data) {
+      const container = document.getElementById('svc-rear-results');
+      if (!container) return;
+      if (!data.length) {
+        container.innerHTML = `<div class="empty-state">${esc(tr('noTyresFound'))}</div>`;
+        return;
+      }
+      const countLabel = `<div class="sec-label">${esc(tr('resultsFound', { count: data.length }))}</div>`;
+      const cards = data
+        .map((item) => {
+          const qty = Math.max(0, Number(item.quantity || 0));
+          const isZero = qty === 0;
+          const size = esc(formatTyreSizeValue(item.size) || item.size);
+          const location = esc(item.location || 'No location');
+          const stockClass = isZero ? 'stock-low' : 'stock-ok';
+          const stockText = isZero
+            ? uiText('غير متوفر', 'Out of stock')
+            : tr('inStockText', { qty });
+          const style = isZero
+            ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
+            : '';
+          const sizeStyle = isZero ? ' style="color:var(--gold);"' : '';
+          const btnStyle = isZero
+            ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
+            : '';
+          const safeId = String(item.id).replace(/'/g, '&#39;');
+          const safeSize = String(item.size).replace(/'/g, '&#39;');
+          return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn"${btnStyle} onclick="selectRearTyre('${safeId}','${safeSize}')">${esc(tr('selectLabel'))}</button></div></div>`;
+        })
+        .join('');
+      container.innerHTML = countLabel + `<div style="display:flex;flex-direction:column;gap:10px;">${cards}</div>`;
+    };
+  }
+
+  function bootQpxSearchAndTopbarPatch() {
+    const topbar = getTopbar();
+    if (topbar) topbar.classList.add('qpx-topbar-curtain');
+    bindTopbarCurtain(window, 'Window');
+    bindTopbarCurtain(getMainContent(), 'MainContent');
+    bindSizeSearchInputs();
+    overrideSearchRenderers();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootQpxSearchAndTopbarPatch);
+  } else {
+    bootQpxSearchAndTopbarPatch();
+  }
+  window.addEventListener('load', bootQpxSearchAndTopbarPatch);
+})();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
