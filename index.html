@@ -15005,6 +15005,9 @@ a:hover {
     return String(tx?.notes || '').startsWith(STOCK_LOG_PREFIX);
   }
 
+  window.qpxIsStockLog = window.qpxIsStockLog || qpxIsStockLog;
+  window.qpxlsStockLog = window.qpxlsStockLog || qpxIsStockLog;
+
   function qpxIsDamagedTx(tx) {
     return String(tx?.tyre_condition || '').toLowerCase() === 'damaged';
   }
@@ -15833,11 +15836,12 @@ a:hover {
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <style>
 #app-screen .topbar.qpx-topbar-curtain {
+  transform: translateX(-50%) translateY(0);
   transition: transform 0.28s ease, margin-bottom 0.28s ease, opacity 0.28s ease, box-shadow 0.28s ease;
   will-change: transform;
 }
 #app-screen .topbar.qpx-topbar-curtain.is-hidden {
-  transform: translateY(calc(-1 * var(--app-topbar-offset, 100%)));
+  transform: translateX(-50%) translateY(calc(-1 * var(--app-topbar-offset, 100%)));
   margin-bottom: calc(-1 * var(--app-topbar-offset, 0px));
   opacity: 0.96;
   pointer-events: none;
@@ -16092,5 +16096,6 @@ a:hover {
 })();
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
