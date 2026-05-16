@@ -16097,5 +16097,538 @@ a:hover {
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+<!-- ======================================================
+  QPX ORDER REQUEST FEATURE
+  Adds "Request Size" button for out-of-stock tyres and
+  an "Order List" management panel in the dashboard.
+
+  SQL (run once in Supabase SQL editor to enable DB mode):
+  -------------------------------------------------------
+  CREATE TABLE IF NOT EXISTS order_requests (
+    id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    size        text NOT NULL,
+    quantity    int  NOT NULL DEFAULT 1,
+    notes       text,
+    status      text NOT NULL DEFAULT 'pending',
+    operator    text,
+    created_at  timestamptz NOT NULL DEFAULT now()
+  );
+  ALTER TABLE order_requests ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY "allow_all_order_requests" ON order_requests
+    FOR ALL USING (true) WITH CHECK (true);
+  -------------------------------------------------------
+
+  STORAGE_MODE: Change to 'local' to skip Supabase and use
+  localStorage only (no SQL needed).
+====================================================== -->
+<style id="qpx-order-style">
+/* ---- Order Request Feature Styles ---- */
+#qpx-order-list-panel{margin-top:24px;}
+.qpx-order-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.qpx-order-item:last-child{border-bottom:none;}
+.qpx-order-info{flex:1;min-width:0;}
+.qpx-order-size{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold);margin-bottom:4px;}
+.qpx-order-meta{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.qpx-order-notes{font-size:12px;color:var(--text-dim);margin-top:4px;padding:4px 8px;background:rgba(255,255,255,0.04);border-radius:6px;border-left:2px solid var(--gold);}
+.qpx-order-actions{display:flex;gap:6px;flex-shrink:0;}
+.qpx-request-btn{margin-top:6px;background:rgba(248,210,110,0.12);border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+.qpx-request-btn:hover{background:rgba(248,210,110,0.25);}
+
+/* ---- Fix: modal must appear above bottom nav bar ---- */
+#qpx-request-modal{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:999999 !important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,0.65);
+  padding:16px;
+  box-sizing:border-box;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.18s;
+}
+#qpx-request-modal.open{
+  opacity:1 !important;
+  pointer-events:all !important;
+}
+#qpx-request-modal .modal-content{
+  position:relative;
+  z-index:1000000 !important;
+  width:100%;
+  max-width:380px;
+  max-height:calc(100vh - 120px);
+  overflow-y:auto;
+  border-radius:16px;
+  background:var(--card,#151c26);
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+  animation:qpxSlideUp 0.22s ease;
+}
+@keyframes qpxSlideUp{
+  from{transform:translateY(30px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+</style>
+
+<script id="qpx-order-request-feature">
+(function () {
+  /* -------------------------------------------------------
+   * CONFIGURATION
+   * Set to 'local' to use localStorage only (no Supabase table needed).
+   * Set to 'supabase' to use the DB (auto-falls back to localStorage
+   * if the table doesn't exist yet).
+   * ----------------------------------------------------- */
+  var QPX_STORAGE_MODE = 'supabase'; // 'supabase' | 'local'
+  var QPX_LS_KEY = 'qpx-order-requests';
+  var qpxUseLocal = (QPX_STORAGE_MODE === 'local');
+
+  /* ---- localStorage helpers ---- */
+  function lsGet() {
+    try { return JSON.parse(localStorage.getItem(QPX_LS_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+  function lsSave(arr) { localStorage.setItem(QPX_LS_KEY, JSON.stringify(arr)); }
+  function lsId() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+  /* ---- Supabase helpers ---- */
+  async function dbGet() {
+    var r = await db.from('order_requests').select('*').order('created_at', { ascending: false });
+    if (r.error) throw r.error;
+    return r.data || [];
+  }
+  async function dbInsert(payload) {
+    var r = await db.from('order_requests').insert(payload).select().single();
+    if (r.error) throw r.error;
+    return r.data;
+  }
+  async function dbUpdate(id, payload) {
+    var r = await db.from('order_requests').update(payload).eq('id', id);
+    if (r.error) throw r.error;
+  }
+  async function dbDelete(id) {
+    var r = await db.from('order_requests').delete().eq('id', id);
+    if (r.error) throw r.error;
+  }
+  async function dbClear() {
+    var r = await db.from('order_requests').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    if (r.error) throw r.error;
+  }
+
+  /* ---- Unified API (Supabase → localStorage fallback) ---- */
+  async function apiGet() {
+    if (qpxUseLocal) return lsGet();
+    try { return await dbGet(); }
+    catch (e) { console.warn('[QPX Order] Supabase unavailable, using localStorage:', e.message || e); qpxUseLocal = true; return lsGet(); }
+  }
+  async function apiAdd(size, quantity, notes) {
+    var payload = { size: size, quantity: Number(quantity) || 1, notes: notes || null, status: 'pending', operator: (typeof currentUser !== 'undefined' && currentUser && currentUser.username) || 'unknown', created_at: new Date().toISOString() };
+    if (qpxUseLocal) { var arr = lsGet(); var item = Object.assign({}, payload, { id: lsId() }); arr.unshift(item); lsSave(arr); return item; }
+    try { return await dbInsert(payload); }
+    catch (e) { console.warn('[QPX Order] Insert failed, using localStorage:', e.message || e); qpxUseLocal = true; return apiAdd(size, quantity, notes); }
+  }
+  async function apiUpdate(id, updates) {
+    if (qpxUseLocal) { var arr = lsGet(); var i = arr.findIndex(function(o){return o.id===id;}); if (i !== -1) { arr[i] = Object.assign({}, arr[i], updates); lsSave(arr); } return; }
+    try { await dbUpdate(id, updates); }
+    catch (e) { console.warn('[QPX Order] Update failed, using localStorage:', e.message || e); qpxUseLocal = true; await apiUpdate(id, updates); }
+  }
+  async function apiDelete(id) {
+    if (qpxUseLocal) { lsSave(lsGet().filter(function(o){return o.id!==id;})); return; }
+    try { await dbDelete(id); }
+    catch (e) { console.warn('[QPX Order] Delete failed, using localStorage:', e.message || e); qpxUseLocal = true; await apiDelete(id); }
+  }
+  async function apiClear() {
+    if (qpxUseLocal) { lsSave([]); return; }
+    try { await dbClear(); }
+    catch (e) { console.warn('[QPX Order] Clear failed, using localStorage:', e.message || e); qpxUseLocal = true; lsSave([]); }
+  }
+
+  /* ---- Render the Order List panel body ---- */
+  window.renderOrderList = async function () {
+    var container = document.getElementById('qpx-order-list-body');
+    if (!container) return;
+    container.innerHTML = '<div class="empty-state"><span class="loading"></span></div>';
+    var orders;
+    try { orders = await apiGet(); }
+    catch (e) { container.innerHTML = '<div class="empty-state">Failed to load orders.</div>'; return; }
+
+    var badge = document.getElementById('qpx-order-badge');
+    if (badge) { badge.textContent = orders.length > 0 ? String(orders.length) : ''; badge.style.display = orders.length > 0 ? 'inline-flex' : 'none'; }
+
+    if (!orders.length) {
+      container.innerHTML = '<div class="empty-state" style="padding:20px 0;">No order requests yet.<br><small style="color:var(--text-dim);">Search for a tyre and tap <b>📋 Request Size</b> on out-of-stock items.</small></div>';
+      return;
+    }
+    container.innerHTML = orders.map(function (o) {
+      var sizeDisplay = esc(formatTyreSizeValue(o.size) || o.size || '-');
+      var date = o.created_at ? new Date(o.created_at).toLocaleDateString() : '-';
+      var time = o.created_at ? new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      var qty = Number(o.quantity) || 1;
+      var op = esc(o.operator || '-');
+      var statusClass = o.status === 'ordered' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-orange';
+      var statusBadge = '<span class="badge ' + statusClass + '">' + esc(o.status || 'pending') + '</span>';
+      var safeId = esc(String(o.id));
+      var notesHtml = o.notes ? '<div class="qpx-order-notes">📝 ' + esc(o.notes) + '</div>' : '';
+      return '<div class="qpx-order-item" data-id="' + safeId + '">'
+        + '<div class="qpx-order-info">'
+        + '<div class="qpx-order-size">' + sizeDisplay + '</div>'
+        + '<div class="qpx-order-meta">📦 Qty: <b>' + qty + '</b>&nbsp;·&nbsp;📅 ' + date + ' ' + time + '&nbsp;·&nbsp;👤 ' + op + '&nbsp;·&nbsp;' + statusBadge + '</div>'
+        + notesHtml
+        + '</div>'
+        + '<div class="qpx-order-actions">'
+        + '<button class="btn btn-ghost btn-sm" onclick="qpxEditOrder(\'' + safeId + '\')">✏️</button>'
+        + '<button class="btn btn-danger btn-sm" onclick="qpxDeleteOrder(\'' + safeId + '\')">🗑</button>'
+        + '</div>'
+        + '</div>';
+    }).join('');
+  };
+
+  /* ---- Inject Order List Panel into #page-dashboard ---- */
+  function injectOrderPanel() {
+    var dashboard = document.getElementById('page-dashboard');
+    if (!dashboard || document.getElementById('qpx-order-list-panel')) return;
+    var panel = document.createElement('div');
+    panel.id = 'qpx-order-list-panel';
+    panel.className = 'card';
+    panel.style.marginTop = '24px';
+    panel.innerHTML = [
+      '<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">',
+        '<div style="display:flex;align-items:center;gap:10px;">',
+          '<span style="font-size:18px;">📋</span>',
+          '<span class="card-title">Order Request List</span>',
+          '<span id="qpx-order-badge" class="badge badge-orange" style="min-width:20px;text-align:center;display:none;"></span>',
+        '</div>',
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">',
+          '<button class="btn btn-ghost btn-sm" onclick="qpxPrintOrders()">🖨️ Print</button>',
+          '<button class="btn btn-danger btn-sm" onclick="qpxNewOrderList()">🗑️ New List</button>',
+        '</div>',
+      '</div>',
+      '<div id="qpx-order-list-body" style="padding:16px 16px 8px;"></div>',
+      /* Inline edit form (hidden by default) */
+      '<div id="qpx-order-edit-area" style="display:none;padding:16px;border-top:1px solid var(--border);">',
+        '<div style="font-weight:600;margin-bottom:12px;">✏️ Edit Order Request</div>',
+        '<input type="hidden" id="qpx-edit-id">',
+        '<div style="display:flex;flex-direction:column;gap:10px;">',
+          '<div><label style="font-size:12px;color:var(--text-dim);">Tyre Size</label>',
+            '<input class="table-select" id="qpx-edit-size" placeholder="e.g. 205/55R16" style="width:100%;margin-top:4px;"></div>',
+          '<div><label style="font-size:12px;color:var(--text-dim);">Quantity</label>',
+            '<input class="table-select" id="qpx-edit-qty" type="number" min="1" value="1" style="width:100%;margin-top:4px;"></div>',
+          '<div><label style="font-size:12px;color:var(--text-dim);">Status</label>',
+            '<select class="table-select" id="qpx-edit-status" style="width:100%;margin-top:4px;">',
+              '<option value="pending">Pending</option>',
+              '<option value="ordered">Ordered</option>',
+              '<option value="cancelled">Cancelled</option>',
+            '</select></div>',
+          '<div><label style="font-size:12px;color:var(--text-dim);">Notes</label>',
+            '<input class="table-select" id="qpx-edit-notes" placeholder="Optional notes..." style="width:100%;margin-top:4px;"></div>',
+          '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">',
+            '<button class="btn btn-ghost btn-sm" onclick="qpxCancelEdit()">Cancel</button>',
+            '<button class="btn btn-primary btn-sm" onclick="qpxSaveEdit()">Save Changes</button>',
+          '</div>',
+        '</div>',
+      '</div>'
+    ].join('');
+    dashboard.appendChild(panel);
+    renderOrderList();
+  }
+
+  /* ---- Inject Request Modal into body ---- */
+  function injectRequestModal() {
+    if (document.getElementById('qpx-request-modal')) return;
+    var modal = document.createElement('div');
+    modal.id = 'qpx-request-modal';
+    modal.className = 'modal';
+    modal.setAttribute('role', 'dialog');
+    modal.innerHTML = [
+      '<div class="modal-content" style="max-width:380px;">',
+        '<div class="modal-header">',
+          '<span class="modal-title">📋 Request Out-of-Stock Size</span>',
+          '<button class="modal-close" onclick="qpxCloseRequestModal()">×</button>',
+        '</div>',
+        '<div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">',
+          '<div>',
+            '<label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px;">Tyre Size</label>',
+            '<div id="qpx-req-size-display" style="font-size:20px;font-weight:700;font-family:\'DM Mono\',monospace;color:var(--gold);"></div>',
+            '<input type="hidden" id="qpx-req-size">',
+          '</div>',
+          '<div>',
+            '<label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px;">Quantity Needed</label>',
+            '<input class="table-select" id="qpx-req-qty" type="number" min="1" value="1" style="width:100%;" inputmode="numeric">',
+          '</div>',
+          '<div>',
+            '<label style="font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px;">Notes (optional)</label>',
+            '<input class="table-select" id="qpx-req-notes" placeholder="e.g. customer name, urgency…" style="width:100%;">',
+          '</div>',
+          '<div style="display:flex;gap:8px;justify-content:flex-end;padding-top:4px;">',
+            '<button class="btn btn-ghost" onclick="qpxCloseRequestModal()">Cancel</button>',
+            '<button class="btn btn-primary" onclick="qpxSubmitRequest()">➕ Add to Order List</button>',
+          '</div>',
+        '</div>',
+      '</div>'
+    ].join('');
+    modal.addEventListener('click', function (e) { if (e.target === modal) qpxCloseRequestModal(); });
+    document.body.appendChild(modal);
+  }
+
+  /* ---- Public: open / close request modal ---- */
+  window.qpxOpenRequestModal = function (rawSize) {
+    injectRequestModal();
+    var display = formatTyreSizeValue(rawSize) || rawSize;
+    document.getElementById('qpx-req-size').value = rawSize;
+    document.getElementById('qpx-req-size-display').textContent = display;
+    document.getElementById('qpx-req-qty').value = '1';
+    document.getElementById('qpx-req-notes').value = '';
+    document.getElementById('qpx-request-modal').classList.add('open');
+    setTimeout(function () { var el = document.getElementById('qpx-req-qty'); if (el) el.focus(); }, 120);
+  };
+  window.qpxCloseRequestModal = function () {
+    var m = document.getElementById('qpx-request-modal');
+    if (m) m.classList.remove('open');
+  };
+
+  /* ---- Public: submit request ---- */
+  window.qpxSubmitRequest = async function () {
+    var size = document.getElementById('qpx-req-size').value;
+    var qty  = parseInt(document.getElementById('qpx-req-qty').value, 10) || 1;
+    var notes = document.getElementById('qpx-req-notes').value.trim();
+    if (!size) { showToast('No size selected', 'error'); return; }
+    try {
+      await apiAdd(size, qty, notes);
+      showToast('✅ "' + (formatTyreSizeValue(size) || size) + '" added to the order list', 'success');
+      qpxCloseRequestModal();
+      if (document.getElementById('page-dashboard') && document.getElementById('page-dashboard').classList.contains('active')) {
+        renderOrderList();
+      }
+    } catch (e) {
+      showToast('Failed to save request: ' + (e.message || e), 'error');
+    }
+  };
+
+  /* ---- Public: delete ---- */
+  window.qpxDeleteOrder = async function (id) {
+    if (!confirm('Remove this order request?')) return;
+    try { await apiDelete(id); showToast('Removed from order list', 'success'); renderOrderList(); }
+    catch (e) { showToast('Failed to delete: ' + (e.message || e), 'error'); }
+  };
+
+  /* ---- Public: edit ---- */
+  window.qpxEditOrder = async function (id) {
+    var orders;
+    try { orders = await apiGet(); } catch (e) { showToast('Cannot load orders', 'error'); return; }
+    var o = orders.find(function (x) { return x.id === id; });
+    if (!o) return;
+    document.getElementById('qpx-edit-id').value = o.id;
+    document.getElementById('qpx-edit-size').value = formatTyreSizeValue(o.size) || o.size || '';
+    document.getElementById('qpx-edit-qty').value = o.quantity || 1;
+    document.getElementById('qpx-edit-status').value = o.status || 'pending';
+    document.getElementById('qpx-edit-notes').value = o.notes || '';
+    var area = document.getElementById('qpx-order-edit-area');
+    if (area) { area.style.display = 'block'; area.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+  };
+  window.qpxCancelEdit = function () {
+    var area = document.getElementById('qpx-order-edit-area');
+    if (area) area.style.display = 'none';
+  };
+  window.qpxSaveEdit = async function () {
+    var id     = document.getElementById('qpx-edit-id').value;
+    var size   = document.getElementById('qpx-edit-size').value.trim();
+    var qty    = parseInt(document.getElementById('qpx-edit-qty').value, 10) || 1;
+    var status = document.getElementById('qpx-edit-status').value;
+    var notes  = document.getElementById('qpx-edit-notes').value.trim();
+    if (!id || !size) { showToast('Size is required', 'error'); return; }
+    try {
+      await apiUpdate(id, { size: size, quantity: qty, status: status, notes: notes || null });
+      showToast('Order updated', 'success');
+      qpxCancelEdit();
+      renderOrderList();
+    } catch (e) { showToast('Failed to update: ' + (e.message || e), 'error'); }
+  };
+
+  /* ---- Public: new list (clear all) ---- */
+  window.qpxNewOrderList = function () {
+    if (!confirm('Clear the entire order list and start a new one?\nThis cannot be undone.')) return;
+    apiClear().then(function () {
+      showToast('Order list cleared — ready for a new list', 'success');
+      renderOrderList();
+    }).catch(function (e) { showToast('Failed to clear: ' + (e.message || e), 'error'); });
+  };
+
+  /* ---- Public: print ---- */
+  window.qpxPrintOrders = async function () {
+    var orders;
+    try { orders = await apiGet(); } catch (e) { showToast('Failed to load orders', 'error'); return; }
+    if (!orders.length) { showToast('No orders to print', 'error'); return; }
+    var rows = orders.map(function (o) {
+      var size  = String(formatTyreSizeValue(o.size) || o.size || '-').replace(/</g,'&lt;');
+      var date  = o.created_at ? new Date(o.created_at).toLocaleString() : '-';
+      var notes = String(o.notes || '-').replace(/</g,'&lt;');
+      var statusClass = o.status === 'ordered' ? 'color:#16a34a;' : o.status === 'cancelled' ? 'color:#dc2626;' : 'color:#d97706;';
+      return '<tr><td><b>' + size + '</b></td><td style="text-align:center;">' + (Number(o.quantity)||1) + '</td><td style="' + statusClass + 'font-weight:600;">' + (o.status||'pending') + '</td><td>' + (o.operator||'-').replace(/</g,'&lt;') + '</td><td>' + date + '</td><td>' + notes + '</td></tr>';
+    }).join('');
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Order Requests \u2013 Quality Part X</title>'
+      + '<style>body{font-family:Arial,sans-serif;padding:30px;color:#0f172a}'
+      + '.header{text-align:center;margin-bottom:24px;border-bottom:3px solid #f0a500;padding-bottom:14px}'
+      + '.company{font-size:26px;font-weight:bold;color:#f0a500;letter-spacing:1px}'
+      + '.sub{color:#475569;font-size:13px;margin-top:4px}'
+      + 'table{width:100%;border-collapse:collapse;margin-top:16px}'
+      + 'th,td{border:1px solid #e2e8f0;padding:9px 10px;text-align:left;font-size:13px}'
+      + 'th{background:#f0a500;color:#000;font-weight:700}'
+      + 'tr:nth-child(even){background:#f8fafc}'
+      + '.total{margin-top:18px;font-weight:bold;text-align:right;font-size:14px}'
+      + '</style></head><body>'
+      + '<div class="header"><div class="company">QUALITY PART X</div>'
+      + '<div class="sub">TYRE SERVICES &middot; DUNSTABLE</div>'
+      + '<div class="sub">Order Request List &middot; ' + new Date().toLocaleString() + '</div>'
+      + '<div class="sub">Printed by: ' + ((typeof currentUser !== 'undefined' && currentUser && currentUser.username) || '-') + '</div></div>'
+      + '<table><thead><tr><th>Tyre Size</th><th>Qty</th><th>Status</th><th>Requested By</th><th>Date &amp; Time</th><th>Notes</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody></table>'
+      + '<div class="total">Total Requests: ' + orders.length + '</div>'
+      + '</body></html>';
+    var win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    setTimeout(function () { win.print(); }, 400);
+  };
+
+  /* ---- Patch buildSearchCard (via getTyreSearchMarkup) ---- */
+  function patchGetTyreSearchMarkup() {
+    if (!window.getTyreSearchMarkup) return;
+    var orig = window.getTyreSearchMarkup;
+    window.getTyreSearchMarkup = function (data, options) {
+      /* Re-render with "Request Size" button on zero-stock items */
+      var countLabel = '<div class="sec-label">' + esc(tr('resultsFound', { count: data.length })) + '</div>';
+      var cards = data.map(function (item) {
+        var qty = Math.max(0, Number(item.quantity || 0));
+        var isZero = qty === 0;
+        var sizeValue = formatTyreSizeValue(item.size) || item.size;
+        var sizeEsc = esc(sizeValue);
+        var locEsc = esc(item.location || 'No location');
+        var stockClass = isZero ? 'stock-low' : 'stock-ok';
+        var stockText = isZero ? uiText('\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631', 'Out of stock') : tr('inStockText', { qty: qty });
+        var safeId   = String(item.id).replace(/'/g, '&#39;');
+        var safeSize = String(item.size).replace(/'/g, '&#39;');
+        var action = (options && options.mode === 'modal')
+          ? "selectTyreFromSearchHub('" + safeId + "','" + safeSize + "')"
+          : "selectTyre('" + safeId + "','" + safeSize + "')";
+        var wrapStyle  = isZero ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"' : '';
+        var sizeStyle  = isZero ? ' style="color:var(--gold);"' : '';
+        var selectBtn  = isZero
+          ? '<button class="tyre-select-btn" disabled style="background:linear-gradient(135deg,var(--gold),#e8b54a);">' + uiText('\u063a\u064a\u0631 \u0645\u062a\u0648\u0641\u0631','Unavailable') + '</button>'
+          : '<button class="tyre-select-btn" onclick="' + action + '">' + esc(tr('selectLabel')) + '</button>';
+        var requestBtn = isZero
+          ? '<button class="qpx-request-btn" onclick="qpxOpenRequestModal(\'' + safeSize + '\')">📋 Request Size</button>'
+          : '';
+        return '<div class="tyre-result"' + wrapStyle + '>'
+          + '<div class="tyre-info">'
+          + '<div class="tyre-size"' + sizeStyle + '>' + sizeEsc + '</div>'
+          + '<div class="tyre-meta"><span class="tyre-brand">📍 ' + locEsc + '</span><span class="stock-badge ' + stockClass + '">' + esc(stockText) + '</span></div>'
+          + '</div>'
+          + '<div class="tyre-right">'
+          + '<div class="tyre-price">' + qty + ' <span>qty</span></div>'
+          + '<div style="display:flex;flex-direction:column;align-items:flex-end;">' + selectBtn + requestBtn + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+      return countLabel + '<div style="display:flex;flex-direction:column;gap:10px;">' + cards + '</div>';
+    };
+  }
+
+  /* ---- Patch searchTyre() to inject Request button in out-of-stock cards ---- */
+  function patchSearchTyre() {
+    if (typeof searchTyre !== 'function') return;
+    var orig = searchTyre;
+    searchTyre = async function () {
+      await orig.apply(this, arguments);
+      var container = document.getElementById('sale-results');
+      if (!container) return;
+      container.querySelectorAll('.tyre-result').forEach(function (card) {
+        /* The original card uses btn-primary + disabled for out-of-stock */
+        var disabledBtn = card.querySelector('button.btn-primary[disabled]');
+        if (!disabledBtn) return;
+        if (card.querySelector('.qpx-request-btn')) return; /* already patched */
+        /* Extract size from the rendered size element */
+        var sizeEl = card.querySelector('.tyre-result-size');
+        var rawSize = sizeEl ? sizeEl.textContent.trim() : '';
+        if (!rawSize) return;
+        var safeSize = rawSize.replace(/'/g, "\\'");
+        var btn = document.createElement('button');
+        btn.className = 'qpx-request-btn';
+        btn.innerHTML = '📋 Request Size';
+        btn.onclick = function () { qpxOpenRequestModal(rawSize); };
+        /* Insert after the button group div */
+        var btnGroup = disabledBtn.parentElement;
+        if (btnGroup) btnGroup.appendChild(btn);
+      });
+    };
+  }
+
+  /* ---- Patch renderRearSearchResults to add Request button on zero-qty items ---- */
+  function patchRearSearch() {
+    if (!window.renderRearSearchResults) return;
+    var orig = window.renderRearSearchResults;
+    window.renderRearSearchResults = function (data) {
+      orig(data);
+      var container = document.getElementById('svc-rear-results');
+      if (!container) return;
+      container.querySelectorAll('.tyre-result').forEach(function (card) {
+        var qtyEl = card.querySelector('.tyre-price');
+        if (!qtyEl) return;
+        var qty = parseInt(qtyEl.textContent, 10);
+        if (isNaN(qty) || qty > 0) return;
+        if (card.querySelector('.qpx-request-btn')) return;
+        var sizeEl = card.querySelector('.tyre-size');
+        var rawSize = sizeEl ? sizeEl.textContent.trim() : '';
+        if (!rawSize) return;
+        var btn = document.createElement('button');
+        btn.className = 'qpx-request-btn';
+        btn.innerHTML = '📋 Request Size';
+        btn.onclick = function () { qpxOpenRequestModal(rawSize); };
+        var right = card.querySelector('.tyre-right');
+        if (right) right.appendChild(btn);
+      });
+    };
+  }
+
+  /* ---- Patch showPage to refresh Order List when dashboard opens ---- */
+  function patchShowPage() {
+    if (typeof showPage !== 'function') return;
+    var origShow = showPage;
+    showPage = function (name) {
+      origShow.apply(this, arguments);
+      if (name === 'dashboard') {
+        setTimeout(function () { injectOrderPanel(); renderOrderList(); }, 80);
+      }
+    };
+  }
+
+  /* ---- Bootstrap ---- */
+  function boot() {
+    injectRequestModal();
+    injectOrderPanel();
+    patchSearchTyre();
+    patchShowPage();
+    /* getTyreSearchMarkup and renderRearSearchResults are set by the topbar patch
+       script which runs at DOMContentLoaded/load — patch them after they exist */
+    function tryPatchRenderers() {
+      patchGetTyreSearchMarkup();
+      patchRearSearch();
+    }
+    tryPatchRenderers();
+    /* Retry once more after load in case the IIFE hasn't run yet */
+    window.addEventListener('load', function () {
+      tryPatchRenderers();
+      injectOrderPanel();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
 </body>
 </html>
