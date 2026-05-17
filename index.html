@@ -16630,5 +16630,64 @@ a:hover {
   }
 })();
 </script>
+
+<script id="qpx-bulk-transfer-guard">
+(function () {
+  /* ----------------------------------------------------------
+   * Prevents double-execution of "Move All Stock" transfer.
+   * Wraps confirmWarehouseBulkTransfer ONLY — no other guards
+   * that could break the internal call chain.
+   * ---------------------------------------------------------- */
+
+  /* Wait until the function is defined (it's in the main script) */
+  function applyGuard() {
+    if (typeof confirmWarehouseBulkTransfer !== 'function') return;
+
+    var _orig = confirmWarehouseBulkTransfer;
+    var _running = false;
+
+    window.confirmWarehouseBulkTransfer = async function () {
+      /* If already running, block the second click */
+      if (_running) {
+        showToast(
+          uiText('النقل جارٍ بالفعل، يرجى الانتظار…', 'Transfer already in progress — please wait…'),
+          'error'
+        );
+        return;
+      }
+
+      /* Grab the "Move All" button inside the modal */
+      var btn = document.querySelector('#warehouse-bulk-transfer-modal .btn.btn-primary');
+      var origHtml = btn ? btn.innerHTML : '';
+
+      /* Lock */
+      _running = true;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span>&nbsp;' + uiText('جارٍ النقل…', 'Moving…');
+      }
+
+      try {
+        await _orig();          /* Run the original — it shows confirm() then transfers */
+      } finally {
+        /* Always unlock, even if user pressed Cancel in the confirm() dialog */
+        _running = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    };
+  }
+
+  /* Run after all scripts have executed */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyGuard);
+  } else {
+    applyGuard();
+  }
+  window.addEventListener('load', applyGuard); /* Safety net */
+})();
+</script>
 </body>
 </html>
