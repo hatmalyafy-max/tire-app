@@ -8041,7 +8041,7 @@ a:hover {
         container.innerHTML = locations
           .map((loc) => {
             const stats = getWarehouseStats(loc);
-            return `<div class="warehouse-manager-item"><div><div><strong>${esc(loc)}</strong></div><div class="warehouse-manager-summary">${esc(uiText(`${stats.activeRows.length} مقاسات متوفرة · ${stats.totalQty} كفر`, `${stats.activeRows.length} active sizes · ${stats.totalQty} tyres`))}</div></div><div class="table-actions"><button class="btn btn-info btn-sm" onclick='printWarehouseStock(${JSON.stringify(loc)})'>🖨️ ${esc(uiText("طباعة المخزون", "Print Stock"))}</button><button class="btn btn-warning btn-sm" onclick='transferWarehouseStockPrompt(${JSON.stringify(loc)})'>🔁 ${esc(uiText("نقل الكل", "Move All"))}</button><button class="btn btn-ghost btn-sm" onclick='renameWarehousePrompt(${JSON.stringify(loc)})'>✏️ ${esc(uiText("تعديل", "Rename"))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehousePrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText("حذف", "Delete"))}</button></div></div>`;
+            return `<div class="warehouse-manager-item"><div><div><strong>${esc(loc)}</strong></div><div class="warehouse-manager-summary">${esc(uiText(`${stats.activeRows.length} مقاسات متوفرة · ${stats.totalQty} كفر`, `${stats.activeRows.length} active sizes · ${stats.totalQty} tyres`))}</div></div><div class="table-actions"><button class="btn btn-info btn-sm" onclick='printWarehouseStock(${JSON.stringify(loc)})'>🖨️ ${esc(uiText("طباعة المخزون", "Print Stock"))}</button><button class="btn btn-warning btn-sm" onclick='transferWarehouseStockPrompt(${JSON.stringify(loc)})'>🔁 ${esc(uiText("نقل الكل", "Move All"))}</button><button class="btn btn-ghost btn-sm" onclick='renameWarehousePrompt(${JSON.stringify(loc)})'>✏️ ${esc(uiText("تعديل", "Rename"))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehousePrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText("حذف", "Delete"))}</button><button class="btn btn-danger btn-sm" onclick='deleteWarehouseWithSizesPrompt(${JSON.stringify(loc)})'>🗑 ${esc(uiText("حذف المخزن شامل المقاسات", "Delete Warehouse + Sizes"))}</button></div></div>`;
           })
           .join("");
       }
@@ -8114,8 +8114,8 @@ a:hover {
         if (activeRows.length) {
           showToast(
             uiText(
-              "لا يمكن حذف مخزن يحتوي على مخزون. انقل الكميات أولاً.",
-              "Cannot delete a warehouse that still has stock. Transfer the quantities first.",
+              "لا يمكن حذف مخزن يحتوي على مخزون. انقل الكميات أولاً أو استخدم زر حذف المخزن شامل المقاسات.",
+              "Cannot delete a warehouse that still has stock. Transfer the quantities first or use Delete Warehouse + Sizes.",
             ),
             "error",
           );
@@ -8143,9 +8143,51 @@ a:hover {
         removeSavedLocation(location);
         await loadInventory();
         renderWarehouseManager();
+        populateQuickLocationSelect();
+        renderQuickRestockResults();
         populateTransferSelects();
         showToast(
           uiText("تم حذف المخزن من القائمة", "Warehouse removed from the list"),
+          "success",
+        );
+      }
+
+      async function deleteWarehouseWithSizesPrompt(location) {
+        const stats = getWarehouseStats(location);
+        const totalQty = stats.rows.reduce(
+          (sum, item) => sum + Number(item.quantity || 0),
+          0,
+        );
+        if (
+          !confirm(
+            uiText(
+              `سيتم حذف المخزن "${location}" نهائياً مع جميع المقاسات والكميات (${stats.rows.length} سجل / ${totalQty} كفر). لا يمكن التراجع. هل تريد المتابعة؟`,
+              `Delete warehouse "${location}" permanently with all sizes and quantities (${stats.rows.length} rows / ${totalQty} tyres)? This cannot be undone.`,
+            ),
+          )
+        )
+          return;
+        if (stats.rows.length) {
+          const { error } = await db
+            .from("inventory")
+            .delete()
+            .eq("location", location);
+          if (error) {
+            showToast(error.message, "error");
+            return;
+          }
+        }
+        removeSavedLocation(location);
+        await loadInventory();
+        renderWarehouseManager();
+        populateQuickLocationSelect();
+        renderQuickRestockResults();
+        populateTransferSelects();
+        showToast(
+          uiText(
+            "تم حذف المخزن مع جميع المقاسات والكميات التابعة له",
+            "Warehouse and all related sizes were deleted",
+          ),
           "success",
         );
       }
@@ -16689,5 +16731,6 @@ a:hover {
   window.addEventListener('load', applyGuard); /* Safety net */
 })();
 </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
