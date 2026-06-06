@@ -2950,6 +2950,17 @@ a:hover {
       .transfer-selected-item .transfer-item-controls .btn {
         min-width: 82px;
       }
+
+      /* ── QPX: auth-screen flash prevention (base state only) ──
+         The visibility: hidden hides auth-screen immediately.
+         The animation that makes it visible again is in the
+         glass-theme style block below (it uses !important to
+         override the R3-5 animation and correctly sets visibility).
+      ─────────────────────────────────────────────────────── */
+      #auth-screen {
+        visibility : hidden;
+        opacity    : 0;
+      }
 </style>
 </head>
   <body>
@@ -5397,9 +5408,10 @@ a:hover {
           1,
           parseInt(quickRestockDraft.quantity, 10) || 1,
         );
+        const normalizedDraftKey = normalizeTyreKey(quickRestockDraft.key) || quickRestockDraft.key;
         const existing = quickRestockQueue.find(
           (item) =>
-            item.key === quickRestockDraft.key &&
+            (normalizeTyreKey(item.key) || item.key) === normalizedDraftKey &&
             item.location.toLowerCase() === location.toLowerCase(),
         );
         if (existing) {
@@ -6373,8 +6385,10 @@ a:hover {
         if (
           document.getElementById("quick-restock-panel")?.style.display ===
           "block"
-        )
+        ) {
           renderQuickRestockResults();
+          renderQuickRestockQueue();
+        }
       }
 
       function buildLocationOptions(selected = "", includeEmpty = false) {
@@ -9796,7 +9810,10 @@ a:hover {
           .getElementById("svc-qty")
           ?.closest(".field-group");
         if (!qtyGroup) return;
-        const row = qtyGroup.closest(".form-row");
+        const row = qtyGroup.closest(".form-row")
+          || document.getElementById("svc-plate")?.closest(".form-row")
+          || document.querySelector("#service-form .form-row");
+        if (!row) return;
         const wrap = document.createElement("div");
         wrap.className = "service-action-wrap";
         wrap.id = "service-action-wrap";
@@ -14149,6 +14166,8 @@ a:hover {
             const btn = event.target.closest(".nav-item");
             if (!btn || !nav.contains(btn)) return;
             if (event.type === "click" && Date.now() - qpxLastNavTouchTs < 700) {
+              event.preventDefault();
+              event.stopPropagation();
               return;
             }
             if (event.type === "touchend") qpxLastNavTouchTs = Date.now();
@@ -16267,13 +16286,11 @@ a:hover {
   async function apiAdd(size, quantity, notes) {
     var payload = { size: size, quantity: Number(quantity) || 1, notes: notes || null, status: 'pending', operator: (typeof currentUser !== 'undefined' && currentUser && currentUser.username) || 'unknown', created_at: new Date().toISOString() };
     if (qpxUseLocal) { var arr = lsGet(); var item = Object.assign({}, payload, { id: lsId() }); arr.unshift(item); lsSave(arr); return item; }
-    try { return await dbInsert(payload); }
-    catch (e) { console.warn('[QPX Order] Insert failed, using localStorage:', e.message || e); qpxUseLocal = true; return apiAdd(size, quantity, notes); }
+    return await dbInsert(payload);
   }
   async function apiUpdate(id, updates) {
     if (qpxUseLocal) { var arr = lsGet(); var i = arr.findIndex(function(o){return o.id===id;}); if (i !== -1) { arr[i] = Object.assign({}, arr[i], updates); lsSave(arr); } return; }
-    try { await dbUpdate(id, updates); }
-    catch (e) { console.warn('[QPX Order] Update failed, using localStorage:', e.message || e); qpxUseLocal = true; await apiUpdate(id, updates); }
+    await dbUpdate(id, updates);
   }
   async function apiDelete(id) {
     if (qpxUseLocal) { lsSave(lsGet().filter(function(o){return o.id!==id;})); return; }
@@ -16304,8 +16321,6 @@ a:hover {
     }
     container.innerHTML = orders.map(function (o) {
       var sizeDisplay = esc(formatTyreSizeValue(o.size) || o.size || '-');
-      var date = o.created_at ? new Date(o.created_at).toLocaleDateString() : '-';
-      var time = o.created_at ? new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
       var qty = Number(o.quantity) || 1;
       var op = esc(o.operator || '-');
       var statusClass = o.status === 'ordered' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-orange';
@@ -16315,7 +16330,7 @@ a:hover {
       return '<div class="qpx-order-item" data-id="' + safeId + '">'
         + '<div class="qpx-order-info">'
         + '<div class="qpx-order-size">' + sizeDisplay + '</div>'
-        + '<div class="qpx-order-meta">📦 Qty: <b>' + qty + '</b>&nbsp;·&nbsp;📅 ' + date + ' ' + time + '&nbsp;·&nbsp;👤 ' + op + '&nbsp;·&nbsp;' + statusBadge + '</div>'
+        + '<div class="qpx-order-meta">📦 Qty: <b>' + qty + '</b>&nbsp;·&nbsp;👤 ' + op + '&nbsp;·&nbsp;' + statusBadge + '</div>'
         + notesHtml
         + '</div>'
         + '<div class="qpx-order-actions">'
@@ -16732,5 +16747,2360 @@ a:hover {
 })();
 </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script id="qpx-service-plate-search-patch">
+(() => {
+  Object.assign(I18N.en, {
+    serviceInventoryShortcutLabel: "Open Inventory",
+    serviceInventoryShortcutSub: "Go directly to stock page",
+    serviceAdminShortcutLabel: "Open Management",
+    serviceAdminShortcutSub: "Go directly to admin page",
+    plateSearchToggle: "Search by Plate",
+    plateSearchToggleSub: "Check previous services any time",
+    plateSearchTitle: "Service Search by Plate",
+    plateSearchHint: "Type the plate number in English then press OK.",
+    plateSearchPlaceholder: "AB12CDE",
+    plateSearchSubmit: "OK",
+    plateSearchEmpty: "Type a plate number and press OK",
+    plateSearchNoResult: "Not found",
+    plateSearchDateLabel: "Date",
+    plateSearchActionLabel: "Action",
+    plateSearchServiceLabel: "Service",
+    plateSearchLoadError: "Unable to load service records",
+    plateSearchMatches: "Found {count} service records",
+  });
+
+  Object.assign(I18N.ar, {
+    serviceInventoryShortcutLabel: "فتح المخزون",
+    serviceInventoryShortcutSub: "الانتقال مباشرة إلى صفحة المخزون",
+    serviceAdminShortcutLabel: "فتح الإدارة",
+    serviceAdminShortcutSub: "الانتقال مباشرة إلى صفحة الإدارة",
+    plateSearchToggle: "بحث برقم اللوحة",
+    plateSearchToggleSub: "التحقق من الخدمات السابقة في أي وقت",
+    plateSearchTitle: "البحث عن خدمة برقم اللوحة",
+    plateSearchHint: "اكتب رقم اللوحة بالإنجليزية ثم اضغط موافق.",
+    plateSearchPlaceholder: "AB12CDE",
+    plateSearchSubmit: "موافق",
+    plateSearchEmpty: "اكتب رقم اللوحة ثم اضغط موافق",
+    plateSearchNoResult: "لا يوجد",
+    plateSearchDateLabel: "التاريخ",
+    plateSearchActionLabel: "الإجراء",
+    plateSearchServiceLabel: "الخدمة",
+    plateSearchLoadError: "تعذر تحميل سجلات الخدمات",
+    plateSearchMatches: "تم العثور على {count} خدمة",
+  });
+
+  function qpxServiceSearchText(key, arFallback, enFallback, params) {
+    const value = typeof tr === 'function' ? tr(key, params) : '';
+    if (!value || value === key) return currentLang === 'ar' ? arFallback : enFallback;
+    return value;
+  }
+
+  function qpxNormalizePlate(value) {
+    return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+
+  function qpxDisplayPlate(value) {
+    return String(value || '').toUpperCase().trim();
+  }
+
+  function qpxApplyEnglishPlateKeyboard(input) {
+    if (!input) return;
+    input.setAttribute('lang', 'en');
+    input.setAttribute('dir', 'ltr');
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('autocapitalize', 'characters');
+    input.setAttribute('spellcheck', 'false');
+    input.inputMode = 'text';
+  }
+
+  function qpxEnsureServiceSearchStyles() {
+    if (document.getElementById('qpx-service-search-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'qpx-service-search-styles';
+    style.textContent = [
+      '.service-search-card{margin-top:14px;padding:14px 14px 16px;display:flex;flex-direction:column;gap:12px;}',
+      '.service-search-toggle{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.10);border-radius:18px;background:linear-gradient(180deg,rgba(20,28,42,.96),rgba(12,18,28,.96));color:var(--text-main);cursor:pointer;box-shadow:0 14px 34px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);}',
+      '.service-search-toggle:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(0,0,0,.34),0 0 0 1px rgba(248,210,110,.14) inset;}',
+      '.service-search-toggle-main{display:flex;align-items:flex-start;gap:12px;min-width:0;flex:1;}',
+      '.service-search-toggle .qa-btn-icon{margin-bottom:0;flex-shrink:0;}',
+      '.service-search-toggle-copy{display:flex;flex-direction:column;gap:4px;min-width:0;text-align:start;}',
+      '.service-search-toggle-title{font-size:13px;font-weight:800;color:var(--text-main);}',
+      '.service-search-toggle-sub{font-size:11px;line-height:1.45;color:#9fb1c7;}',
+      '.service-search-toggle-arrow{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.05);color:var(--gold);transition:transform .2s ease;flex-shrink:0;}',
+      '.service-search-card.open .service-search-toggle-arrow{transform:rotate(180deg);}',
+      '.service-search-panel{display:none;gap:12px;}',
+      '.service-search-card.open .service-search-panel{display:grid;}',
+      '.service-search-hint{font-size:12px;line-height:1.55;color:var(--text-soft);}',
+      '.service-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;}',
+      '.service-search-input{direction:ltr;text-transform:uppercase;letter-spacing:.08em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}',
+      '.service-search-results{display:grid;gap:12px;}',
+      '.service-search-results .empty-state{padding:18px 14px;}',
+      '.service-search-match-count{font-size:12px;color:var(--gold);font-weight:700;}',
+      '.svc-card.svc-card-no-photo .svc-card-body{padding-top:14px;}',
+      '.svc-card.svc-card-no-photo .svc-card-actions{display:none;}',
+      '@media (max-width:560px){.service-search-row{grid-template-columns:1fr;}.service-search-row .btn{width:100%;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function qpxUpdateServiceSearchText() {
+    const inventoryLabel = document.getElementById('qa-go-inventory-label');
+    const inventorySub = document.getElementById('qa-go-inventory-sub');
+    const adminLabel = document.getElementById('qa-go-admin-label');
+    const adminSub = document.getElementById('qa-go-admin-sub');
+    const toggleTitle = document.getElementById('svc-plate-search-toggle-title');
+    const toggleSub = document.getElementById('svc-plate-search-toggle-sub');
+    const title = document.getElementById('svc-plate-search-title');
+    const hint = document.getElementById('svc-plate-search-hint');
+    const submit = document.getElementById('svc-plate-search-submit');
+    const input = document.getElementById('svc-plate-search-input');
+    const results = document.getElementById('svc-plate-search-results');
+    if (inventoryLabel) inventoryLabel.textContent = qpxServiceSearchText('serviceInventoryShortcutLabel', 'فتح المخزون', 'Open Inventory');
+    if (inventorySub) inventorySub.textContent = qpxServiceSearchText('serviceInventoryShortcutSub', 'الانتقال مباشرة إلى صفحة المخزون', 'Go directly to stock page');
+    if (adminLabel) adminLabel.textContent = qpxServiceSearchText('serviceAdminShortcutLabel', 'فتح الإدارة', 'Open Management');
+    if (adminSub) adminSub.textContent = qpxServiceSearchText('serviceAdminShortcutSub', 'الانتقال مباشرة إلى صفحة الإدارة', 'Go directly to admin page');
+    if (toggleTitle) toggleTitle.textContent = qpxServiceSearchText('plateSearchToggle', 'بحث برقم اللوحة', 'Search by Plate');
+    if (toggleSub) toggleSub.textContent = qpxServiceSearchText('plateSearchToggleSub', 'التحقق من الخدمات السابقة في أي وقت', 'Check previous services any time');
+    if (title) title.textContent = qpxServiceSearchText('plateSearchTitle', 'البحث عن خدمة برقم اللوحة', 'Service Search by Plate');
+    if (hint) hint.textContent = qpxServiceSearchText('plateSearchHint', 'اكتب رقم اللوحة بالإنجليزية ثم اضغط موافق.', 'Type the plate number in English then press OK.');
+    if (submit) submit.textContent = qpxServiceSearchText('plateSearchSubmit', 'موافق', 'OK');
+    if (input) {
+      input.placeholder = qpxServiceSearchText('plateSearchPlaceholder', 'AB12CDE', 'AB12CDE');
+      qpxApplyEnglishPlateKeyboard(input);
+    }
+    if (results && !results.dataset.hasSearch) {
+      results.innerHTML = `<div class="empty-state">${esc(qpxServiceSearchText('plateSearchEmpty', 'اكتب رقم اللوحة ثم اضغط موافق', 'Type a plate number and press OK'))}</div>`;
+    }
+  }
+
+  function qpxEnsureServiceQuickLinksAndSearch() {
+    qpxEnsureServiceSearchStyles();
+    const quickActions = document.querySelector('#page-service .quick-actions');
+    if (!quickActions) return;
+
+    if (!document.getElementById('qa-go-inventory')) {
+      quickActions.insertAdjacentHTML('beforeend', `
+        <button class="qa-btn" id="qa-go-inventory" onclick="showPage('inventory')">
+          <div class="qa-btn-icon" style="background:rgba(96,165,250,.16);color:#60a5fa"><i class="fas fa-warehouse"></i></div>
+          <div class="qa-btn-label" id="qa-go-inventory-label"></div>
+          <div class="qa-btn-sub" id="qa-go-inventory-sub"></div>
+        </button>
+        <button class="qa-btn" id="qa-go-admin" onclick="showPage('dashboard')">
+          <div class="qa-btn-icon" style="background:rgba(168,85,247,.18);color:#a855f7"><i class="fas fa-gauge-high"></i></div>
+          <div class="qa-btn-label" id="qa-go-admin-label"></div>
+          <div class="qa-btn-sub" id="qa-go-admin-sub"></div>
+        </button>
+      `);
+    }
+
+    const actionsSection = quickActions.parentElement;
+    if (actionsSection && !document.getElementById('svc-plate-search-card')) {
+      actionsSection.insertAdjacentHTML('afterend', `
+        <div class="glass-card service-search-card" id="svc-plate-search-card">
+          <button type="button" class="service-search-toggle" id="svc-plate-search-toggle" onclick="togglePlateSearchPanel()">
+            <div class="service-search-toggle-main">
+              <div class="qa-btn-icon" style="background:rgba(248,210,110,.16);color:var(--gold)"><i class="fas fa-magnifying-glass"></i></div>
+              <div class="service-search-toggle-copy">
+                <div class="service-search-toggle-title" id="svc-plate-search-toggle-title"></div>
+                <div class="service-search-toggle-sub" id="svc-plate-search-toggle-sub"></div>
+              </div>
+            </div>
+            <div class="service-search-toggle-arrow"><i class="fas fa-chevron-down"></i></div>
+          </button>
+          <div class="service-search-panel" id="svc-plate-search-panel">
+            <div class="service-search-hint" id="svc-plate-search-hint"></div>
+            <div class="service-search-row">
+              <input type="text" id="svc-plate-search-input" class="field-input service-search-input" placeholder="AB12CDE" maxlength="16" onfocus="qpxApplyEnglishPlateKeyboard(this)" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key === 'Enter'){event.preventDefault();searchServiceByPlate();}">
+              <button type="button" class="btn btn-primary" id="svc-plate-search-submit" onclick="searchServiceByPlate()"></button>
+            </div>
+            <div class="service-search-results" id="svc-plate-search-results"></div>
+          </div>
+        </div>
+      `);
+    }
+
+    qpxUpdateServiceSearchText();
+  }
+
+  function qpxBuildPlateServiceRow(label, value) {
+    return `<div class="svc-card-row"><span class="label">${esc(label)}</span><span class="val">${esc(value || '—')}</span></div>`;
+  }
+
+  function qpxRenderPlateSearchCard(tx) {
+    const meta = typeof getTransactionMeta === 'function' ? getTransactionMeta(tx) : {};
+    const isOld = tx?.tyre_condition === 'old';
+    const sizeText = formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '—';
+    const sizeBlock = meta?.mode === 'two_sizes' && meta.frontSize && meta.rearSize && typeof renderServiceCardSizeBlock === 'function'
+      ? renderServiceCardSizeBlock(tx, meta)
+      : `<div class="svc-card-size" ${isOld ? 'style="color:var(--gold);"' : ''}>${esc(sizeText)}</div>`;
+    const timeText = tx?.created_at ? new Date(tx.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+    const dateText = tx?.created_at ? new Date(tx.created_at).toLocaleString() : '—';
+    const actionText = typeof getServiceModeMetaLabel === 'function'
+      ? getServiceModeMetaLabel(meta)
+      : qpxServiceSearchText('plateSearchServiceLabel', 'الخدمة', 'Service');
+    const typeText = typeof qpxConditionLabel === 'function'
+      ? qpxConditionLabel(tx, meta)
+      : (tx?.tyre_condition === 'old' ? qpxServiceSearchText('usedLabel', 'مستعمل', 'Used') : qpxServiceSearchText('newLabel', 'جديد', 'New'));
+    const qtyValue = meta?.mode === 'two_sizes'
+      ? `${Number(meta.frontQty) || Number(tx?.quantity) || 1} / ${Number(meta.rearQty) || Number(tx?.quantity) || 1}`
+      : String(Number(tx?.quantity) || 1);
+    const positionText = typeof getPositionShortCodes === 'function'
+      ? getPositionShortCodes(tx)
+      : '—';
+    let serviceValue = '';
+    let serviceLabel = qpxServiceSearchText('repairLabelShort', 'الإصلاح', 'Repair');
+    if (meta?.mode === 'service' && typeof serviceOptionLabel === 'function') {
+      serviceValue = serviceOptionLabel(meta.serviceType);
+      serviceLabel = qpxServiceSearchText('serviceTypeCardLabel', 'نوع الخدمة', 'Service Type');
+    } else if (tx?.repair_type) {
+      serviceValue = tx.repair_type;
+    }
+    const noteText = typeof getTransactionNoteText === 'function' ? getTransactionNoteText(tx) : (tx?.notes || '');
+    const noNoteToken = qpxServiceSearchText('noServiceNote', 'بدون ملاحظة', 'No note');
+    const noteLines = [];
+    if (meta?.mode === 'two_sizes') noteLines.push(qpxServiceSearchText('twoDifferentSizesNote', 'مقاسان مختلفان', 'Two different sizes'));
+    if (noteText && noteText !== noNoteToken) noteLines.push(noteText);
+    const noteBlock = noteLines.length
+      ? `<div class="svc-card-note service-note-stack"><strong>${esc(qpxServiceSearchText('noteTitle', 'ملاحظة', 'Note'))}</strong>${noteLines.map((line) => `<span>${esc(line)}</span>`).join('')}</div>`
+      : '';
+    const cardStyle = isOld ? 'style="border-color:rgba(248,210,110,0.25);"' : '';
+    const headStyle = isOld ? 'style="background:var(--gold-dim);"' : '';
+    const bodyRows = [
+      qpxBuildPlateServiceRow(qpxServiceSearchText('plateSearchDateLabel', 'التاريخ', 'Date'), dateText),
+      qpxBuildPlateServiceRow(qpxServiceSearchText('plateSearchActionLabel', 'الإجراء', 'Action'), actionText),
+      qpxBuildPlateServiceRow(qpxServiceSearchText('typeLabel', 'النوع', 'Type'), typeText),
+      qpxBuildPlateServiceRow(currentLang === 'ar' ? 'الكمية' : 'Qty', qtyValue),
+      qpxBuildPlateServiceRow(qpxServiceSearchText('positionLabelShort', 'الجهة', 'Position'), positionText),
+      serviceValue ? qpxBuildPlateServiceRow(serviceLabel, serviceValue) : '',
+      qpxBuildPlateServiceRow(qpxServiceSearchText('byLabel', 'بواسطة', 'By'), tx?.operator || '—')
+    ].join('');
+    return `<div class="svc-card svc-card-no-photo" ${cardStyle}><div class="svc-card-hd" ${headStyle}>${sizeBlock}<div class="time-chip">${esc(timeText)}</div></div><div class="svc-card-body">${bodyRows}<div class="svc-card-plate">${esc(tx?.plate_number || '—')}</div>${noteBlock}</div></div>`;
+  }
+
+  async function searchServiceByPlate() {
+    qpxEnsureServiceQuickLinksAndSearch();
+    const input = document.getElementById('svc-plate-search-input');
+    const results = document.getElementById('svc-plate-search-results');
+    if (!input || !results) return;
+    qpxApplyEnglishPlateKeyboard(input);
+    input.value = qpxDisplayPlate(input.value);
+    const normalizedPlate = qpxNormalizePlate(input.value);
+    if (!normalizedPlate) {
+      results.dataset.hasSearch = '0';
+      results.innerHTML = `<div class="empty-state">${esc(qpxServiceSearchText('plateRequiredMsg', 'أدخل رقم اللوحة', 'Enter plate number'))}</div>`;
+      showToast(qpxServiceSearchText('plateRequiredMsg', 'أدخل رقم اللوحة', 'Enter plate number'), 'error');
+      input.focus();
+      return;
+    }
+    results.dataset.hasSearch = '1';
+    results.innerHTML = '<div class="empty-state"><span class="loading"></span></div>';
+    const { data, error } = await db.from('transactions').select('*').order('created_at', { ascending: false });
+    if (error) {
+      results.innerHTML = `<div class="empty-state">${esc(error.message || qpxServiceSearchText('plateSearchLoadError', 'تعذر تحميل سجلات الخدمات', 'Unable to load service records'))}</div>`;
+      return;
+    }
+    const matches = (data || []).filter((tx) => {
+      if (!tx) return false;
+      if (typeof qpxIsStockLog === 'function' && qpxIsStockLog(tx)) return false;
+      if (typeof qpxIsDamagedTx === 'function' && qpxIsDamagedTx(tx)) return false;
+      const plate = qpxNormalizePlate(tx.plate_number || '');
+      return plate && plate === normalizedPlate;
+    });
+    if (!matches.length) {
+      results.innerHTML = `<div class="empty-state">${esc(qpxServiceSearchText('plateSearchNoResult', 'لا يوجد', 'Not found'))}</div>`;
+      return;
+    }
+    const countLabel = qpxServiceSearchText('plateSearchMatches', `تم العثور على ${matches.length} خدمة`, `Found ${matches.length} service records`, { count: matches.length });
+    results.innerHTML = `<div class="service-search-match-count">${esc(countLabel)}</div>${matches.map((tx) => qpxRenderPlateSearchCard(tx)).join('')}`;
+  }
+
+  function togglePlateSearchPanel(forceOpen) {
+    qpxEnsureServiceQuickLinksAndSearch();
+    const card = document.getElementById('svc-plate-search-card');
+    const input = document.getElementById('svc-plate-search-input');
+    if (!card) return;
+    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !card.classList.contains('open');
+    card.classList.toggle('open', shouldOpen);
+    if (shouldOpen && input) {
+      qpxApplyEnglishPlateKeyboard(input);
+      setTimeout(() => {
+        input.focus();
+        input.select();
+      }, 40);
+    }
+  }
+
+  window.searchServiceByPlate = searchServiceByPlate;
+  window.togglePlateSearchPanel = togglePlateSearchPanel;
+  window.qpxApplyEnglishPlateKeyboard = qpxApplyEnglishPlateKeyboard;
+
+  const qpxPrevApplyLanguage = typeof applyLanguage === 'function' ? applyLanguage : null;
+  if (qpxPrevApplyLanguage) {
+    applyLanguage = function () {
+      qpxPrevApplyLanguage();
+      qpxEnsureServiceQuickLinksAndSearch();
+      qpxUpdateServiceSearchText();
+    };
+  }
+
+  const qpxPrevShowPage = typeof showPage === 'function' ? showPage : null;
+  if (qpxPrevShowPage) {
+    showPage = function (name) {
+      qpxPrevShowPage(name);
+      if (name === 'service') {
+        qpxEnsureServiceQuickLinksAndSearch();
+        qpxUpdateServiceSearchText();
+      }
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    qpxEnsureServiceQuickLinksAndSearch();
+    qpxUpdateServiceSearchText();
+  });
+
+  qpxEnsureServiceQuickLinksAndSearch();
+  qpxUpdateServiceSearchText();
+})();
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script id="qpx-service-dashboard-folders-patch">
+(() => {
+  Object.assign(I18N.en, {
+    qtyStepperLabel: 'Quantity',
+    positionQtyMismatchMsg: 'Select {count} position(s) for the selected quantity',
+    positionQtyLimitMsg: 'Quantity is {count}. Select only {count} position(s)',
+    positionCountLabel: 'Position',
+    maxWheelCountMsg: 'The total selected wheels cannot exceed 4',
+    ordersPanelTitle: 'Order Requests',
+    ordersPanelHint: 'Requested sizes waiting to be ordered',
+    damagedPanelTitle: 'Damaged Tyres',
+    damagedPanelHint: 'Damaged tyres waiting to be returned',
+    listSizesLabel: 'Sizes',
+    listQtyLabel: 'Qty',
+    listPrintLabel: 'Print',
+    listDeleteLabel: 'Delete List',
+    listShowLabel: 'Show',
+    listHideLabel: 'Hide',
+    ordersEmptyLabel: 'No order requests in the current list',
+    damagedEmptyLabel: 'No damaged tyres in the current list',
+    orderListClearedMsg: 'Order list deleted',
+    damagedListClearedMsg: 'Damaged tyre list deleted',
+    deleteOrdersConfirm: 'Delete the full order list',
+    deleteDamagedConfirm: 'Delete the full damaged tyre list',
+    damagedNoteShort: 'Note',
+    damagedPrintTitle: 'Damaged Tyres List',
+    ordersPrintTitle: 'Order Requests List'
+  });
+
+  Object.assign(I18N.ar, {
+    qtyStepperLabel: 'الكمية',
+    positionQtyMismatchMsg: 'اختر {count} جهة مطابقة للعدد المحدد',
+    positionQtyLimitMsg: 'العدد {count} لذلك اختر {count} جهة فقط',
+    positionCountLabel: 'الجهة',
+    maxWheelCountMsg: 'إجمالي الإطارات المحددة لا يمكن أن يتجاوز 4',
+    ordersPanelTitle: 'قسم الطلبات',
+    ordersPanelHint: 'المقاسات المطلوبة بانتظار الطلب',
+    damagedPanelTitle: 'الإطارات التالفة',
+    damagedPanelHint: 'الإطارات التالفة بانتظار الإرجاع',
+    listSizesLabel: 'المقاسات',
+    listQtyLabel: 'الكمية',
+    listPrintLabel: 'طباعة',
+    listDeleteLabel: 'حذف القائمة',
+    listShowLabel: 'إظهار',
+    listHideLabel: 'إخفاء',
+    ordersEmptyLabel: 'لا توجد طلبات في القائمة الحالية',
+    damagedEmptyLabel: 'لا توجد إطارات تالفة في القائمة الحالية',
+    orderListClearedMsg: 'تم حذف قائمة الطلبات',
+    damagedListClearedMsg: 'تم حذف قائمة الإطارات التالفة',
+    deleteOrdersConfirm: 'حذف قائمة الطلبات بالكامل',
+    deleteDamagedConfirm: 'حذف قائمة الإطارات التالفة بالكامل',
+    damagedNoteShort: 'الملاحظة',
+    damagedPrintTitle: 'قائمة الإطارات التالفة',
+    ordersPrintTitle: 'قائمة الطلبات'
+  });
+
+  const QPX_DAMAGED_ARCHIVE_KEY = 'qpx-damaged-list-archived';
+  const QPX_ORDER_OPEN_KEY = 'qpx-order-panel-open';
+  const QPX_DAMAGED_OPEN_KEY = 'qpx-damaged-panel-open';
+  const STOCK_LOG_PREFIX = '[[QPX_STOCK:';
+  const POSITION_KEYS = ['front_left', 'front_right', 'rear_left', 'rear_right'];
+
+  function qpxFoldText(key, ar, en, params) {
+    const value = typeof tr === 'function' ? tr(key, params) : '';
+    if (!value || value === key) return currentLang === 'ar' ? ar : en;
+    return value;
+  }
+
+  function qpxIsDamagedMode() {
+    return document.getElementById('service-form')?.dataset?.qpxDamaged === '1';
+  }
+
+  function qpxIsStockLog(tx) {
+    return String(tx?.notes || '').startsWith(STOCK_LOG_PREFIX);
+  }
+
+  function qpxIsDamagedTx(tx) {
+    return String(tx?.tyre_condition || '').toLowerCase() === 'damaged';
+  }
+
+  function qpxClampQty(value) {
+    return Math.max(1, Math.min(4, parseInt(value, 10) || 1));
+  }
+
+  function qpxGetMainQtyInput() {
+    return document.getElementById('svc-qty');
+  }
+
+  function qpxGetMainQty() {
+    return qpxClampQty(qpxGetMainQtyInput()?.value || 1);
+  }
+
+  function qpxGetRearQty() {
+    const rearInput = document.getElementById('svc-rear-qty');
+    return qpxClampQty(rearInput?.value || window.rearTyreQuantity || 1);
+  }
+
+  function qpxGetRequiredPositionCount() {
+    if (qpxIsDamagedMode()) return 0;
+    if (typeof serviceActionMode !== 'undefined' && serviceActionMode === 'two_sizes') {
+      return qpxGetMainQty() + qpxGetRearQty();
+    }
+    return qpxGetMainQty();
+  }
+
+  function qpxDispatchQtyEvents(input) {
+    if (!input) return;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function qpxEnsureTotalWheelLimit(source) {
+    if (typeof serviceActionMode === 'undefined' || serviceActionMode !== 'two_sizes') return;
+    const mainInput = qpxGetMainQtyInput();
+    const rearInput = document.getElementById('svc-rear-qty');
+    let mainQty = qpxGetMainQty();
+    let rearQty = qpxGetRearQty();
+    if (mainQty + rearQty <= 4) return;
+    showToast(qpxFoldText('maxWheelCountMsg', 'إجمالي الإطارات المحددة لا يمكن أن يتجاوز 4', 'The total selected wheels cannot exceed 4'), 'error');
+    if (source === 'rear' && rearInput) {
+      rearQty = Math.max(1, 4 - mainQty);
+      rearInput.value = String(rearQty);
+      window.rearTyreQuantity = rearQty;
+      qpxDispatchQtyEvents(rearInput);
+    } else if (mainInput) {
+      mainQty = Math.max(1, 4 - rearQty);
+      mainInput.value = String(mainQty);
+      qpxDispatchQtyEvents(mainInput);
+    }
+  }
+
+  function qpxSetMainQty(value) {
+    const input = qpxGetMainQtyInput();
+    if (!input) return;
+    input.value = String(qpxClampQty(value));
+    qpxEnsureTotalWheelLimit('main');
+    qpxRefreshMainQtyUi();
+    qpxSyncPositionSelectionToQuantity();
+    qpxDispatchQtyEvents(input);
+  }
+
+  function qpxAdjustMainQty(delta) {
+    qpxSetMainQty(qpxGetMainQty() + delta);
+  }
+
+  function qpxRefreshMainQtyUi() {
+    const input = qpxGetMainQtyInput();
+    const label = document.getElementById('svc-qty-label');
+    if (label) label.textContent = tr('quantityLabel');
+    if (!input) return;
+    input.value = String(qpxClampQty(input.value || 1));
+  }
+
+  function qpxGetDomSelectedPositionCount() {
+    return document.querySelectorAll('.pos-btn.active').length;
+  }
+
+  function qpxUpdatePositionCounterLabel() {
+    const label = document.getElementById('svc-position-label');
+    if (!label) return;
+    if (!label.dataset.baseText) label.dataset.baseText = label.textContent || qpxFoldText('positionCountLabel', 'الجهة', 'Position');
+    const required = qpxGetRequiredPositionCount();
+    const selected = qpxGetDomSelectedPositionCount();
+    label.textContent = required > 0
+      ? `${label.dataset.baseText} (${selected}/${required})`
+      : label.dataset.baseText;
+  }
+
+  function qpxRefreshPositionSelectionUi() {
+    const required = qpxGetRequiredPositionCount();
+    const selectedCount = qpxGetDomSelectedPositionCount();
+    document.querySelectorAll('.pos-btn').forEach((btn) => {
+      const active = btn.classList.contains('active');
+      const locked = !active && required > 0 && selectedCount >= required;
+      btn.classList.toggle('qpx-pos-disabled', locked);
+      btn.disabled = locked;
+    });
+    qpxUpdatePositionCounterLabel();
+  }
+
+  function qpxSyncPositionSelectionToQuantity() {
+    const required = qpxGetRequiredPositionCount();
+    if (required > 0) {
+      const activeBtns = Array.from(document.querySelectorAll('.pos-btn.active'));
+      for (let i = activeBtns.length - 1; i >= required; i--) {
+        const pos = activeBtns[i]?.dataset?.pos;
+        if (pos && qpxOriginalTogglePos) qpxOriginalTogglePos(pos);
+      }
+    }
+    qpxRefreshPositionSelectionUi();
+  }
+
+  function qpxEnsureServiceQtyStyles() {
+    if (document.getElementById('qpx-service-qty-style')) return;
+    const style = document.createElement('style');
+    style.id = 'qpx-service-qty-style';
+    style.textContent = [
+      '#service-form .qpx-service-plate-row{grid-template-columns:1fr;}',
+      '#qpx-main-qty-group{margin-bottom:12px;}',
+      '#qpx-main-qty-group .field-label{margin-bottom:8px;}',
+      '.qpx-qty-stepper{display:flex;align-items:center;justify-content:center;gap:12px;}',
+      '.qpx-qty-stepper-btn{width:46px;height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(20,28,42,.96),rgba(12,18,28,.96));color:var(--text-main);font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.22);}',
+      '.qpx-qty-stepper-btn:hover{transform:translateY(-1px);}',
+      '.qpx-qty-stepper-center{width:108px;min-width:104px;max-width:132px;flex-shrink:0;}',
+      '#svc-qty.qpx-main-qty-input{width:100%;box-sizing:border-box;padding:12px 14px;text-align:center;font-size:18px;font-weight:800;letter-spacing:.08em;font-family:\'DM Mono\',monospace;pointer-events:none;}',
+      '.pos-btn.qpx-pos-disabled{opacity:.42;filter:saturate(.45);cursor:not-allowed;}',
+      '.qpx-fold-panel{margin-top:24px;overflow:hidden;}',
+      '.qpx-fold-shell{padding:18px;display:grid;gap:14px;background:linear-gradient(180deg,rgba(19,27,39,.95),rgba(11,17,27,.96));backdrop-filter:blur(14px);}',
+      '.qpx-fold-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}',
+      '.qpx-fold-title-wrap{display:flex;flex-direction:column;gap:4px;min-width:0;}',
+      '.qpx-fold-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);}',
+      '.qpx-fold-title{font-size:19px;font-weight:800;color:var(--text-main);}',
+      '.qpx-fold-hint{font-size:12px;line-height:1.55;color:var(--text-soft);}',
+      '.qpx-fold-arrow{width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}',
+      '.qpx-fold-arrow i{transition:transform .2s ease;}',
+      '.qpx-fold-panel.open .qpx-fold-arrow i{transform:rotate(180deg);}',
+      '.qpx-fold-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}',
+      '.qpx-fold-stat{border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 16px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:6px;}',
+      '.qpx-fold-stat strong{font-size:24px;color:var(--gold);line-height:1;}',
+      '.qpx-fold-stat span{font-size:12px;color:var(--text-soft);}',
+      '.qpx-fold-actions{display:flex;gap:10px;flex-wrap:wrap;}',
+      '.qpx-fold-actions .btn{flex:1;min-width:120px;}',
+      '.qpx-fold-toggle-line{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:2px;color:var(--text-soft);font-size:12px;cursor:pointer;border-top:1px dashed rgba(255,255,255,.08);padding-top:14px;}',
+      '.qpx-fold-content{display:none;padding-top:4px;}',
+      '.qpx-fold-panel.open .qpx-fold-content{display:block;}',
+      '.qpx-fold-content .empty-state{padding:22px 12px;}',
+      '.qpx-damaged-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}',
+      '.qpx-damaged-item:last-child{border-bottom:none;}',
+      '.qpx-damaged-size{font-size:16px;font-weight:700;font-family:\'DM Mono\',monospace;color:#ef4444;margin-bottom:4px;}',
+      '.qpx-damaged-meta{font-size:12px;color:var(--text-soft);display:flex;gap:6px;flex-wrap:wrap;}',
+      '.qpx-damaged-note{font-size:12px;color:var(--text-soft);margin-top:6px;padding:6px 9px;background:rgba(239,68,68,.08);border-radius:10px;border-inline-start:2px solid rgba(239,68,68,.55);}',
+      '@media (max-width:560px){.qpx-fold-actions .btn{width:100%;flex:unset;}.qpx-fold-summary{grid-template-columns:1fr;}.qpx-qty-stepper-center{width:92px;min-width:88px;max-width:110px;}}'
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function qpxEnsureMainQtyControl() {
+    qpxEnsureServiceQtyStyles();
+    const qtyGroup = document.getElementById('svc-qty')?.closest('.field-group');
+    const plateGroup = document.getElementById('svc-plate')?.closest('.field-group');
+    const row = plateGroup?.closest('.form-row');
+    const qtyInput = qpxGetMainQtyInput();
+    if (!qtyGroup || !plateGroup || !row || !qtyInput) return;
+    qtyGroup.id = 'qpx-main-qty-group';
+    row.classList.add('qpx-service-plate-row');
+    if (qtyGroup.parentElement === row) {
+      row.parentElement.insertBefore(qtyGroup, row);
+    }
+    if (!document.getElementById('qpx-main-qty-stepper')) {
+      const control = document.createElement('div');
+      control.id = 'qpx-main-qty-stepper';
+      control.className = 'qpx-qty-stepper';
+      control.innerHTML = `
+        <button type="button" class="qpx-qty-stepper-btn" onclick="qpxAdjustMainQty(-1)">−</button>
+        <div class="qpx-qty-stepper-center"></div>
+        <button type="button" class="qpx-qty-stepper-btn" onclick="qpxAdjustMainQty(1)">+</button>
+      `;
+      qtyInput.classList.add('qpx-main-qty-input');
+      qtyInput.readOnly = true;
+      qtyInput.type = 'text';
+      qtyInput.removeAttribute('max');
+      qtyGroup.appendChild(control);
+      control.querySelector('.qpx-qty-stepper-center').appendChild(qtyInput);
+    }
+    qpxRefreshMainQtyUi();
+    qpxSyncPositionSelectionToQuantity();
+  }
+
+  async function qpxFetchOrderRequests() {
+    try {
+      const result = await db.from('order_requests').select('*').order('created_at', { ascending: false });
+      if (result.error) throw result.error;
+      return result.data || [];
+    } catch (error) {
+      try {
+        return JSON.parse(localStorage.getItem('qpx-order-requests') || '[]');
+      } catch (_) {
+        return [];
+      }
+    }
+  }
+
+  function qpxGetArchivedDamagedIds() {
+    try {
+      return JSON.parse(localStorage.getItem(QPX_DAMAGED_ARCHIVE_KEY) || '[]');
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function qpxSetArchivedDamagedIds(ids) {
+    localStorage.setItem(QPX_DAMAGED_ARCHIVE_KEY, JSON.stringify(Array.from(new Set(ids || []))));
+  }
+
+  async function qpxFetchDamagedRows() {
+    const archived = new Set(qpxGetArchivedDamagedIds().map(String));
+    const result = await db.from('transactions').select('*').order('created_at', { ascending: false });
+    if (result.error) throw result.error;
+    return (result.data || []).filter((tx) => !qpxIsStockLog(tx) && qpxIsDamagedTx(tx) && !archived.has(String(tx.id)));
+  }
+
+  function qpxUniqueCount(rows, getter) {
+    const set = new Set();
+    (rows || []).forEach((row) => set.add(String(getter(row) || '').trim().toUpperCase()));
+    set.delete('');
+    return set.size;
+  }
+
+  function qpxTotalQty(rows, getter) {
+    return (rows || []).reduce((sum, row) => sum + (Number(getter(row)) || 0), 0);
+  }
+
+  function qpxGetPanelState(key) {
+    return localStorage.getItem(key) === '1';
+  }
+
+  function qpxSetPanelState(key, open) {
+    localStorage.setItem(key, open ? '1' : '0');
+  }
+
+  function qpxApplyPanelState(panelId, key) {
+    const panel = document.getElementById(panelId);
+    const toggleId = panelId === 'qpx-order-list-panel' ? 'qpx-order-panel-toggle-text' : 'qpx-damaged-panel-toggle-text';
+    const toggle = document.getElementById(toggleId);
+    if (!panel) return;
+    const open = qpxGetPanelState(key);
+    panel.classList.toggle('open', open);
+    if (toggle) toggle.textContent = open ? tr('listHideLabel') : tr('listShowLabel');
+  }
+
+  function qpxToggleFoldPanel(kind) {
+    const config = kind === 'orders'
+      ? { panelId: 'qpx-order-list-panel', key: QPX_ORDER_OPEN_KEY }
+      : { panelId: 'qpx-damaged-fold-panel', key: QPX_DAMAGED_OPEN_KEY };
+    const next = !qpxGetPanelState(config.key);
+    qpxSetPanelState(config.key, next);
+    qpxApplyPanelState(config.panelId, config.key, '');
+  }
+
+  function qpxBuildFoldShell(panel, options) {
+    if (!panel) return null;
+    panel.classList.add('card', 'qpx-fold-panel');
+    panel.innerHTML = `
+      <div class="qpx-fold-shell">
+        <div class="qpx-fold-top">
+          <div class="qpx-fold-title-wrap">
+            <div class="qpx-fold-kicker">${esc(options.kicker)}</div>
+            <div class="qpx-fold-title" id="${options.id}-title"></div>
+            <div class="qpx-fold-hint" id="${options.id}-hint"></div>
+          </div>
+          <button type="button" class="qpx-fold-arrow" onclick="qpxToggleFoldPanel('${options.kind}')"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="qpx-fold-summary">
+          <div class="qpx-fold-stat"><strong id="${options.id}-sizes">0</strong><span id="${options.id}-sizes-label"></span></div>
+          <div class="qpx-fold-stat"><strong id="${options.id}-qty">0</strong><span id="${options.id}-qty-label"></span></div>
+        </div>
+        <div class="qpx-fold-actions">
+          <button class="btn btn-ghost" id="${options.id}-print-btn"></button>
+          <button class="btn btn-danger" id="${options.id}-delete-btn"></button>
+        </div>
+        <div class="qpx-fold-toggle-line" onclick="qpxToggleFoldPanel('${options.kind}')">
+          <i class="fas fa-angle-down"></i>
+          <span id="${options.id}-toggle-text"></span>
+        </div>
+        <div class="qpx-fold-content" id="${options.id}-content"></div>
+      </div>
+    `;
+    return document.getElementById(`${options.id}-content`);
+  }
+
+  function qpxEnsureDashboardPanels() {
+    qpxEnsureServiceQtyStyles();
+    const dashboard = document.getElementById('page-dashboard');
+    if (!dashboard) return;
+
+    const orderPanel = document.getElementById('qpx-order-list-panel') || (() => {
+      const panel = document.createElement('div');
+      panel.id = 'qpx-order-list-panel';
+      dashboard.appendChild(panel);
+      return panel;
+    })();
+
+    if (!orderPanel.dataset.qpxFoldReady) {
+      const body = document.getElementById('qpx-order-list-body') || document.createElement('div');
+      body.id = 'qpx-order-list-body';
+      const edit = document.getElementById('qpx-order-edit-area') || document.createElement('div');
+      edit.id = 'qpx-order-edit-area';
+      if (!edit.style.display) edit.style.display = 'none';
+      const content = qpxBuildFoldShell(orderPanel, { id: 'qpx-order-panel', kind: 'orders', kicker: 'ORDERS' });
+      if (content) {
+        content.appendChild(body);
+        content.appendChild(edit);
+      }
+      orderPanel.dataset.qpxFoldReady = '1';
+      document.getElementById('qpx-order-panel-print-btn').onclick = () => window.qpxPrintOrders && window.qpxPrintOrders();
+      document.getElementById('qpx-order-panel-delete-btn').onclick = () => window.qpxClearOrdersList && window.qpxClearOrdersList();
+    }
+
+    let damagedPanel = document.getElementById('qpx-damaged-fold-panel');
+    if (!damagedPanel) {
+      damagedPanel = document.createElement('div');
+      damagedPanel.id = 'qpx-damaged-fold-panel';
+      dashboard.appendChild(damagedPanel);
+    }
+    if (!damagedPanel.dataset.qpxFoldReady) {
+      const content = qpxBuildFoldShell(damagedPanel, { id: 'qpx-damaged-panel', kind: 'damaged', kicker: 'DAMAGED' });
+      const body = document.createElement('div');
+      body.id = 'qpx-damaged-list-body';
+      content?.appendChild(body);
+      damagedPanel.dataset.qpxFoldReady = '1';
+      document.getElementById('qpx-damaged-panel-print-btn').onclick = () => window.qpxPrintDamagedList && window.qpxPrintDamagedList();
+      document.getElementById('qpx-damaged-panel-delete-btn').onclick = () => window.qpxClearDamagedList && window.qpxClearDamagedList();
+    }
+
+    qpxUpdateDashboardPanelTexts();
+    qpxApplyPanelState('qpx-order-list-panel', QPX_ORDER_OPEN_KEY);
+    qpxApplyPanelState('qpx-damaged-fold-panel', QPX_DAMAGED_OPEN_KEY);
+  }
+
+  function qpxUpdateDashboardPanelTexts() {
+    const map = [
+      ['qpx-order-panel-title', tr('ordersPanelTitle')],
+      ['qpx-order-panel-hint', tr('ordersPanelHint')],
+      ['qpx-order-panel-sizes-label', tr('listSizesLabel')],
+      ['qpx-order-panel-qty-label', tr('listQtyLabel')],
+      ['qpx-order-panel-print-btn', `🖨️ ${tr('listPrintLabel')}`],
+      ['qpx-order-panel-delete-btn', `🗑️ ${tr('listDeleteLabel')}`],
+      ['qpx-damaged-panel-title', tr('damagedPanelTitle')],
+      ['qpx-damaged-panel-hint', tr('damagedPanelHint')],
+      ['qpx-damaged-panel-sizes-label', tr('listSizesLabel')],
+      ['qpx-damaged-panel-qty-label', tr('listQtyLabel')],
+      ['qpx-damaged-panel-print-btn', `🖨️ ${tr('listPrintLabel')}`],
+      ['qpx-damaged-panel-delete-btn', `🗑️ ${tr('listDeleteLabel')}`]
+    ];
+    map.forEach(([id, text]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    });
+    ['qpx-order-list-panel', 'qpx-damaged-fold-panel'].forEach((panelId, index) => {
+      const key = index === 0 ? QPX_ORDER_OPEN_KEY : QPX_DAMAGED_OPEN_KEY;
+      const toggleId = panelId === 'qpx-order-list-panel' ? 'qpx-order-panel-toggle-text' : 'qpx-damaged-panel-toggle-text';
+      const toggle = document.getElementById(toggleId);
+      if (toggle) toggle.textContent = qpxGetPanelState(key) ? tr('listHideLabel') : tr('listShowLabel');
+    });
+  }
+
+  async function qpxRefreshOrderPanelSummary() {
+    qpxEnsureDashboardPanels();
+    const rows = await qpxFetchOrderRequests();
+    const sizes = qpxUniqueCount(rows, (row) => row.size);
+    const qty = qpxTotalQty(rows, (row) => row.quantity);
+    const sizeEl = document.getElementById('qpx-order-panel-sizes');
+    const qtyEl = document.getElementById('qpx-order-panel-qty');
+    if (sizeEl) sizeEl.textContent = String(sizes);
+    if (qtyEl) qtyEl.textContent = String(qty);
+    const body = document.getElementById('qpx-order-list-body');
+    if (body && !rows.length) {
+      body.innerHTML = `<div class="empty-state">${esc(tr('ordersEmptyLabel'))}</div>`;
+    }
+  }
+
+  function qpxBuildDamagedRow(tx) {
+    const size = formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-';
+    const qty = Number(tx?.quantity) || 1;
+    const operator = tx?.operator || '—';
+    const date = tx?.created_at ? new Date(tx.created_at).toLocaleString() : '—';
+    const note = typeof getTransactionNoteText === 'function' ? getTransactionNoteText(tx) : (tx?.notes || '');
+    const noteText = note && note !== tr('noServiceNote') ? `<div class="qpx-damaged-note"><strong>${esc(tr('damagedNoteShort'))}:</strong> ${esc(note)}</div>` : '';
+    return `
+      <div class="qpx-damaged-item" data-id="${esc(String(tx.id || ''))}">
+        <div class="qpx-order-info">
+          <div class="qpx-damaged-size">${esc(size)}</div>
+          <div class="qpx-damaged-meta">
+            <span>📦 ${esc(tr('qty'))}: <b>${qty}</b></span>
+            <span>👤 ${esc(operator)}</span>
+            <span>🕒 ${esc(date)}</span>
+          </div>
+          ${noteText}
+        </div>
+      </div>
+    `;
+  }
+
+  async function qpxRenderDamagedDashboardList() {
+    qpxEnsureDashboardPanels();
+    const body = document.getElementById('qpx-damaged-list-body');
+    if (!body) return;
+    body.innerHTML = '<div class="empty-state"><span class="loading"></span></div>';
+    try {
+      const rows = await qpxFetchDamagedRows();
+      const sizes = qpxUniqueCount(rows, (row) => row.tyre_size);
+      const qty = qpxTotalQty(rows, (row) => row.quantity);
+      const sizeEl = document.getElementById('qpx-damaged-panel-sizes');
+      const qtyEl = document.getElementById('qpx-damaged-panel-qty');
+      if (sizeEl) sizeEl.textContent = String(sizes);
+      if (qtyEl) qtyEl.textContent = String(qty);
+      if (!rows.length) {
+        body.innerHTML = `<div class="empty-state">${esc(tr('damagedEmptyLabel'))}</div>`;
+        return;
+      }
+      body.innerHTML = rows.map(qpxBuildDamagedRow).join('');
+    } catch (error) {
+      body.innerHTML = `<div class="empty-state">${esc(error?.message || tr('damagedEmptyLabel'))}</div>`;
+    }
+  }
+
+  async function qpxRefreshDashboardSpecialLists() {
+    qpxEnsureDashboardPanels();
+    if (typeof window.renderOrderList === 'function') {
+      await window.renderOrderList();
+    } else {
+      await qpxRefreshOrderPanelSummary();
+    }
+    await qpxRenderDamagedDashboardList();
+  }
+
+  window.qpxClearOrdersList = async function () {
+    if (!confirm(tr('deleteOrdersConfirm'))) return;
+    try {
+      try {
+        const result = await db.from('order_requests').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        if (result.error) throw result.error;
+      } catch (error) {
+        localStorage.setItem('qpx-order-requests', '[]');
+      }
+      showToast(tr('orderListClearedMsg'), 'success');
+      await qpxRefreshDashboardSpecialLists();
+    } catch (error) {
+      showToast(error?.message || tr('orderListClearedMsg'), 'error');
+    }
+  };
+
+  window.qpxClearDamagedList = async function () {
+    let rows = [];
+    try {
+      rows = await qpxFetchDamagedRows();
+    } catch (error) {
+      showToast(error?.message || tr('damagedEmptyLabel'), 'error');
+      return;
+    }
+    if (!rows.length) {
+      showToast(tr('damagedEmptyLabel'), 'error');
+      return;
+    }
+    if (!confirm(tr('deleteDamagedConfirm'))) return;
+    const next = qpxGetArchivedDamagedIds().concat(rows.map((row) => String(row.id)));
+    qpxSetArchivedDamagedIds(next);
+    showToast(tr('damagedListClearedMsg'), 'success');
+    await qpxRenderDamagedDashboardList();
+  };
+
+  window.qpxPrintDamagedList = async function () {
+    let rows = [];
+    try {
+      rows = await qpxFetchDamagedRows();
+    } catch (error) {
+      showToast(error?.message || tr('damagedEmptyLabel'), 'error');
+      return;
+    }
+    if (!rows.length) {
+      showToast(tr('damagedEmptyLabel'), 'error');
+      return;
+    }
+    const totalQty = qpxTotalQty(rows, (row) => row.quantity);
+    const totalSizes = qpxUniqueCount(rows, (row) => row.tyre_size);
+    const body = rows.map((tx) => {
+      const size = String(formatTyreSizeValue(tx?.tyre_size) || tx?.tyre_size || '-').replace(/</g, '&lt;');
+      const note = String((typeof getTransactionNoteText === 'function' ? getTransactionNoteText(tx) : (tx?.notes || '')) || '-').replace(/</g, '&lt;');
+      const operator = String(tx?.operator || '-').replace(/</g, '&lt;');
+      const date = tx?.created_at ? new Date(tx.created_at).toLocaleString() : '-';
+      return `<tr><td><b>${size}</b></td><td style="text-align:center;">${Number(tx?.quantity) || 1}</td><td>${operator}</td><td>${date}</td><td>${note}</td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(tr('damagedPrintTitle'))}</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#0f172a}.header{text-align:center;margin-bottom:24px;border-bottom:3px solid #ef4444;padding-bottom:14px}.company{font-size:26px;font-weight:bold;color:#ef4444;letter-spacing:1px}.sub{color:#475569;font-size:13px;margin-top:4px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{border:1px solid #e2e8f0;padding:9px 10px;text-align:left;font-size:13px}th{background:#ef4444;color:#fff;font-weight:700}tr:nth-child(even){background:#f8fafc}.total{margin-top:18px;font-weight:bold;text-align:right;font-size:14px}</style></head><body><div class="header"><div class="company">QUALITY PART X</div><div class="sub">TYRE SERVICES · DUNSTABLE</div><div class="sub">${esc(tr('damagedPrintTitle'))} · ${new Date().toLocaleString()}</div><div class="sub">${esc(tr('operatorLabel'))}: ${esc(currentUser?.username || '-')}</div></div><table><thead><tr><th>${esc(tr('size'))}</th><th>${esc(tr('qty'))}</th><th>${esc(tr('operatorLabel'))}</th><th>${currentLang === 'ar' ? 'الوقت' : 'Date & Time'}</th><th>${esc(tr('damagedNoteShort'))}</th></tr></thead><tbody>${body}</tbody></table><div class="total">${esc(tr('listSizesLabel'))}: ${totalSizes} | ${esc(tr('listQtyLabel'))}: ${totalQty}</div></body></html>`;
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => win.print(), 400);
+  };
+
+  const qpxOriginalRenderOrderList = typeof window.renderOrderList === 'function' ? window.renderOrderList : null;
+  if (qpxOriginalRenderOrderList) {
+    window.renderOrderList = async function () {
+      await qpxOriginalRenderOrderList.apply(this, arguments);
+      await qpxRefreshOrderPanelSummary();
+    };
+  }
+
+  const qpxOriginalTogglePos = typeof window.togglePos === 'function' ? window.togglePos : null;
+  if (qpxOriginalTogglePos) {
+    window.togglePos = function (pos) {
+      const required = qpxGetRequiredPositionCount();
+      const btn = document.querySelector(`.pos-btn[data-pos="${pos}"]`);
+      const isActive = btn ? btn.classList.contains('active') : false;
+      if (!isActive && required > 0 && qpxGetDomSelectedPositionCount() >= required) {
+        showToast(tr('positionQtyLimitMsg', { count: required }), 'error');
+        qpxRefreshPositionSelectionUi();
+        return;
+      }
+      qpxOriginalTogglePos.apply(this, arguments);
+      qpxRefreshPositionSelectionUi();
+    };
+  }
+
+  const qpxOriginalSetRearQty = typeof window.setRearQty === 'function' ? window.setRearQty : null;
+  if (qpxOriginalSetRearQty) {
+    window.setRearQty = function (value) {
+      qpxOriginalSetRearQty(value);
+      qpxEnsureTotalWheelLimit('rear');
+      qpxSyncPositionSelectionToQuantity();
+    };
+  }
+
+  const qpxOriginalChangeRearQty = typeof window.changeRearQty === 'function' ? window.changeRearQty : null;
+  if (qpxOriginalChangeRearQty) {
+    window.changeRearQty = function (delta) {
+      qpxOriginalChangeRearQty(delta);
+      qpxEnsureTotalWheelLimit('rear');
+      qpxSyncPositionSelectionToQuantity();
+    };
+  }
+
+  const qpxOriginalSelectTyre = typeof window.selectTyre === 'function' ? window.selectTyre : null;
+  if (qpxOriginalSelectTyre) {
+    window.selectTyre = function () {
+      qpxOriginalSelectTyre.apply(this, arguments);
+      qpxEnsureMainQtyControl();
+      qpxSetMainQty(1);
+      qpxSyncPositionSelectionToQuantity();
+    };
+  }
+
+  const qpxOriginalClearSvc = typeof window.clearSvc === 'function' ? window.clearSvc : null;
+  if (qpxOriginalClearSvc) {
+    window.clearSvc = function () {
+      qpxOriginalClearSvc.apply(this, arguments);
+      qpxEnsureMainQtyControl();
+      qpxSetMainQty(1);
+      qpxRefreshPositionSelectionUi();
+    };
+  }
+
+  const qpxOriginalSubmitService = typeof window.submitService === 'function' ? window.submitService : null;
+  if (qpxOriginalSubmitService) {
+    window.submitService = async function (event) {
+      const required = qpxGetRequiredPositionCount();
+      const selected = qpxGetDomSelectedPositionCount();
+      if (!qpxIsDamagedMode() && required > 0 && selected !== required) {
+        showToast(tr('positionQtyMismatchMsg', { count: required }), 'error');
+        qpxRefreshPositionSelectionUi();
+        return;
+      }
+      const result = await qpxOriginalSubmitService.apply(this, arguments);
+      await qpxRefreshDashboardSpecialLists();
+      return result;
+    };
+  }
+
+  const qpxOriginalDeleteService = typeof window.deleteService === 'function' ? window.deleteService : null;
+  if (qpxOriginalDeleteService) {
+    window.deleteService = async function () {
+      const result = await qpxOriginalDeleteService.apply(this, arguments);
+      await qpxRenderDamagedDashboardList();
+      return result;
+    };
+  }
+
+  const qpxOriginalShowPage = typeof window.showPage === 'function' ? window.showPage : null;
+  if (qpxOriginalShowPage) {
+    window.showPage = function (name) {
+      const result = qpxOriginalShowPage.apply(this, arguments);
+      if (name === 'service') {
+        qpxEnsureMainQtyControl();
+        qpxSyncPositionSelectionToQuantity();
+      }
+      if (name === 'dashboard') {
+        setTimeout(() => {
+          qpxEnsureDashboardPanels();
+          qpxRefreshDashboardSpecialLists();
+        }, 80);
+      }
+      return result;
+    };
+  }
+
+  const qpxOriginalApplyLanguage = typeof window.applyLanguage === 'function' ? window.applyLanguage : null;
+  if (qpxOriginalApplyLanguage) {
+    window.applyLanguage = function () {
+      const result = qpxOriginalApplyLanguage.apply(this, arguments);
+      qpxEnsureMainQtyControl();
+      qpxRefreshMainQtyUi();
+      qpxUpdatePositionCounterLabel();
+      qpxUpdateDashboardPanelTexts();
+      qpxApplyPanelState('qpx-order-list-panel', QPX_ORDER_OPEN_KEY);
+      qpxApplyPanelState('qpx-damaged-fold-panel', QPX_DAMAGED_OPEN_KEY);
+      return result;
+    };
+  }
+
+  document.addEventListener('input', (event) => {
+    if (event.target?.id === 'svc-qty') {
+      qpxRefreshMainQtyUi();
+      qpxEnsureTotalWheelLimit('main');
+      qpxSyncPositionSelectionToQuantity();
+    }
+    if (event.target?.id === 'svc-rear-qty') {
+      qpxEnsureTotalWheelLimit('rear');
+      qpxSyncPositionSelectionToQuantity();
+    }
+  });
+
+  window.qpxAdjustMainQty = qpxAdjustMainQty;
+  window.qpxSetMainQty = qpxSetMainQty;
+  window.qpxToggleFoldPanel = qpxToggleFoldPanel;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    qpxEnsureMainQtyControl();
+    qpxRefreshMainQtyUi();
+    qpxSyncPositionSelectionToQuantity();
+    qpxEnsureDashboardPanels();
+    qpxRefreshDashboardSpecialLists();
+  });
+
+  qpxEnsureMainQtyControl();
+  qpxRefreshMainQtyUi();
+  qpxSyncPositionSelectionToQuantity();
+  qpxEnsureDashboardPanels();
+})();
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+<!-- ═══════════════════════════════════════════════════════
+     QPX GLASS THEME — Gray · Black · White
+     Overrides colors only — no layout/functional changes
+     ══════════════════════════════════════════════════════ -->
+<style id="qpx-glass-theme">
+
+/* ── 1. Root variables ─────────────────────────────────── */
+:root {
+  --bg-base:          #dde1e8;
+  --bg-mid:           #cdd1d9;
+  --bg-card:          rgba(60, 65, 78, 0.72);
+  --bg-card-hover:    rgba(72, 78, 93, 0.80);
+  --bg-input:         rgba(255, 255, 255, 0.18);
+  --stroke:           rgba(255, 255, 255, 0.22);
+  --stroke-strong:    rgba(255, 255, 255, 0.38);
+  --stroke-accent:    rgba(255, 255, 255, 0.45);
+  --stroke-gold:      rgba(255, 255, 255, 0.30);
+  --text:             #ffffff;
+  --text-muted:       rgba(255, 255, 255, 0.65);
+  --text-faint:       rgba(255, 255, 255, 0.38);
+  --teal:             #e8eaed;
+  --teal-dim:         rgba(232, 234, 237, 0.14);
+  --teal-glow:        rgba(232, 234, 237, 0.20);
+  --blue:             #c8ccd4;
+  --blue-dim:         rgba(200, 204, 212, 0.16);
+  --gold:             #e8eaed;
+  --gold-dim:         rgba(232, 234, 237, 0.14);
+  --danger:           #f87171;
+  --danger-dim:       rgba(248, 113, 113, 0.20);
+  --success:          #86efac;
+  --success-dim:      rgba(134, 239, 172, 0.18);
+  --shadow-card:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 4px 12px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --shadow-glow:      0 0 24px rgba(0, 0, 0, 0.12);
+  --shadow-btn:
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --blur-card:        blur(28px);
+  --blur-lite:        blur(16px);
+
+  /* Button-specific variables */
+  --btn-light-bg:     rgba(221, 225, 232, 0.92);
+  --btn-light-text:   #1a1d24;
+  --btn-dark-bg:      #1a1d24;
+  --btn-dark-text:    #ffffff;
+  --btn-shadow-3d:
+    0 6px 18px rgba(0, 0, 0, 0.38),
+    0 2px 6px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22);
+  --btn-shadow-3d-hover:
+    0 8px 24px rgba(0, 0, 0, 0.42),
+    0 3px 8px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.20);
+}
+
+/* ── 2. Body: light gray background, remove dark gradient ─ */
+body {
+  background: #dde1e8 !important;
+  color: var(--text) !important;
+}
+body::before {
+  background: linear-gradient(160deg, #dde1e8 0%, #cdd1d9 55%, #d4d8de 100%) !important;
+}
+
+/* ── 3. Topbar: glass on light background ─────────────── */
+.topbar {
+  background: rgba(60, 65, 78, 0.78) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22) !important;
+}
+.topbar-brand {
+  background: linear-gradient(135deg, #ffffff, #c8ccd4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.topbar-sub, .topbar-loc, .topbar-user-name {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+.topbar-icon-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+}
+.topbar-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.20) !important;
+}
+
+/* ── 4. Tab bar: glass ────────────────────────────────── */
+.tab-bar {
+  background: rgba(55, 60, 72, 0.82) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.22) !important;
+}
+.tab-item {
+  color: rgba(255, 255, 255, 0.50) !important;
+}
+.tab-item.active {
+  color: #ffffff !important;
+}
+.tab-item.active .tab-label {
+  color: #ffffff !important;
+}
+.tab-item .tab-label {
+  color: rgba(255, 255, 255, 0.50) !important;
+}
+.tab-dot {
+  background: #ffffff !important;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ── 5. Cards: darker gray glass ─────────────────────── */
+.card,
+.auth-card,
+.service-card-body,
+.stat-card,
+.quick-item,
+.tyre-result,
+.modal-box,
+.summary-card,
+.order-row,
+.emp-card {
+  background: rgba(60, 65, 78, 0.72) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    0 4px 12px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+.card-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+.card-title {
+  color: #ffffff !important;
+}
+.card-title::before {
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18) !important;
+}
+.panel-subtitle {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* ── 6. Auth card & brand ─────────────────────────────── */
+.auth-card {
+  background: rgba(55, 60, 72, 0.82) !important;
+}
+.brand {
+  background: linear-gradient(135deg, #ffffff, #c8ccd4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.auth-divider {
+  background: linear-gradient(90deg, #ffffff, #9ca3af, #6b7280) !important;
+}
+.auth-location { color: rgba(255,255,255,0.55) !important; }
+.auth-division { color: rgba(255,255,255,0.80) !important; }
+.auth-title    { color: rgba(255,255,255,0.60) !important; }
+
+/* ── 7. Primary action buttons: dark/black ───────────── */
+.btn-primary {
+  background: linear-gradient(160deg, #2a2d36 0%, #1a1d24 60%, #111318 100%) !important;
+  color: #ffffff !important;
+  box-shadow: var(--btn-shadow-3d) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+}
+.btn-primary:hover {
+  background: linear-gradient(160deg, #32363f 0%, #22252e 60%, #18191f 100%) !important;
+  box-shadow: var(--btn-shadow-3d-hover) !important;
+}
+.btn-primary:active {
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.4),
+    inset 0 2px 4px rgba(0,0,0,0.35) !important;
+  transform: translateY(1px) !important;
+}
+
+/* ── 9. Danger buttons: dark red-gray ────────────────── */
+.btn-danger {
+  background: linear-gradient(160deg, #2d1a1a 0%, #1f1212 60%, #150d0d 100%) !important;
+  color: #ffffff !important;
+  box-shadow: var(--btn-shadow-3d) !important;
+  border: 1px solid rgba(248,113,113,0.22) !important;
+}
+.btn-danger:hover {
+  background: linear-gradient(160deg, #3a2020 0%, #281818 60%, #1c1010 100%) !important;
+  box-shadow: var(--btn-shadow-3d-hover) !important;
+}
+
+/* ── 10. Info buttons: dark blue-gray ───────────────── */
+.btn-info {
+  background: linear-gradient(160deg, #1a1e2d 0%, #121624 60%, #0d1018 100%) !important;
+  color: #ffffff !important;
+  box-shadow: var(--btn-shadow-3d) !important;
+  border: 1px solid rgba(200,204,212,0.22) !important;
+}
+.btn-info:hover {
+  background: linear-gradient(160deg, #222636 0%, #181c2c 60%, #11141f 100%) !important;
+  box-shadow: var(--btn-shadow-3d-hover) !important;
+}
+
+/* ── 11. Ghost buttons: light gray (like page bg) ────── */
+.btn-ghost,
+.btn-ghost:visited {
+  background: rgba(221, 225, 232, 0.90) !important;
+  color: #1a1d24 !important;
+  border: 1px solid rgba(255,255,255,0.70) !important;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.22),
+    0 1px 3px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -1px 0 rgba(0,0,0,0.10) !important;
+  backdrop-filter: none !important;
+}
+.btn-ghost:hover {
+  background: rgba(235, 238, 243, 0.96) !important;
+  color: #000000 !important;
+  border-color: rgba(255,255,255,0.85) !important;
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -1px 0 rgba(0,0,0,0.08) !important;
+}
+
+/* ── 12. Tyre type, repair, and position buttons: light gray */
+.tyre-type-btn,
+.repair-btn,
+.pos-btn {
+  background: rgba(215, 219, 226, 0.88) !important;
+  border: 1px solid rgba(255,255,255,0.65) !important;
+  color: #2a2d36 !important;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.22),
+    0 1px 3px rgba(0,0,0,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -2px 0 rgba(0,0,0,0.14) !important;
+}
+.tyre-type-btn:hover,
+.repair-btn:hover,
+.pos-btn:hover {
+  background: rgba(228, 231, 237, 0.95) !important;
+  color: #1a1d24 !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    inset 0 -2px 0 rgba(0,0,0,0.12) !important;
+}
+
+/* Active states: black for selected option buttons */
+.tyre-type-btn.active-new {
+  background: linear-gradient(160deg, #2a2d36, #1a1d24) !important;
+  border-color: rgba(255,255,255,0.22) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    inset 0 -2px 0 rgba(0,0,0,0.28) !important;
+}
+.tyre-type-btn.active-old {
+  background: linear-gradient(160deg, #3a3d48, #2c2f3a) !important;
+  border-color: rgba(255,255,255,0.20) !important;
+  color: #e8eaed !important;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+.repair-btn.active {
+  background: linear-gradient(160deg, #1a1d24, #111318) !important;
+  border-color: rgba(255,255,255,0.22) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.14) !important;
+}
+.pos-btn.active {
+  background: linear-gradient(160deg, #1a1d24, #111318) !important;
+  border-color: rgba(255,255,255,0.25) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 -2px 0 rgba(0,0,0,0.30) !important;
+}
+.pos-btn.qpx-pos-disabled {
+  background: rgba(190, 193, 200, 0.55) !important;
+  color: rgba(80, 85, 95, 0.60) !important;
+  border-color: rgba(200,203,210,0.50) !important;
+  box-shadow: none !important;
+}
+
+/* ── 13. Service option buttons (Change / Service / etc.) */
+.service-opt-btn,
+button.service-opt-btn {
+  background: rgba(215, 219, 226, 0.88) !important;
+  border: 1px solid rgba(255,255,255,0.65) !important;
+  color: #2a2d36 !important;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -2px 0 rgba(0,0,0,0.14) !important;
+}
+.service-opt-btn.active,
+button.service-opt-btn.active {
+  background: linear-gradient(160deg, #1a1d24, #111318) !important;
+  border-color: rgba(255,255,255,0.22) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.14) !important;
+}
+
+/* ── 14. Form inputs & selects ──────────────────────── */
+input, select, textarea,
+.qpx-qty-input, #svc-qty, #svc-rear-qty {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255,255,255,0.35) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+input::placeholder, textarea::placeholder {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(255,255,255,0.60) !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.14) !important;
+  outline: none !important;
+}
+select option {
+  background: #2a2d36 !important;
+  color: #ffffff !important;
+}
+
+/* ── 15. Qty stepper buttons ─────────────────────────── */
+.qpx-qty-btn,
+.qpx-qty-stepper-center button {
+  background: rgba(215, 219, 226, 0.88) !important;
+  border: 1px solid rgba(255,255,255,0.65) !important;
+  color: #1a1d24 !important;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -2px 0 rgba(0,0,0,0.12) !important;
+}
+.qpx-qty-btn:hover {
+  background: rgba(235, 238, 243, 0.96) !important;
+}
+
+/* ── 16. Stats & metric cards ────────────────────────── */
+.stat-card {
+  background: rgba(58, 62, 76, 0.74) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+.stat-value, .today-metric-val {
+  color: #ffffff !important;
+}
+.stat-label, .today-metric-lbl {
+  color: rgba(255, 255, 255, 0.60) !important;
+}
+.stat-icon-wrap {
+  background: rgba(255,255,255,0.12) !important;
+}
+
+/* ── 17. Table rows ──────────────────────────────────── */
+.table-wrap table { border-collapse: collapse; }
+.table-wrap th {
+  background: rgba(255,255,255,0.10) !important;
+  color: rgba(255,255,255,0.75) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.14) !important;
+}
+.table-wrap td {
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  color: rgba(255,255,255,0.88) !important;
+}
+.table-wrap tr:hover td {
+  background: rgba(255,255,255,0.06) !important;
+}
+
+/* ── 18. Search bar & pills ──────────────────────────── */
+.search-bar input,
+.search-input {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255,255,255,0.28) !important;
+  color: #ffffff !important;
+}
+.chip, .badge, .pill, .position-pill,
+[class*="chip"], [class*="badge"] {
+  background: rgba(255,255,255,0.16) !important;
+  color: rgba(255,255,255,0.85) !important;
+  border: 1px solid rgba(255,255,255,0.20) !important;
+}
+
+/* ── 19. Modal overlay ───────────────────────────────── */
+.modal-overlay, .overlay {
+  background: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+.modal-box {
+  background: rgba(55, 60, 72, 0.90) !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.45),
+    0 8px 24px rgba(0,0,0,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.18) !important;
+}
+
+/* ── 20. Toast / alert ───────────────────────────────── */
+.toast, .alert {
+  background: rgba(45, 48, 58, 0.94) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
+}
+
+/* ── 21. Quick restock items ─────────────────────────── */
+.quick-item {
+  background: rgba(62, 67, 80, 0.72) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+.quick-item:hover {
+  background: rgba(72, 77, 92, 0.82) !important;
+}
+.quick-item-name { color: #ffffff !important; }
+.quick-item-size { color: rgba(255,255,255,0.65) !important; }
+.quick-item-stock { color: rgba(255,255,255,0.55) !important; }
+
+/* ── 22. Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.10); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.28); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.45); }
+
+/* ── 23. Dividers & separators ───────────────────────── */
+hr, .divider {
+  border-color: rgba(255,255,255,0.12) !important;
+}
+
+/* ── 24. Labels & small text ─────────────────────────── */
+label, .form-label, .field-label, .svc-label {
+  color: rgba(255,255,255,0.78) !important;
+}
+.text-muted, .muted, small {
+  color: rgba(255,255,255,0.52) !important;
+}
+
+/* ── 25. Page/section background areas ───────────────── */
+.page, .screen, #app-screen, #auth-screen,
+.mobile-shell, .tab-content, .scroll-area {
+  background: transparent !important;
+}
+
+/* ── 26. Tyre result cards ───────────────────────────── */
+.tyre-result {
+  background: rgba(62, 67, 80, 0.72) !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+}
+.tyre-result-size {
+  color: #ffffff !important;
+}
+.tyre-result-location,
+.tyre-result-stock {
+  color: rgba(255,255,255,0.65) !important;
+}
+
+/* ── 27. Order row / damaged entry cards ─────────────── */
+.order-row, .dmg-card, .emp-card {
+  background: rgba(62, 67, 80, 0.70) !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+.order-row:hover, .dmg-card:hover, .emp-card:hover {
+  background: rgba(72, 78, 92, 0.80) !important;
+}
+
+/* ── 28. Photo area ──────────────────────────────────── */
+.photo-area {
+  background: rgba(255,255,255,0.14) !important;
+  border: 1.5px dashed rgba(255,255,255,0.35) !important;
+}
+.photo-area:hover, .photo-area.has-photo {
+  border-color: rgba(255,255,255,0.60) !important;
+  background: rgba(255,255,255,0.20) !important;
+}
+
+/* ── 29. Stepper/counter label ───────────────────────── */
+#svc-position-label, .qpx-pos-label {
+  color: rgba(255,255,255,0.80) !important;
+}
+
+/* ── 30. Print report panels (excluded from glass) ───── */
+@media print {
+  body { background: #ffffff !important; }
+  .card, .auth-card {
+    background: #f8f9fa !important;
+    border: 1px solid #dde1e8 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .btn, button {
+    background: #e0e3e8 !important;
+    color: #1a1d24 !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   QPX DESIGN ENHANCEMENT PACK — injected CSS-only overrides
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── B. Service-page unframed sections → glass card frames ── */
+.svc-shift-row {
+  background    : rgba(50, 55, 68, 0.68) !important;
+  backdrop-filter: blur(26px) !important;
+  -webkit-backdrop-filter: blur(26px) !important;
+  border        : 1px solid rgba(255,255,255,0.14) !important;
+  border-radius : 20px !important;
+  padding       : 14px 16px !important;
+  box-shadow    : 0 8px 32px rgba(0,0,0,0.38),
+                  inset 0 1px 0 rgba(255,255,255,0.10) !important;
+  margin-bottom : 12px !important;
+}
+
+.service-stat-strip {
+  background    : rgba(50, 55, 68, 0.62) !important;
+  backdrop-filter: blur(26px) !important;
+  -webkit-backdrop-filter: blur(26px) !important;
+  border        : 1px solid rgba(255,255,255,0.12) !important;
+  border-radius : 20px !important;
+  padding       : 14px !important;
+  box-shadow    : 0 8px 32px rgba(0,0,0,0.32),
+                  inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  margin-bottom : 12px !important;
+}
+
+/* Quick-actions parent div */
+#page-service > div:has(.quick-actions) {
+  background    : rgba(50, 55, 68, 0.62) !important;
+  backdrop-filter: blur(26px) !important;
+  -webkit-backdrop-filter: blur(26px) !important;
+  border        : 1px solid rgba(255,255,255,0.12) !important;
+  border-radius : 20px !important;
+  padding       : 14px !important;
+  box-shadow    : 0 8px 32px rgba(0,0,0,0.30) !important;
+  margin-bottom : 12px !important;
+}
+
+/* Today's Services parent div */
+#page-service > div:has(.services-scroll) {
+  background    : rgba(50, 55, 68, 0.60) !important;
+  backdrop-filter: blur(26px) !important;
+  -webkit-backdrop-filter: blur(26px) !important;
+  border        : 1px solid rgba(255,255,255,0.12) !important;
+  border-radius : 20px !important;
+  padding       : 14px !important;
+  box-shadow    : 0 8px 32px rgba(0,0,0,0.28) !important;
+}
+
+/* ── C. Page intro text readability ─────────────────────── */
+.page-kicker {
+  display          : inline-block !important;
+  background       : rgba(255,255,255,0.09) !important;
+  backdrop-filter  : blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border           : 1px solid rgba(255,255,255,0.16) !important;
+  border-radius    : 999px !important;
+  padding          : 2px 11px !important;
+  font-size        : 10px !important;
+  font-weight      : 700 !important;
+  letter-spacing   : 0.12em !important;
+  text-transform   : uppercase !important;
+  color            : rgba(255,255,255,0.82) !important;
+  margin-bottom    : 4px !important;
+}
+
+.page-title {
+  color      : #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.55) !important;
+}
+
+/* Section labels → glass capsule */
+.sec-label {
+  display         : inline-block !important;
+  background      : rgba(255,255,255,0.07) !important;
+  backdrop-filter : blur(10px) !important;
+  border          : 1px solid rgba(255,255,255,0.13) !important;
+  border-radius   : 999px !important;
+  padding         : 2px 12px !important;
+  color           : rgba(255,255,255,0.82) !important;
+  margin-bottom   : 10px !important;
+}
+
+/* date-badge (Live / Overview header badge) */
+.date-badge {
+  background    : rgba(255,255,255,0.09) !important;
+  backdrop-filter: blur(10px) !important;
+  border        : 1px solid rgba(255,255,255,0.15) !important;
+  border-radius : 14px !important;
+  color         : rgba(255,255,255,0.85) !important;
+  box-shadow    : 0 4px 14px rgba(0,0,0,0.30),
+                  inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+
+/* scroll-hint text */
+.scroll-hint {
+  color       : rgba(255,255,255,0.55) !important;
+  font-size   : 12px !important;
+}
+
+/* ── E. btn-success → light sky-blue instead of green ────── */
+.btn-success,
+button.btn-success {
+  background: linear-gradient(160deg, #163657 0%, #0e2540 60%, #091b30 100%) !important;
+  color     : #7dd3fc !important;
+  border    : 1px solid rgba(125,211,252,0.28) !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.38),
+    0 2px 4px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(125,211,252,0.14),
+    inset 0 -2px 0 rgba(0,0,0,0.20),
+    0 0 10px rgba(125,211,252,0.08) !important;
+}
+.btn-success:hover,
+button.btn-success:hover {
+  background: linear-gradient(160deg, #1c4470 0%, #123058 60%, #0d2445 100%) !important;
+  color     : #bae6fd !important;
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(125,211,252,0.18),
+    0 0 16px rgba(125,211,252,0.14) !important;
+}
+
+/* ── G. Important numbers in 3D glass shapes ─────────────── */
+
+/* Stat values in stat-cards → glass circle/rect */
+.stat-value,
+.today-metric-val {
+  display        : inline-flex !important;
+  align-items    : center !important;
+  justify-content: center !important;
+  min-width      : 56px !important;
+  min-height     : 56px !important;
+  background     : rgba(255,255,255,0.09) !important;
+  backdrop-filter: blur(14px) !important;
+  border         : 1px solid rgba(255,255,255,0.20) !important;
+  border-radius  : 16px !important;
+  box-shadow     :
+    0 6px 18px rgba(0,0,0,0.34),
+    0 2px 4px rgba(0,0,0,0.22),
+    inset 0 1.5px 0 rgba(255,255,255,0.22),
+    inset 0 -2px 0 rgba(0,0,0,0.18) !important;
+  margin         : 0 auto 6px !important;
+  padding        : 6px 8px !important;
+  color          : #ffffff !important;
+}
+
+/* Service stat-strip pill values */
+.stat-pill .sv {
+  display        : inline-flex !important;
+  align-items    : center !important;
+  justify-content: center !important;
+  min-width      : 30px !important;
+  min-height     : 30px !important;
+  background     : rgba(255,255,255,0.10) !important;
+  backdrop-filter: blur(10px) !important;
+  border         : 1px solid rgba(255,255,255,0.20) !important;
+  border-radius  : 10px !important;
+  box-shadow     :
+    0 4px 12px rgba(0,0,0,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(0,0,0,0.16) !important;
+  padding        : 2px 6px !important;
+  font-weight    : 700 !important;
+  color          : #ffffff !important;
+}
+
+/* Tyre quantity display in search results */
+.tyre-price {
+  display        : inline-flex !important;
+  align-items    : baseline !important;
+  gap            : 3px !important;
+  background     : rgba(255,255,255,0.07) !important;
+  border         : 1px solid rgba(255,255,255,0.14) !important;
+  border-radius  : 10px !important;
+  padding        : 3px 10px !important;
+  backdrop-filter: blur(8px) !important;
+  box-shadow     :
+    0 3px 10px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.14) !important;
+  color          : #ffffff !important;
+}
+
+/* Qty pill in inventory / service cards */
+.qty-pill {
+  background: rgba(255,255,255,0.10) !important;
+  border    : 1px solid rgba(255,255,255,0.20) !important;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.20) !important;
+  border-radius: 999px !important;
+}
+
+/* Quick-restock size label */
+.quick-restock-size {
+  display     : inline-block !important;
+  background  : rgba(255,255,255,0.08) !important;
+  border      : 1px solid rgba(255,255,255,0.16) !important;
+  border-radius: 12px !important;
+  padding     : 4px 12px !important;
+  box-shadow  :
+    0 4px 12px rgba(0,0,0,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.15) !important;
+}
+
+/* ── H. btn-warning — keep amber/gold but dark ────────────── */
+.btn-warning,
+button.btn-warning {
+  background: linear-gradient(160deg, #3d2f0c 0%, #2c220a 60%, #1f1807 100%) !important;
+  color     : #fbbf24 !important;
+  border    : 1px solid rgba(251,191,36,0.26) !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.38),
+    inset 0 1px 0 rgba(251,191,36,0.10),
+    inset 0 -2px 0 rgba(0,0,0,0.22) !important;
+}
+.btn-warning:hover,
+button.btn-warning:hover {
+  background: linear-gradient(160deg, #4d3b0e 0%, #382c0c 60%, #281f09 100%) !important;
+  color     : #fcd34d !important;
+}
+
+/* ── I. section-head-inline (Today's Services header row) ─── */
+.section-head-inline {
+  display        : flex !important;
+  align-items    : center !important;
+  justify-content: space-between !important;
+  gap            : 10px !important;
+  margin-bottom  : 8px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   QPX ROUND-2 FIXES — sky blue unification + titles + layout
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── R2-1. CSS variable overrides → sky-blue palette ──────── */
+:root {
+  --success       : #38bdf8 !important;
+  --success-dim   : rgba(56,189,248,0.14) !important;
+  --shadow-btn    : 0 8px 22px rgba(56,189,248,0.20) !important;
+  --stroke-accent : rgba(56,189,248,0.30) !important;
+  --shadow-glow   : 0 0 28px rgba(56,189,248,0.13) !important;
+}
+
+/* ── R2-2. Background — slightly lighter than pure black ───── */
+body::before {
+  background:
+    radial-gradient(ellipse 56% 36% at 16%  0%,  rgba(56,189,248,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 42% 32% at 84% 12%,  rgba(96,165,250,0.08) 0%, transparent 57%),
+    radial-gradient(ellipse 58% 40% at 50% 100%, rgba(60,60,110,0.07)  0%, transparent 55%),
+    linear-gradient(168deg, #030912 0%, #040d1a 28%, #060f1e 58%, #030c12 100%) !important;
+}
+
+/* ── R2-3. btn-cta → sky blue gradient ─────────────────────── */
+.btn-cta {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 52%, #60a5fa 100%) !important;
+  color     : #03111e !important;
+  box-shadow: 0 8px 22px rgba(56,189,248,0.28) !important;
+  border    : none !important;
+}
+.btn-cta:hover {
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 52%, #818cf8 100%) !important;
+  box-shadow: 0 10px 28px rgba(56,189,248,0.36) !important;
+}
+
+/* ── R2-4. tyre-select-btn (available) → sky blue ──────────── */
+.tyre-select-btn {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
+  color     : #03111e !important;
+  box-shadow: 0 5px 15px rgba(56,189,248,0.22) !important;
+  border    : none !important;
+}
+.tyre-select-btn:hover {
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%) !important;
+  box-shadow: 0 7px 20px rgba(56,189,248,0.30) !important;
+}
+
+/* ── R2-5. Out-of-stock cards → red outline (not purple) ───── */
+.tyre-result:has(.tyre-select-btn[disabled]) {
+  background: rgba(50, 55, 68, 0.62) !important;
+  border    : 1.5px solid rgba(251,113,133,0.52) !important;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.32),
+    0 0 0 1px rgba(251,113,133,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+.tyre-result:has(.tyre-select-btn[disabled]) .tyre-size,
+.tyre-result:has(.tyre-select-btn[disabled]) .tyre-result-size {
+  color: rgba(255,180,185,0.82) !important;
+}
+.tyre-result:has(.tyre-select-btn[disabled]) .stock-badge {
+  background: rgba(251,113,133,0.13) !important;
+  color     : rgba(255,180,185,0.80) !important;
+  border    : 1px solid rgba(251,113,133,0.28) !important;
+}
+.tyre-result:has(.tyre-select-btn[disabled]) .tyre-price {
+  color: rgba(255,180,185,0.78) !important;
+}
+.tyre-result:has(.tyre-select-btn[disabled]) .tyre-select-btn {
+  background: linear-gradient(135deg, rgba(90,25,35,0.80), rgba(70,15,25,0.90)) !important;
+  color     : rgba(255,175,180,0.65) !important;
+  border    : 1px solid rgba(251,113,133,0.22) !important;
+  cursor    : not-allowed !important;
+  box-shadow: none !important;
+}
+/* inline-style "gold" zero-stock cards from older render functions */
+.tyre-result[style*="gold"] {
+  background   : rgba(50,55,68,0.62) !important;
+  border-color : rgba(251,113,133,0.48) !important;
+}
+
+/* ── R2-6. card-title → 3D glass pill badge ────────────────── */
+.card-title {
+  display              : inline-flex !important;
+  align-items          : center !important;
+  gap                  : 7px !important;
+  font-size            : 13px !important;
+  font-weight          : 700 !important;
+  color                : #ffffff !important;
+  background           : rgba(255,255,255,0.08) !important;
+  backdrop-filter      : blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border               : 1px solid rgba(255,255,255,0.16) !important;
+  border-radius        : 999px !important;
+  padding              : 5px 16px 5px 6px !important;
+  box-shadow           :
+    0 4px 14px rgba(0,0,0,0.32),
+    0 1px 3px rgba(0,0,0,0.22),
+    inset 0 1.5px 0 rgba(255,255,255,0.20),
+    inset 0 -1px 0 rgba(0,0,0,0.14) !important;
+  width                : fit-content !important;
+  flex-shrink          : 0 !important;
+  text-shadow          : none !important;
+}
+.card-title::before {
+  display: none !important;
+}
+/* card-icon inside the pill */
+.card-icon {
+  border-radius: 50% !important;
+  width        : 26px !important;
+  height       : 26px !important;
+  flex-shrink  : 0 !important;
+}
+/* glass-card variant uses .card-hd + .card-title with .card-icon */
+.card-hd .card-title {
+  padding: 5px 16px 5px 6px !important;
+}
+
+/* ── R2-7. qa-btn-sub — centered, uniform glass rect ───────── */
+.qa-btn {
+  display        : flex !important;
+  flex-direction : column !important;
+  align-items    : center !important;
+  text-align     : center !important;
+}
+.qa-btn-icon {
+  margin-bottom: 6px !important;
+}
+.qa-btn-label {
+  text-align   : center !important;
+  width        : 100% !important;
+  font-size    : 12px !important;
+  font-weight  : 700 !important;
+  color        : rgba(255,255,255,0.92) !important;
+}
+.qa-btn-sub {
+  display         : block !important;
+  text-align      : center !important;
+  align-self      : center !important;
+  margin          : 5px auto 0 !important;
+  width           : auto !important;
+  max-width       : 92% !important;
+  background      : rgba(255,255,255,0.07) !important;
+  backdrop-filter : blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border          : 1px solid rgba(255,255,255,0.12) !important;
+  border-radius   : 10px !important;
+  padding         : 3px 10px !important;
+  font-size       : 10px !important;
+  font-weight     : 400 !important;
+  color           : rgba(255,255,255,0.60) !important;
+  box-shadow      : 0 2px 6px rgba(0,0,0,0.16) !important;
+  white-space     : normal !important;
+  line-height     : 1.4 !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   QPX ROUND-3 — Service mini-btns + mini-badge + auth flash
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── R3-1. service-mini-btn: inactive → dark glass ──────── */
+.service-mini-btn,
+#service-action-wrap .service-mini-btn,
+button.service-mini-btn {
+  background       : rgba(48, 53, 66, 0.72) !important;
+  border           : 1px solid rgba(255,255,255,0.14) !important;
+  color            : rgba(255,255,255,0.85) !important;
+  backdrop-filter  : blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius    : 14px !important;
+  box-shadow       :
+    0 4px 14px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+.service-mini-btn:hover,
+#service-action-wrap .service-mini-btn:hover {
+  background: rgba(58, 63, 78, 0.82) !important;
+  border-color: rgba(255,255,255,0.22) !important;
+}
+
+/* ── R3-2. service-mini-btn ACTIVE → sky blue ───────────── */
+.service-mini-btn.active,
+#service-action-wrap .service-mini-btn.active,
+button.service-mini-btn.active {
+  background  : linear-gradient(135deg, #38bdf8 0%, #0ea5e9 55%, #60a5fa 100%) !important;
+  border-color: transparent !important;
+  color       : #03111e !important;
+  box-shadow  :
+    0 8px 22px rgba(56,189,248,0.32),
+    inset 0 1px 0 rgba(255,255,255,0.28) !important;
+}
+
+/* ── R3-3. Damaged-tyre active state stays red ───────────── */
+.service-mini-btn.damage-active,
+#service-action-wrap .service-mini-btn.damage-active,
+button.service-mini-btn.damage-active {
+  background  : linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+  border-color: transparent !important;
+  color       : #ffffff !important;
+  box-shadow  : 0 8px 22px rgba(239,68,68,0.30) !important;
+}
+
+/* ── R3-4. mini-badge: remove rectangle, plain subtle text ─ */
+/* Undo the [class*="badge"] rule that added background/border */
+.mini-badge,
+.service-mini-btn .mini-badge,
+#service-action-wrap .mini-badge {
+  background   : transparent !important;
+  border       : none !important;
+  box-shadow   : none !important;
+  padding      : 0 !important;
+  border-radius: 0 !important;
+  font-size    : 10px !important;
+  font-weight  : 500 !important;
+  opacity      : 0.68 !important;
+  color        : inherit !important;
+  display      : block !important;
+  margin-top   : 3px !important;
+  line-height  : 1.3 !important;
+}
+/* When the button is active (sky blue), keep badge text dark */
+.service-mini-btn.active .mini-badge {
+  opacity: 0.72 !important;
+  color  : #03111e !important;
+}
+
+/* ── R3-5. Auth card enhanced glass style ────────────────── */
+.auth-card {
+  background           : rgba(46, 50, 64, 0.90) !important;
+  backdrop-filter      : blur(32px) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+  border               : 1px solid rgba(255,255,255,0.16) !important;
+  box-shadow           :
+    0 24px 64px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+/* Brand/logo: sky-blue-to-white gradient (not old teal) */
+.brand {
+  background               : linear-gradient(135deg, #38bdf8 0%, #7dd3fc 50%, #e2f8ff 100%) !important;
+  -webkit-background-clip  : text !important;
+  -webkit-text-fill-color  : transparent !important;
+  background-clip          : text !important;
+}
+
+/* ── R4. Auth-screen: final corrected animation ─────────────
+   This overrides R3-5 (qpxAuthReveal which ignored visibility).
+   Base state in HEAD CSS: visibility:hidden; opacity:0
+   This animation restores visibility after 0.55s delay so
+   logged-in users' JS can set display:none before it appears.
+   ─────────────────────────────────────────────────────────── */
+#auth-screen {
+  animation: qpxAuthFix 0.4s ease 0.55s forwards !important;
+}
+@keyframes qpxAuthFix {
+  from {
+    visibility: visible;
+    opacity   : 0;
+    transform : translateY(6px);
+  }
+  to {
+    visibility: visible;
+    opacity   : 1;
+    transform : none;
+  }
+}
+
+</style>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     QPX FEATURE PACK — Scroll-top · Refresh Btn · List Toggles
+     ═══════════════════════════════════════════════════════════ -->
+<style id="qpx-feature-pack">
+
+/* ── Refresh circular button ───────────────────────────────── */
+#qpx-refresh-btn {
+  width          : 30px;
+  height         : 30px;
+  border-radius  : 50%;
+  background     : rgba(255,255,255,0.11);
+  border         : 1px solid rgba(255,255,255,0.24);
+  color          : rgba(255,255,255,0.82);
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  cursor         : pointer;
+  font-size      : 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow     :
+    0 3px 10px rgba(0,0,0,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+  transition     : background 0.18s ease, transform 0.22s ease, box-shadow 0.18s;
+  flex-shrink    : 0;
+  padding        : 0;
+  align-self     : flex-end;
+}
+#qpx-refresh-btn:hover {
+  background  : rgba(255,255,255,0.20);
+  transform   : rotate(45deg);
+  box-shadow  :
+    0 5px 16px rgba(0,0,0,0.36),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+}
+#qpx-refresh-btn:active {
+  transform   : rotate(200deg);
+  background  : rgba(56,189,248,0.28);
+  border-color: rgba(56,189,248,0.50);
+}
+
+/* Wrapper column that holds refresh btn above lang-switch */
+#qpx-lang-col {
+  display        : flex;
+  flex-direction : column;
+  align-items    : flex-end;
+  gap            : 5px;
+}
+
+/* ── Collapsible list wrapper ──────────────────────────────── */
+.qpx-toggle-wrap {
+  display : none;
+  overflow: hidden;
+}
+.qpx-toggle-wrap.qpx-open {
+  display : block;
+}
+
+/* ── Toggle / show-list button ─────────────────────────────── */
+.qpx-show-toggle {
+  width          : 100%;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  gap            : 8px;
+  padding        : 11px 16px;
+  background     : rgba(255,255,255,0.055);
+  border         : 1px dashed rgba(255,255,255,0.20);
+  border-radius  : 16px;
+  color          : rgba(255,255,255,0.70);
+  font-size      : 13px;
+  font-weight    : 600;
+  cursor         : pointer;
+  margin         : 12px 0 2px;
+  transition     : background 0.18s, border-color 0.18s, color 0.18s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  letter-spacing : 0.01em;
+}
+.qpx-show-toggle:hover {
+  background  : rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.32);
+  color       : rgba(255,255,255,0.92);
+}
+.qpx-show-toggle i {
+  transition: transform 0.25s ease;
+}
+.qpx-show-toggle.qpx-open i {
+  transform: rotate(180deg);
+}
+
+/* ── Report search input ───────────────────────────────────── */
+.qpx-rep-search {
+  width         : 100%;
+  padding       : 9px 14px 9px 38px;
+  border-radius : 12px;
+  background    : rgba(255,255,255,0.11) !important;
+  border        : 1px solid rgba(255,255,255,0.22) !important;
+  color         : #ffffff !important;
+  font-size     : 13px;
+  margin-bottom : 2px;
+  box-sizing    : border-box;
+}
+.qpx-rep-search::placeholder {
+  color: rgba(255,255,255,0.40) !important;
+}
+.qpx-rep-search-wrap {
+  position   : relative;
+  padding    : 8px 0 4px;
+}
+.qpx-rep-search-wrap::before {
+  content     : '\f002';
+  font-family : 'Font Awesome 5 Free';
+  font-weight : 900;
+  position    : absolute;
+  left        : 13px;
+  top         : 50%;
+  transform   : translateY(-50%);
+  color       : rgba(255,255,255,0.40);
+  font-size   : 12px;
+  pointer-events: none;
+}
+
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── helpers ───────────────────────────────────────────── */
+  function ready(fn) {
+    if (document.readyState !== 'loading') { fn(); }
+    else { document.addEventListener('DOMContentLoaded', fn); }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     1. SCROLL TO TOP ON TAB NAVIGATION
+     ════════════════════════════════════════════════════════ */
+  ready(function () {
+    var mc = document.querySelector('.main-content');
+    if (!mc) return;
+    document.querySelectorAll('.nav-item[data-page]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        /* small delay lets showPage() finish switching first */
+        setTimeout(function () { mc.scrollTop = 0; }, 40);
+      }, true);
+    });
+  });
+
+  /* ════════════════════════════════════════════════════════
+     2. CIRCULAR REFRESH BUTTON — above lang-switch in topbar
+     ════════════════════════════════════════════════════════ */
+  ready(function () {
+    var topbarRight = document.querySelector('.topbar-right');
+    if (!topbarRight) return;
+
+    var langSwitch = topbarRight.querySelector('.lang-switch');
+    if (!langSwitch) return;
+
+    /* create column wrapper */
+    var col = document.createElement('div');
+    col.id = 'qpx-lang-col';
+
+    /* create refresh button */
+    var rfBtn = document.createElement('button');
+    rfBtn.type    = 'button';
+    rfBtn.id      = 'qpx-refresh-btn';
+    rfBtn.title   = 'Refresh / تحديث الصفحة';
+    rfBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    rfBtn.addEventListener('click', function () { window.location.reload(); });
+
+    /* replace lang-switch with [col > (rfBtn + langSwitch)] */
+    langSwitch.parentNode.insertBefore(col, langSwitch);
+    langSwitch.parentNode.removeChild(langSwitch);
+    col.appendChild(rfBtn);
+    col.appendChild(langSwitch);
+  });
+
+  /* ════════════════════════════════════════════════════════
+     3. INVENTORY LIST — hidden by default, toggle with arrow
+     ════════════════════════════════════════════════════════ */
+  ready(function () {
+    var invTbody = document.getElementById('inv-table');
+    if (!invTbody) return;
+    var tableWrap = invTbody.closest('.table-wrap');
+    if (!tableWrap) return;
+
+    /* wrap the table */
+    var wrap = document.createElement('div');
+    wrap.className = 'qpx-toggle-wrap';
+    tableWrap.parentNode.insertBefore(wrap, tableWrap);
+    wrap.appendChild(tableWrap);
+
+    /* toggle button */
+    var btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'qpx-show-toggle';
+    btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show Inventory List &nbsp;·&nbsp; قائمة المخزون';
+    wrap.parentNode.insertBefore(btn, wrap);
+
+    btn.addEventListener('click', function () {
+      var open = wrap.classList.toggle('qpx-open');
+      btn.classList.toggle('qpx-open', open);
+      btn.innerHTML = open
+        ? '<i class="fas fa-chevron-up"></i> Hide List &nbsp;·&nbsp; إخفاء القائمة'
+        : '<i class="fas fa-chevron-down"></i> Show Inventory List &nbsp;·&nbsp; قائمة المخزون';
+    });
+  });
+
+  /* ════════════════════════════════════════════════════════
+     4. REPORTS TABLES — hidden by default + live search
+     ════════════════════════════════════════════════════════ */
+  ready(function () {
+    /* Service Reports table */
+    setupReportBlock(
+      'rep-table',
+      'Show Service Reports &nbsp;·&nbsp; تقارير الخدمة',
+      'Hide Reports &nbsp;·&nbsp; إخفاء التقارير',
+      'Search services… / ابحث في الخدمات'
+    );
+    /* Full Stock Report table */
+    setupReportBlock(
+      'stock-rep-table',
+      'Show Full Stock Report &nbsp;·&nbsp; تقرير المخزون الكامل',
+      'Hide Stock Report &nbsp;·&nbsp; إخفاء التقرير',
+      'Search stock… / ابحث في المخزون'
+    );
+  });
+
+  function setupReportBlock(tbodyId, labelShow, labelHide, placeholder) {
+    var tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    var tableWrap = tbody.closest('.table-wrap');
+    if (!tableWrap) return;
+
+    /* 4a. collapsible wrapper */
+    var wrap = document.createElement('div');
+    wrap.className = 'qpx-toggle-wrap';
+    tableWrap.parentNode.insertBefore(wrap, tableWrap);
+    wrap.appendChild(tableWrap);
+
+    /* 4b. search input */
+    var searchWrap = document.createElement('div');
+    searchWrap.className = 'qpx-rep-search-wrap';
+    var searchInput = document.createElement('input');
+    searchInput.type        = 'text';
+    searchInput.className   = 'qpx-rep-search';
+    searchInput.placeholder = placeholder;
+    searchInput.addEventListener('input', function () {
+      var q = this.value.trim().toLowerCase();
+      Array.prototype.forEach.call(tbody.querySelectorAll('tr'), function (row) {
+        row.style.display = (!q || row.textContent.toLowerCase().indexOf(q) !== -1) ? '' : 'none';
+      });
+      /* auto-open list while typing */
+      if (q && !wrap.classList.contains('qpx-open')) {
+        wrap.classList.add('qpx-open');
+        btn.classList.add('qpx-open');
+        btn.innerHTML = '<i class="fas fa-chevron-up"></i> ' + labelHide;
+      }
+    });
+    searchWrap.appendChild(searchInput);
+
+    /* 4c. toggle button */
+    var btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'qpx-show-toggle';
+    btn.innerHTML = '<i class="fas fa-chevron-down"></i> ' + labelShow;
+
+    /* insert: [toggleBtn] [searchWrap] [collapsibleWrap(tableWrap)] */
+    wrap.parentNode.insertBefore(btn,        wrap);
+    wrap.parentNode.insertBefore(searchWrap, wrap);
+
+    btn.addEventListener('click', function () {
+      var open = wrap.classList.toggle('qpx-open');
+      btn.classList.toggle('qpx-open', open);
+      btn.innerHTML = '<i class="fas fa-chevron-' + (open ? 'up' : 'down') + '"></i> ' + (open ? labelHide : labelShow);
+    });
+  }
+
+})();
+</script>
+
 </body>
 </html>
