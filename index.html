@@ -3464,6 +3464,25 @@ a:hover {
                 </div>
               </div>
             </div>
+
+            <div class="card" id="delete-photos-card" style="display:none">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Storage Management</div>
+                  <div class="panel-subtitle">حذف جميع صور الخدمات من قاعدة البيانات.</div>
+                </div>
+              </div>
+              <div style="padding: 12px 18px 18px">
+                <button
+                  class="btn btn-danger btn-sm btn-block"
+                  id="delete-photos-btn"
+                  onclick="deleteAllServicePhotos()"
+                >
+                  🗑️ Delete All Service Photos
+                </button>
+              </div>
+            </div>
+
             <div class="card">
               <div class="card-header">
                 <div>
@@ -3906,6 +3925,25 @@ a:hover {
                 </table>
               </div>
             </div>
+
+            <div class="card" style="margin-top:8px">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">🗑️ Storage</div>
+                  <div class="panel-subtitle">حذف جميع صور الخدمات من قاعدة البيانات.</div>
+                </div>
+              </div>
+              <div style="padding: 12px 18px 18px">
+                <button
+                  class="btn btn-danger btn-block"
+                  id="delete-photos-btn"
+                  onclick="deleteAllServicePhotos()"
+                >
+                  🗑️ Delete All Service Photos
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -5781,6 +5819,43 @@ a:hover {
         await idbDelete(LOCAL_META_STORE, txId);
       }
 
+      async function deleteAllServicePhotos() {
+        if (!confirm("Delete ALL service photos from storage?\nThis cannot be undone.\n\nهل تريد حذف جميع صور الخدمات؟ لا يمكن التراجع.")) return;
+
+        const btn = document.getElementById("delete-photos-btn");
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading"></span>'; }
+
+        try {
+          // List all files in services/ folder
+          const { data: files, error: listErr } = await db.storage
+            .from("service-photos")
+            .list("services", { limit: 1000 });
+
+          if (listErr) throw new Error(listErr.message);
+          if (!files || files.length === 0) {
+            showToast("✅ No photos found in storage.", "success");
+            return;
+          }
+
+          const paths = files.map(f => `services/${f.name}`);
+
+          const { error: delErr } = await db.storage
+            .from("service-photos")
+            .remove(paths);
+
+          if (delErr) throw new Error(delErr.message);
+
+          // Clear photo_url from all transactions
+          await db.from("transactions").update({ photo_url: null }).not("photo_url", "is", null);
+
+          showToast(`🗑️ Deleted ${paths.length} photo(s) successfully.`, "success");
+        } catch (err) {
+          showToast("Error: " + err.message, "error");
+        } finally {
+          if (btn) { btn.disabled = false; btn.innerHTML = "🗑️ Delete All Photos"; }
+        }
+      }
+
       function esc(value) {
         return String(value ?? "")
           .replace(/&/g, "&amp;")
@@ -5846,6 +5921,8 @@ a:hover {
         if (viewBtn) viewBtn.style.display = isAdmin ? "inline-flex" : "none";
         if (employeeCard && !isAdmin) employeeCard.style.display = "none";
         if (viewBtn && !isAdmin) viewBtn.textContent = tr("viewEmployees");
+        const photosCard = document.getElementById("delete-photos-card");
+        if (photosCard) photosCard.style.display = isAdmin ? "block" : "none";
       }
 
       async function toggleEmployeeList(forceOpen) {
@@ -5962,52 +6039,6 @@ a:hover {
       }
 
       // ==================== SERVICE ====================
-      async function searchTyre() {
-        const input = document.getElementById("sale-search");
-        const q = formatTyreSizeField(input).trim();
-        const container = document.getElementById("sale-results");
-        if (!q) {
-          container.innerHTML = "";
-          return;
-        }
-
-        const source = await ensureInventoryLoaded();
-        const qKey = normalizeTyreKey(q);
-        const data = source
-          .filter((t) => {
-            const size = t.size || "";
-            const sizeKey = normalizeTyreKey(size);
-            return (
-              sizeKey.includes(qKey) ||
-              size.toLowerCase().includes(q.toLowerCase())
-            );
-          })
-          .sort((a, b) =>
-            String(a.size || "").localeCompare(String(b.size || "")),
-          );
-
-        if (!data.length) {
-          container.innerHTML = '<div class="empty-state">No tyres found</div>';
-          return;
-        }
-        container.innerHTML = data
-          .map((t) => {
-            const isOut = Number(t.quantity) <= 0;
-            const size = esc(formatTyreSizeValue(t.size) || t.size);
-            const location = esc(t.location || "No location");
-            return `
-      <div class="tyre-result"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div><div class="tyre-result-size">${size}</div><div>📍 ${location} · <span class="badge ${isOut ? "badge-red" : t.quantity <= 4 ? "badge-orange" : "badge-green"}">${t.quantity} in stock</span></div></div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-ghost btn-sm" onclick="openRestock('${t.id}','${size}',${t.quantity})">➕ Restock</button>
-          <button class="btn btn-primary btn-sm" ${isOut ? "disabled" : ""} onclick="selectTyre('${t.id}','${size}')">🔧 Select</button>
-        </div>
-      </div></div>
-    `;
-          })
-          .join("");
-      }
-
       function selectTyre(id, size) {
         selTyreId = id;
         selTyreSize = size;
@@ -6035,6 +6066,17 @@ a:hover {
           .getElementById("service-form")
           .scrollIntoView({ behavior: "smooth", block: "start" });
       }
+
+      window.qpxQuickOrder = function(size) {
+        selTyreSize = size;
+        if (typeof window.qpxOpenOrderOverlay === 'function') {
+          window.qpxOpenOrderOverlay();
+        } else {
+          const btn = document.getElementById('svc-action-order');
+          if (btn) btn.click();
+          else showToast((typeof tr === 'function' ? tr('orderSelectSize') : 'Select a tyre size first'), 'error');
+        }
+      };
 
       function togglePos(pos) {
         const btn = document.querySelector(`.pos-btn[data-pos="${pos}"]`);
@@ -6312,20 +6354,6 @@ a:hover {
         }
       }
 
-      async function loadTodayStats() {
-        const today = new Date().toISOString().split("T")[0];
-        const { data: txns } = await db
-          .from("transactions")
-          .select("id")
-          .gte("created_at", today + "T00:00:00");
-        const { data: inv } = await db.from("inventory").select("*");
-        document.getElementById("svc-stat-today").textContent =
-          txns?.length || 0;
-        document.getElementById("svc-stat-stock").textContent =
-          inv?.reduce((s, i) => s + i.quantity, 0) || 0;
-        document.getElementById("svc-stat-out").textContent =
-          inv?.filter((i) => i.quantity === 0).length || 0;
-      }
 
       async function loadTodayCards() {
         const today = new Date().toISOString().split("T")[0];
@@ -7492,53 +7520,6 @@ a:hover {
         applyLanguage();
       }
 
-      function getTyreSearchMarkup(data, options = {}) {
-        const mode = options.mode || "service";
-        const countLabel = `<div class="sec-label">Results (${data.length} found)</div>`;
-        const cards = data
-          .map((t) => {
-            const qty = Number(t.quantity || 0);
-            const isOut = qty <= 0;
-            const isLow = qty > 0 && qty <= 4;
-            const size = esc(formatTyreSizeValue(t.size) || t.size);
-            const location = esc(t.location || "No location");
-            const stockClass = isOut
-              ? "stock-out"
-              : isLow
-                ? "stock-low"
-                : "stock-ok";
-            const stockText = isOut
-              ? "Out of stock"
-              : isLow
-                ? `${qty} left`
-                : `${qty} in stock`;
-            const action =
-              mode === "modal"
-                ? `selectTyreFromSearchHub('${t.id}','${size}')`
-                : `selectTyre('${t.id}','${size}')`;
-            const style = isLow
-              ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
-              : isOut
-                ? ' style="border-color:rgba(251,113,133,0.35);background:rgba(251,113,133,0.05);"'
-                : "";
-            const sizeStyle = isLow
-              ? ' style="color:var(--gold);"'
-              : isOut
-                ? ' style="color:var(--danger);"'
-                : "";
-            const btnStyle = isLow
-              ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
-              : isOut
-                ? ' style="background:linear-gradient(135deg,#fb7185,#fda4af);"'
-                : "";
-            return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${stockText}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${isOut ? "disabled" : ""} ${btnStyle} onclick="${action}">${isOut ? "Unavailable" : "Select →"}</button></div></div>`;
-          })
-          .join("");
-        return (
-          countLabel +
-          `<div style="display:flex;flex-direction:column;gap:10px;">${cards}</div>`
-        );
-      }
 
       async function runTyreSearch(query, containerId, options = {}) {
         const container = document.getElementById(containerId);
@@ -9937,42 +9918,6 @@ a:hover {
         updateServiceTitle();
       };
 
-      getTyreSearchMarkup = function (data, options = {}) {
-        const mode = options.mode || "service";
-        const countLabel = `<div class="sec-label">${esc(tr("resultsFound", { count: data.length }))}</div>`;
-        const cards = data
-          .map((t) => {
-            const qty = Math.max(0, Number(t.quantity || 0));
-            const isZero = qty === 0;
-            const isLow = qty > 0 && qty <= 4;
-            const sizeValue = formatTyreSizeValue(t.size) || t.size;
-            const size = esc(sizeValue);
-            const location = esc(t.location || "No location");
-            const stockClass = isZero || isLow ? "stock-low" : "stock-ok";
-            const stockText = isLow
-              ? tr("leftText", { qty })
-              : tr("inStockText", { qty });
-            const safeId = String(t.id).replace(/'/g, "&#39;");
-            const safeSize = String(t.size).replace(/'/g, "&#39;");
-            const action =
-              mode === "modal"
-                ? `selectTyreFromSearchHub('${safeId}','${safeSize}')`
-                : `selectTyre('${safeId}','${safeSize}')`;
-            const style = isZero || isLow
-              ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
-              : "";
-            const sizeStyle = isZero || isLow ? ' style="color:var(--gold);"' : "";
-            const btnStyle = isZero || isLow
-              ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
-              : "";
-            return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${btnStyle} onclick="${action}">${esc(tr("selectLabel"))}</button></div></div>`;
-          })
-          .join("");
-        return (
-          countLabel +
-          `<div style="display:flex;flex-direction:column;gap:10px;">${cards}</div>`
-        );
-      };
 
       runTyreSearch = async function (query, containerId, options = {}) {
         const container = document.getElementById(containerId);
@@ -12084,7 +12029,6 @@ a:hover {
 
 
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
     <script id="qpx-custom-stock-reports-patch">
       (() => {
@@ -13350,7 +13294,6 @@ a:hover {
       })();
     </script>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
     <script id="qpx-manual-warehouse-photo-nav-fix">
       (() => {
@@ -14262,9 +14205,6 @@ a:hover {
         });
       })();
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script id="qpx-hotfix-photo-search-order">
   (() => {
     async function qpxGetLocalServicePhotoFile(tx) {
@@ -14387,7 +14327,6 @@ a:hover {
     };
   })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
 <script id="qpx-damaged-clean-patch">
 (() => {
@@ -15595,8 +15534,6 @@ a:hover {
 })();
 </script>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script id="qpx-photo-sync-hotfix">
 (() => {
   function qpxResolvePhotoPublicUrl(tx) {
@@ -15684,7 +15621,6 @@ a:hover {
   };
 })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script id="qpx-service-stats-and-options-patch">
 (() => {
   Object.assign(I18N.en, {
@@ -15889,12 +15825,6 @@ a:hover {
   window.addEventListener('resize', syncFixedTopbarOffset);
 })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <style>
 #app-screen .topbar.qpx-topbar-curtain {
   transform: translateX(-50%) translateY(0);
@@ -16088,14 +16018,16 @@ a:hover {
         ? `selectTyreFromSearchHub('${safeId}','${safeSize}')`
         : `selectTyre('${safeId}','${safeSize}')`;
     const style = isZero
-      ? ' style="border-color:rgba(248,210,110,0.35);background:rgba(248,210,110,0.05);"'
+      ? ' style="border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.04);"'
       : '';
-    const sizeStyle = isZero ? ' style="color:var(--gold);"' : '';
-    const btnStyle = isZero
-      ? ' style="background:linear-gradient(135deg,var(--gold),#e8b54a);"'
+    const sizeStyle = isZero ? ' style="color:#ef4444;"' : '';
+    const orderBtn = isZero
+      ? `<button class="tyre-select-btn" style="background:rgba(40,40,40,0.9);color:#ffffff;font-weight:700;margin-top:6px;border:1px solid rgba(255,255,255,0.15);" onclick="qpxQuickOrder('${safeSize}')">📋 ${uiText('طلبية', 'Order')}</button>`
       : '';
-    const buttonText = isZero ? uiText('غير متوفر', 'Unavailable') : esc(tr('selectLabel'));
-    return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div><button class="tyre-select-btn" ${isZero && !options.allowZeroSelection ? 'disabled' : ''} ${btnStyle} onclick="${action}">${buttonText}</button></div></div>`;
+    const selectBtn = isZero
+      ? ''
+      : `<button class="tyre-select-btn" onclick="${action}">${esc(tr('selectLabel'))}</button>`;
+    return `<div class="tyre-result"${style}><div class="tyre-info"><div class="tyre-size"${sizeStyle}>${size}</div><div class="tyre-meta"><span class="tyre-brand">📍 ${location}</span><span class="stock-badge ${stockClass}">${esc(stockText)}</span></div></div><div class="tyre-right"><div class="tyre-price">${qty} <span>qty</span></div>${selectBtn}${orderBtn}</div></div>`;
   }
 
   function overrideSearchRenderers() {
@@ -16156,8 +16088,6 @@ a:hover {
   window.addEventListener('load', bootQpxSearchAndTopbarPatch);
 })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
 <!-- ======================================================
   QPX ORDER REQUEST FEATURE v2
@@ -16302,6 +16232,7 @@ a:hover {
   }
 
   window.qpxCloseOrderOverlay = closeOverlay;
+  window.qpxOpenOrderOverlay  = openOverlay;
 
   /* ── UUID generator (client-side, avoids server-sequence conflicts) ── */
   function genUUID() {
@@ -16356,16 +16287,16 @@ a:hover {
     }
   };
 
-  /* ── Delete individual order — archive ID to localStorage ── */
-  window.qpxDeleteOrder = function (id) {
+  /* ── Delete individual order — delete from Supabase ── */
+  window.qpxDeleteOrder = async function (id) {
     if (!confirm(tr('orderDeleteConfirm'))) return;
     try {
-      const ids = getArchived();
-      if (ids.indexOf(String(id)) === -1) {
-        ids.push(String(id));
-        localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ids));
-      }
-    } catch (_) {}
+      const { error } = await db.from('order_requests').delete().eq('id', id);
+      if (error) throw error;
+    } catch (e) {
+      showToast('Error: ' + (e.message || String(e)), 'error');
+      return;
+    }
     showToast(tr('orderDeleteMsg'), 'success');
     if (typeof window.renderOrderList === 'function') window.renderOrderList();
   };
@@ -16385,12 +16316,6 @@ a:hover {
     } catch (_) {
       try { rows = JSON.parse(localStorage.getItem('qpx-order-requests') || '[]'); } catch (__) {}
     }
-
-    /* Filter archived IDs */
-    try {
-      const archived = new Set(getArchived().map(String));
-      if (archived.size) rows = rows.filter(function(o) { return !archived.has(String(o.id)); });
-    } catch (_) {}
 
     /* Update summary counts */
     const sizeSet  = new Set(rows.map(function(r) { return String(r.size || '').trim().toUpperCase(); }).filter(Boolean));
@@ -16439,10 +16364,6 @@ a:hover {
     } catch (_) {
       try { rows = JSON.parse(localStorage.getItem('qpx-order-requests') || '[]'); } catch (__) {}
     }
-    try {
-      const archived = new Set(getArchived().map(String));
-      if (archived.size) rows = rows.filter(function(o) { return !archived.has(String(o.id)); });
-    } catch (_) {}
 
     if (!rows.length) { showToast(tr('ordersEmptyLabel'), 'error'); return; }
 
@@ -16597,7 +16518,6 @@ a:hover {
   window.addEventListener('load', applyGuard); /* Safety net */
 })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script id="qpx-service-plate-search-patch">
 (() => {
   Object.assign(I18N.en, {
@@ -16916,7 +16836,6 @@ a:hover {
 })();
 </script>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script id="qpx-service-dashboard-folders-patch">
 (() => {
   Object.assign(I18N.en, {
@@ -17195,11 +17114,6 @@ a:hover {
       try { rows = JSON.parse(localStorage.getItem('qpx-order-requests') || '[]'); }
       catch (_) { rows = []; }
     }
-    /* Filter out individually-archived (deleted) items — read localStorage directly */
-    try {
-      const archived = new Set(JSON.parse(localStorage.getItem('qpx-order-archived-ids') || '[]').map(String));
-      if (archived.size > 0) rows = rows.filter(function(o) { return !archived.has(String(o.id)); });
-    } catch(_) {}
     return rows;
   }
 
@@ -17216,10 +17130,9 @@ a:hover {
   }
 
   async function qpxFetchDamagedRows() {
-    const archived = new Set(qpxGetArchivedDamagedIds().map(String));
     const result = await db.from('transactions').select('*').order('created_at', { ascending: false });
     if (result.error) throw result.error;
-    return (result.data || []).filter((tx) => !qpxIsStockLog(tx) && qpxIsDamagedTx(tx) && !archived.has(String(tx.id)));
+    return (result.data || []).filter((tx) => !qpxIsStockLog(tx) && qpxIsDamagedTx(tx));
   }
 
   function qpxUniqueCount(rows, getter) {
@@ -17389,20 +17302,64 @@ a:hover {
     const date = tx?.created_at ? new Date(tx.created_at).toLocaleString() : '—';
     const note = typeof getTransactionNoteText === 'function' ? getTransactionNoteText(tx) : (tx?.notes || '');
     const noteText = note && note !== tr('noServiceNote') ? `<div class="qpx-damaged-note"><strong>${esc(tr('damagedNoteShort'))}:</strong> ${esc(note)}</div>` : '';
+    const photoUrl = tx?.photo_url || '';
+    const photoHtml = photoUrl
+      ? `<img src="${esc(photoUrl)}" onclick="qpxOpenDamagedPhoto('${esc(photoUrl)}')" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);" />`
+      : '';
+    const shareBtn = `<button onclick="qpxShareDamagedCard('${esc(String(tx.id || ''))}','${esc(size)}','${qty}','${esc(operator)}','${esc(date)}','${esc(note)}','${esc(photoUrl)}')" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#7a9bc2;padding:7px 11px;border-radius:10px;cursor:pointer;font-size:13px;" title="Share">📤</button>`;
     return `
       <div class="qpx-damaged-item" data-id="${esc(String(tx.id || ''))}">
-        <div class="qpx-order-info">
-          <div class="qpx-damaged-size">${esc(size)}</div>
-          <div class="qpx-damaged-meta">
-            <span>📦 ${esc(tr('qty'))}: <b>${qty}</b></span>
-            <span>👤 ${esc(operator)}</span>
-            <span>🕒 ${esc(date)}</span>
+        <div class="qpx-order-info" style="width:100%">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div>
+              <div class="qpx-damaged-size">${esc(size)}</div>
+              <div class="qpx-damaged-meta">
+                <span>📦 ${esc(tr('qty'))}: <b>${qty}</b></span>
+                <span>👤 ${esc(operator)}</span>
+                <span>🕒 ${esc(date)}</span>
+              </div>
+            </div>
+            ${shareBtn}
           </div>
           ${noteText}
+          ${photoHtml}
         </div>
       </div>
     `;
   }
+
+  window.qpxOpenDamagedPhoto = function(url) {
+    const lb = document.getElementById('image-lightbox');
+    const img = document.getElementById('image-lightbox-img');
+    if (lb && img) { img.src = url; lb.style.display = 'flex'; }
+    else { window.open(url, '_blank'); }
+  };
+
+  window.qpxShareDamagedCard = async function(id, size, qty, operator, date, note, photoUrl) {
+    const text = `🔴 DAMAGED TYRE\n📏 Size: ${size}\n📦 Qty: ${qty}\n👤 ${operator}\n🕒 ${date}${note ? '\n📝 ' + note : ''}`;
+    if (photoUrl && navigator.canShare) {
+      try {
+        const resp = await fetch(photoUrl);
+        const blob = await resp.blob();
+        const ext = blob.type.split('/')[1] || 'jpg';
+        const file = new File([blob], `damaged_${size.replace(/\//g,'_')}.${ext}`, { type: blob.type });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ text, files: [file] });
+          return;
+        }
+      } catch(_) {}
+    }
+    if (navigator.share) {
+      try { await navigator.share({ text: text + (photoUrl ? '\n🖼️ ' + photoUrl : '') }); return; }
+      catch(_) {}
+    }
+    try {
+      await navigator.clipboard.writeText(text + (photoUrl ? '\n🖼️ ' + photoUrl : ''));
+      showToast('📋 Copied to clipboard', 'success');
+    } catch(_) {
+      showToast('Share not supported on this device', 'error');
+    }
+  };
 
   async function qpxRenderDamagedDashboardList() {
     qpxEnsureDashboardPanels();
@@ -17475,8 +17432,14 @@ a:hover {
       return;
     }
     if (!confirm(tr('deleteDamagedConfirm'))) return;
-    const next = qpxGetArchivedDamagedIds().concat(rows.map((row) => String(row.id)));
-    qpxSetArchivedDamagedIds(next);
+    try {
+      const ids = rows.map((row) => row.id);
+      const { error } = await db.from('transactions').delete().in('id', ids);
+      if (error) throw error;
+    } catch (e) {
+      showToast('Error: ' + (e.message || String(e)), 'error');
+      return;
+    }
     showToast(tr('damagedListClearedMsg'), 'success');
     await qpxRenderDamagedDashboardList();
   };
@@ -17660,7 +17623,6 @@ a:hover {
 })();
 </script>
 
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
 <!-- ═══════════════════════════════════════════════════════
      QPX GLASS THEME — Gray · Black · White
@@ -18682,7 +18644,6 @@ button.service-mini-btn.damage-active {
 }
 
 </style>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      QPX FEATURE PACK — Scroll-top · Refresh Btn · List Toggles
