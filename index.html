@@ -16,6 +16,7 @@
       href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -750,6 +751,11 @@
         background: var(--gold-dim);
         border-color: rgba(248, 210, 110, 0.55);
         color: var(--gold);
+      }
+
+      #svc-plate.ocr-filled {
+        border-color: #22c55e !important;
+        box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25) !important;
       }
 
       .photo-area {
@@ -6053,6 +6059,7 @@ a:hover {
         document.getElementById("photo-placeholder").style.display = "block";
         document.getElementById("photo-area").classList.remove("has-photo");
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("car-photo-input").value = "";
@@ -6120,8 +6127,74 @@ a:hover {
           img.style.display = "block";
           document.getElementById("photo-placeholder").style.display = "none";
           document.getElementById("photo-area").classList.add("has-photo");
+          runPlateOCR(capturedPhotoDataUrl);
         };
         reader.readAsDataURL(file);
+      }
+
+      // Attempts to read the plate number from the captured photo using
+      // client-side OCR (Tesseract.js) and auto-fills the plate field.
+      // Only fills the field if it's currently empty, so it never
+      // overwrites a plate number the user already typed manually.
+      async function runPlateOCR(dataUrl) {
+        const plateInput = document.getElementById("svc-plate");
+        if (!plateInput) return;
+        const alreadyFilled = plateInput.value.trim().length > 0;
+
+        const statusMsg =
+          currentLang === "ar"
+            ? "🔍 جاري قراءة رقم اللوحة..."
+            : "🔍 Reading plate number...";
+        showToast(statusMsg, "success");
+
+        try {
+          const {
+            data: { text },
+          } = await Tesseract.recognize(dataUrl, "eng", {
+            tessedit_char_whitelist:
+              "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ",
+          });
+
+          const cleaned = text.toUpperCase().replace(/[^A-Z0-9]/g, " ");
+
+          // UK current-format plate: 2 letters, 2 digits, 3 letters (e.g. AB12 CDE)
+          let match = cleaned.match(/\b([A-Z]{2})\s*([0-9]{2})\s*([A-Z]{3})\b/);
+          let plate = match ? `${match[1]}${match[2]} ${match[3]}` : null;
+
+          // Fallback: older UK format, letter + digits + 3 letters (e.g. A123 BCD)
+          if (!plate) {
+            match = cleaned.match(/\b([A-Z])\s*([0-9]{1,3})\s*([A-Z]{3})\b/);
+            if (match) plate = `${match[1]}${match[2]} ${match[3]}`;
+          }
+
+          if (plate) {
+            if (!alreadyFilled) {
+              plateInput.value = plate;
+              plateInput.classList.add("ocr-filled");
+            }
+            showToast(
+              (currentLang === "ar"
+                ? "✅ تم التعرف على اللوحة: "
+                : "✅ Plate detected: ") + plate,
+              "success"
+            );
+          } else {
+            showToast(
+              currentLang === "ar"
+                ? "⚠️ تعذر قراءة اللوحة تلقائياً، الرجاء إدخالها يدوياً"
+                : "⚠️ Couldn't auto-read the plate, please type it manually",
+              "error"
+            );
+          }
+        } catch (err) {
+          console.error("Plate OCR error:", err);
+          showToast(
+            currentLang === "ar"
+              ? "⚠️ تعذر قراءة اللوحة تلقائياً، الرجاء إدخالها يدوياً"
+              : "⚠️ Couldn't auto-read the plate, please type it manually",
+            "error"
+          );
+        }
       }
 
       function clearSvc() {
@@ -6135,6 +6208,7 @@ a:hover {
         document.getElementById("sale-search").value = "";
         document.getElementById("sale-results").innerHTML = "";
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("photo-preview").style.display = "none";
@@ -7616,6 +7690,7 @@ a:hover {
         document.getElementById("photo-preview").style.display = "none";
         document.getElementById("photo-placeholder").style.display = "flex";
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("car-photo-input").value = "";
@@ -7689,6 +7764,7 @@ a:hover {
         document.getElementById("sale-search").value = "";
         document.getElementById("sale-results").innerHTML = "";
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("photo-preview").style.display = "none";
@@ -9971,6 +10047,7 @@ a:hover {
         document.getElementById("photo-preview").style.display = "none";
         document.getElementById("photo-placeholder").style.display = "flex";
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("car-photo-input").value = "";
@@ -10013,6 +10090,7 @@ a:hover {
         document.getElementById("sale-search").value = "";
         document.getElementById("sale-results").innerHTML = "";
         document.getElementById("svc-plate").value = "";
+        document.getElementById("svc-plate").classList.remove("ocr-filled");
         document.getElementById("svc-qty").value = "1";
         document.getElementById("svc-notes").value = "";
         document.getElementById("photo-preview").style.display = "none";
@@ -16833,6 +16911,332 @@ a:hover {
 
   qpxEnsureServiceQuickLinksAndSearch();
   qpxUpdateServiceSearchText();
+})();
+</script>
+
+<script id="qpx-plate-camera-scan-patch">
+(() => {
+  Object.assign(I18N.en, {
+    scanPlateBtn: "Scan License Plate",
+    scanModalTitle: "Scan License Plate",
+    scanHint: "Line up the plate inside the frame, then tap Capture.",
+    scanCaptureBtn: "Capture",
+    scanCancelBtn: "Cancel",
+    scanReadingMsg: "🔍 Reading plate...",
+    scanNotFoundMsg: "⚠️ Couldn't read the plate. Please enter it manually.",
+    scanFoundMsg: "✅ Plate detected: ",
+    scanCameraDeniedMsg: "Camera permission denied. Please allow camera access in your browser settings, or enter the plate manually.",
+    scanCameraMissingMsg: "No camera was found on this device. Please enter the plate manually.",
+    scanCameraErrorMsg: "Unable to access the camera. Please enter the plate manually.",
+    scanBusyMsg: "Please wait, still processing the previous scan...",
+  });
+
+  Object.assign(I18N.ar, {
+    scanPlateBtn: "مسح رقم اللوحة",
+    scanModalTitle: "مسح رقم اللوحة",
+    scanHint: "ضع اللوحة داخل الإطار ثم اضغط التقاط.",
+    scanCaptureBtn: "التقاط",
+    scanCancelBtn: "إلغاء",
+    scanReadingMsg: "🔍 جاري قراءة اللوحة...",
+    scanNotFoundMsg: "⚠️ تعذر قراءة اللوحة، الرجاء إدخالها يدويًا.",
+    scanFoundMsg: "✅ تم التعرف على اللوحة: ",
+    scanCameraDeniedMsg: "تم رفض إذن الكاميرا. الرجاء السماح بالوصول إلى الكاميرا من إعدادات المتصفح، أو أدخل رقم اللوحة يدويًا.",
+    scanCameraMissingMsg: "لم يتم العثور على كاميرا في هذا الجهاز. الرجاء إدخال رقم اللوحة يدويًا.",
+    scanCameraErrorMsg: "تعذر الوصول إلى الكاميرا. الرجاء إدخال رقم اللوحة يدويًا.",
+    scanBusyMsg: "الرجاء الانتظار، جاري معالجة المسح السابق...",
+  });
+
+  function scanText(key, ar, en, params) {
+    const value = typeof tr === 'function' ? tr(key, params) : '';
+    if (!value || value === key) return currentLang === 'ar' ? ar : en;
+    return value;
+  }
+
+  let plateScanContext = null;
+  let plateScanStream = null;
+  let plateScanBusy = false;
+
+  function qpxEnsurePlateScanStyles() {
+    if (document.getElementById('qpx-plate-scan-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'qpx-plate-scan-styles';
+    style.textContent = [
+      '.plate-scan-sheet{max-width:440px;}',
+      '.plate-scan-video-wrap{position:relative;width:100%;aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#000;border:1px solid var(--stroke);}',
+      '#plate-scan-video{width:100%;height:100%;object-fit:cover;display:block;}',
+      '.plate-scan-frame{position:absolute;top:32%;left:8%;right:8%;bottom:32%;border:2px dashed rgba(248,210,110,.85);border-radius:10px;pointer-events:none;}',
+      '.plate-scan-hint{margin-top:12px;font-size:12px;color:var(--text-soft);text-align:center;}',
+      '.plate-scan-status{margin-top:8px;font-size:13px;text-align:center;min-height:18px;color:var(--gold);}',
+      '.plate-scan-error{padding:22px 10px;text-align:center;font-size:13px;color:var(--text-soft);}',
+      '.plate-scan-actions{margin-top:14px;display:flex;gap:10px;}',
+      '.plate-scan-actions .btn{flex:1;}',
+      '.plate-scan-trigger{margin-bottom:12px;}',
+      '#hub-plate-scan-btn{position:sticky;top:0;z-index:5;}',
+      '#svc-plate-search-panel .plate-scan-trigger{margin-bottom:0;}',
+    ].join('');
+    document.head.appendChild(style);
+  }
+
+  function qpxEnsurePlateScanModal() {
+    if (document.getElementById('plate-scan-modal')) return;
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal-overlay" id="plate-scan-modal">
+        <div class="modal plate-scan-sheet">
+          <div class="modal-header">
+            <div class="modal-title"><i class="fas fa-camera"></i> <span id="plate-scan-modal-title"></span></div>
+            <button class="modal-close" type="button" onclick="closePlateScanner()">✕</button>
+          </div>
+          <div id="plate-scan-camera-area">
+            <div class="plate-scan-video-wrap" id="plate-scan-video-wrap">
+              <video id="plate-scan-video" autoplay playsinline muted></video>
+              <div class="plate-scan-frame"></div>
+            </div>
+            <canvas id="plate-scan-canvas" style="display:none"></canvas>
+            <div class="plate-scan-hint" id="plate-scan-hint"></div>
+          </div>
+          <div class="plate-scan-status" id="plate-scan-status"></div>
+          <div class="plate-scan-actions">
+            <button type="button" class="btn btn-ghost" id="plate-scan-cancel-btn" onclick="closePlateScanner()"></button>
+            <button type="button" class="btn btn-primary" id="plate-scan-capture-btn" onclick="capturePlatePhoto()"></button>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  function qpxUpdatePlateScanText() {
+    const title = document.getElementById('plate-scan-modal-title');
+    const hint = document.getElementById('plate-scan-hint');
+    const cancelBtn = document.getElementById('plate-scan-cancel-btn');
+    const captureBtn = document.getElementById('plate-scan-capture-btn');
+    if (title) title.textContent = scanText('scanModalTitle', 'مسح رقم اللوحة', 'Scan License Plate');
+    if (hint) hint.textContent = scanText('scanHint', 'ضع اللوحة داخل الإطار ثم اضغط التقاط.', 'Line up the plate inside the frame, then tap Capture.');
+    if (cancelBtn) cancelBtn.textContent = scanText('scanCancelBtn', 'إلغاء', 'Cancel');
+    if (captureBtn) captureBtn.innerHTML = '<i class="fas fa-camera"></i> ' + esc(scanText('scanCaptureBtn', 'التقاط', 'Capture'));
+    document.querySelectorAll('.plate-scan-trigger-label').forEach((el) => {
+      el.textContent = scanText('scanPlateBtn', 'مسح رقم اللوحة', 'Scan License Plate');
+    });
+  }
+
+  function qpxEnsurePlateScanTriggers() {
+    // Location 1 (highest priority): tyre-size search hub opened from the
+    // center floating nav button. Button is inserted ABOVE the search
+    // input so it never gets hidden by the results dropdown, and is kept
+    // sticky so it stays visible while results are showing.
+    const hubBody = document.querySelector('#search-hub-modal .search-hub-body');
+    const hubSearchWrap = document.querySelector('#search-hub-modal .search-wrap-main');
+    if (hubBody && hubSearchWrap && !document.getElementById('hub-plate-scan-btn')) {
+      hubSearchWrap.insertAdjacentHTML('beforebegin', `
+        <button type="button" class="btn btn-primary btn-block plate-scan-trigger" id="hub-plate-scan-btn" onclick="openPlateScanner('hub')">
+          <i class="fas fa-camera"></i> <span class="plate-scan-trigger-label"></span>
+        </button>
+      `);
+    }
+
+    // Location 2: Service page "Search by Plate" panel — button inserted
+    // directly above the manual plate input, manual search kept intact.
+    const svcPanel = document.getElementById('svc-plate-search-panel');
+    const svcRow = svcPanel ? svcPanel.querySelector('.service-search-row') : null;
+    if (svcPanel && svcRow && !document.getElementById('svc-plate-scan-btn')) {
+      svcRow.insertAdjacentHTML('beforebegin', `
+        <button type="button" class="btn btn-primary btn-block plate-scan-trigger" id="svc-plate-scan-btn" onclick="openPlateScanner('svc')">
+          <i class="fas fa-camera"></i> <span class="plate-scan-trigger-label"></span>
+        </button>
+      `);
+    }
+
+    qpxUpdatePlateScanText();
+  }
+
+  // Normalizes OCR text into the same searchable format already used by
+  // searchServiceByPlate()/qpxNormalizePlate() (uppercase A-Z0-9 only),
+  // also converting Arabic-Indic digits to their Latin equivalents first.
+  function qpxNormalizeScannedPlate(raw) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    let value = String(raw || '');
+    value = value.replace(/[٠-٩]/g, (d) => String(arabicDigits.indexOf(d)));
+    return value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  }
+
+  function qpxShowPlateScanError(message) {
+    const cameraArea = document.getElementById('plate-scan-camera-area');
+    const captureBtn = document.getElementById('plate-scan-capture-btn');
+    const status = document.getElementById('plate-scan-status');
+    if (cameraArea) cameraArea.innerHTML = `<div class="plate-scan-error">${esc(message)}</div>`;
+    if (captureBtn) captureBtn.style.display = 'none';
+    if (status) status.textContent = '';
+  }
+
+  window.openPlateScanner = async function (context) {
+    if (plateScanBusy) {
+      showToast(scanText('scanBusyMsg', 'الرجاء الانتظار، جاري معالجة المسح السابق...', 'Please wait, still processing the previous scan...'), 'error');
+      return;
+    }
+    qpxEnsurePlateScanStyles();
+    qpxEnsurePlateScanModal();
+    qpxUpdatePlateScanText();
+    plateScanContext = context;
+
+    const modal = document.getElementById('plate-scan-modal');
+    const cameraArea = document.getElementById('plate-scan-camera-area');
+    const status = document.getElementById('plate-scan-status');
+    const captureBtn = document.getElementById('plate-scan-capture-btn');
+    if (cameraArea) {
+      cameraArea.innerHTML = `
+        <div class="plate-scan-video-wrap" id="plate-scan-video-wrap">
+          <video id="plate-scan-video" autoplay playsinline muted></video>
+          <div class="plate-scan-frame"></div>
+        </div>
+        <canvas id="plate-scan-canvas" style="display:none"></canvas>
+        <div class="plate-scan-hint" id="plate-scan-hint"></div>
+      `;
+    }
+    if (captureBtn) {
+      captureBtn.style.display = '';
+      captureBtn.disabled = false;
+    }
+    if (status) status.textContent = '';
+    qpxUpdatePlateScanText();
+    modal?.classList.add('open');
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      qpxShowPlateScanError(scanText('scanCameraErrorMsg', 'تعذر الوصول إلى الكاميرا. الرجاء إدخال رقم اللوحة يدويًا.', 'Unable to access the camera. Please enter the plate manually.'));
+      return;
+    }
+
+    try {
+      plateScanStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      const video = document.getElementById('plate-scan-video');
+      if (video) {
+        video.srcObject = plateScanStream;
+        await video.play().catch(() => {});
+      }
+    } catch (err) {
+      console.error('Camera error:', err);
+      let msg = scanText('scanCameraErrorMsg', 'تعذر الوصول إلى الكاميرا. الرجاء إدخال رقم اللوحة يدويًا.', 'Unable to access the camera. Please enter the plate manually.');
+      if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+        msg = scanText('scanCameraDeniedMsg', 'تم رفض إذن الكاميرا. الرجاء السماح بالوصول إلى الكاميرا من إعدادات المتصفح، أو أدخل رقم اللوحة يدويًا.', 'Camera permission denied. Please allow camera access in your browser settings, or enter the plate manually.');
+      } else if (err && (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError')) {
+        msg = scanText('scanCameraMissingMsg', 'لم يتم العثور على كاميرا في هذا الجهاز. الرجاء إدخال رقم اللوحة يدويًا.', 'No camera was found on this device. Please enter the plate manually.');
+      }
+      qpxShowPlateScanError(msg);
+    }
+  };
+
+  window.closePlateScanner = function () {
+    const modal = document.getElementById('plate-scan-modal');
+    modal?.classList.remove('open');
+    if (plateScanStream) {
+      plateScanStream.getTracks().forEach((t) => t.stop());
+      plateScanStream = null;
+    }
+    plateScanContext = null;
+  };
+
+  function qpxFocusManualInput(context) {
+    if (context === 'svc') {
+      if (typeof togglePlateSearchPanel === 'function') togglePlateSearchPanel(true);
+      document.getElementById('svc-plate-search-input')?.focus();
+    } else if (context === 'hub') {
+      document.getElementById('search-hub-input')?.focus();
+    }
+  }
+
+  function qpxApplyScannedPlate(context, plateValue) {
+    if (context === 'hub') {
+      if (typeof closeSearchHub === 'function') closeSearchHub();
+      if (typeof showPage === 'function') showPage('service');
+      if (typeof togglePlateSearchPanel === 'function') togglePlateSearchPanel(true);
+      const input = document.getElementById('svc-plate-search-input');
+      if (input) {
+        input.value = plateValue;
+        if (typeof searchServiceByPlate === 'function') searchServiceByPlate();
+      }
+      setTimeout(() => {
+        document.getElementById('svc-plate-search-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    } else if (context === 'svc') {
+      if (typeof togglePlateSearchPanel === 'function') togglePlateSearchPanel(true);
+      const input = document.getElementById('svc-plate-search-input');
+      if (input) {
+        input.value = plateValue;
+        if (typeof searchServiceByPlate === 'function') searchServiceByPlate();
+      }
+    }
+  }
+
+  window.capturePlatePhoto = async function () {
+    if (plateScanBusy) return;
+    const video = document.getElementById('plate-scan-video');
+    const canvas = document.getElementById('plate-scan-canvas');
+    const status = document.getElementById('plate-scan-status');
+    const captureBtn = document.getElementById('plate-scan-capture-btn');
+    if (!video || !canvas || !video.videoWidth) return;
+
+    plateScanBusy = true;
+    if (captureBtn) captureBtn.disabled = true;
+    if (status) status.textContent = scanText('scanReadingMsg', '🔍 جاري قراءة اللوحة...', '🔍 Reading plate...');
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+    const context = plateScanContext;
+    closePlateScanner();
+
+    try {
+      const { data: { text } } = await Tesseract.recognize(dataUrl, 'eng', {
+        tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',
+      });
+      const normalized = qpxNormalizeScannedPlate(text);
+      if (!normalized) {
+        showToast(scanText('scanNotFoundMsg', '⚠️ تعذر قراءة اللوحة، الرجاء إدخالها يدويًا.', "⚠️ Couldn't read the plate. Please enter it manually."), 'error');
+        qpxFocusManualInput(context);
+        return;
+      }
+      showToast(scanText('scanFoundMsg', '✅ تم التعرف على اللوحة: ', '✅ Plate detected: ') + normalized, 'success');
+      qpxApplyScannedPlate(context, normalized);
+    } catch (err) {
+      console.error('Plate scan OCR error:', err);
+      showToast(scanText('scanNotFoundMsg', '⚠️ تعذر قراءة اللوحة، الرجاء إدخالها يدويًا.', "⚠️ Couldn't read the plate. Please enter it manually."), 'error');
+      qpxFocusManualInput(context);
+    } finally {
+      plateScanBusy = false;
+      if (captureBtn) captureBtn.disabled = false;
+    }
+  };
+
+  const qpxPrevApplyLanguagePlateScan = typeof applyLanguage === 'function' ? applyLanguage : null;
+  if (qpxPrevApplyLanguagePlateScan) {
+    applyLanguage = function () {
+      qpxPrevApplyLanguagePlateScan();
+      qpxEnsurePlateScanTriggers();
+      qpxUpdatePlateScanText();
+    };
+  }
+
+  const qpxPrevShowPagePlateScan = typeof showPage === 'function' ? showPage : null;
+  if (qpxPrevShowPagePlateScan) {
+    showPage = function (name) {
+      qpxPrevShowPagePlateScan(name);
+      qpxEnsurePlateScanTriggers();
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    qpxEnsurePlateScanStyles();
+    qpxEnsurePlateScanModal();
+    qpxEnsurePlateScanTriggers();
+  });
+
+  qpxEnsurePlateScanStyles();
+  qpxEnsurePlateScanModal();
+  qpxEnsurePlateScanTriggers();
 })();
 </script>
 
