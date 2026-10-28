@@ -900,6 +900,10 @@ select.input { padding-inline-end:8px; }
 .cam-shutter { flex:none; width:72px; height:72px; border-radius:var(--radius-full); background:#fff; border:5px solid rgba(255,255,255,.45); background-clip:padding-box; }
 .cam-shutter:active { transform:scale(.94); }
 .cam-spacer { min-width:72px; }
+.cam-gallery { display:none; min-width:72px; max-width:110px; min-height:44px; padding:4px 8px; flex-direction:column; align-items:center; justify-content:center; gap:2px; border-radius:var(--radius-md); color:#fff; font-size:12px; font-weight:600; line-height:14px; text-align:center; }
+.cam-gallery .ms { font-size:24px; }
+.cam-layer.scan .cam-gallery { display:flex; }
+.cam-layer.scan .cam-spacer { display:none; }
 
 /* ===== Service page refinements (owner feedback, Oct 17) ===== */
 .wh-chips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -1636,6 +1640,7 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
     <button type="button" class="cam-cancel" onclick="closeCamera()" data-i18n="cancel">Cancel</button>
     <button type="button" class="cam-shutter" id="cam-shutter" onclick="snapCamera()" aria-label="Take photo"></button>
     <span class="cam-spacer"></span>
+    <button type="button" class="cam-gallery" onclick="camPickGallery()"><span class="ms" aria-hidden="true">image</span><span data-i18n="uploadGallery">Upload from gallery</span></button>
   </div>
 </div>
 
@@ -1966,6 +1971,7 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
 </div>
 
 <input type="file" id="plate-scan-input" accept="image/*" capture="environment" style="display:none" onchange="scanPlateFile(this)" />
+<input type="file" id="plate-scan-gallery" accept="image/*" style="display:none" onchange="scanPlateFile(this)" />
 <div class="scan-layer" id="scan-layer" aria-live="polite">
   <div class="scan-frame"><img id="scan-img" alt="" /><div class="scan-line"></div><span class="scan-corner tl"></span><span class="scan-corner tr"></span><span class="scan-corner bl"></span><span class="scan-corner br"></span></div>
   <div class="scan-txt"><span id="scan-txt">Reading plate</span><span class="scan-dots"></span></div>
@@ -3193,6 +3199,11 @@ async function handlePhoto(input) {
   renderPhotoArea();
   runPlateOCR(svcPhoto);
 }
+/* UK style: first 4 characters, a space, then the rest (AB12 CDE) */
+function ukPlate(p) {
+  const c = String(p || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return c.length > 4 ? c.slice(0, 4) + " " + c.slice(4) : c;
+}
 function extractPlate(text) {
   const cleaned = String(text || "").toUpperCase().replace(/[^A-Z0-9]/g, " ");
   let m = cleaned.match(/\b([A-Z]{2})\s*([0-9]{2})\s*([A-Z]{3})\b/);
@@ -3203,50 +3214,75 @@ function extractPlate(text) {
   return tok || "";
 }
 let ocrState = "";   // '', 'reading', 'found', 'fail'
-/* ---- Gemini plate reader (Google AI Studio). Paste your key below. Models are tried in order; if one is over its free quota the next one is used. ---- */
-const GEMINI_KEY = "AQ.Ab8RN6Kv8RdgP2VQXtT-FeukcVS6qc4AsNjM2rA4cznUVqCN9A";
-const GEMINI_MODELS = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.5-flash"];
-const GEMINI_PROMPT = "This is a photo of a vehicle. Find the UK number plate (registration) and read it exactly. " +
-  "UK plates look like AB12 CDE (2 letters, 2 digits, 3 letters) or older formats. Do not guess: if letters/digits are unclear or no plate is visible, answer NONE. " +
-  "Answer with the plate characters only, no explanation.";
-async function geminiReadPlate(dataUrl) {
-  const b64 = String(dataUrl).split(",")[1] || "";
+/* ---- Plate reader (Google Gemini). 1) straight from the browser with the key below, 2) if that fails, through the Supabase function "read-plate".
+       NOTE: a key written in the page can be seen by anyone who views the page source - keep this key on the FREE plan (no billing). ---- */
+const GEMINI_KEY = "AQ.Ab8RN6JGGH5VHNC50f9Fj3j-1OYGNWpZvKSvvznnMnlQMzjFWQ";
+const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.7-flash"];
+const GEMINI_PROMPT = "You read UK vehicle number plates. Look at the photo and find the vehicle registration plate. " +
+  "Return ONLY the plate characters in capital letters and digits, with no spaces or punctuation. " +
+  "If several plates are visible, return the one on the vehicle closest to the camera. " +
+  "If there is no readable plate, return the single word NONE.";
+let ocrReason = "", geminiGoodModel = "";
+async function geminiDirect(b64) {
   const body = JSON.stringify({
     contents: [{ parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: "image/jpeg", data: b64 } }] }],
-    generationConfig: { temperature: 0, maxOutputTokens: 40 }
+    generationConfig: { temperature: 0, maxOutputTokens: 1024 }   /* "thinking" tokens count here: a small limit gave empty answers */
   });
-  let lastErr = null;
-  for (const model of GEMINI_MODELS) {
+  const models = geminiGoodModel ? [geminiGoodModel].concat(GEMINI_MODELS.filter((m) => m !== geminiGoodModel)) : GEMINI_MODELS;
+  const seen = [];
+  for (const model of models) {
     try {
       const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
         { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY }, body });
       if (!r.ok) {
-        let detail = ""; try { detail = (await r.text()).slice(0, 300); } catch (_) {}
-        lastErr = model + " HTTP " + r.status + " " + detail;
-        console.warn("Gemini error:", lastErr);
-        if (r.status === 400 || r.status === 401 || r.status === 403) break;   /* bad key/request: other models won't help */
-        continue;
+        let d = ""; try { d = (await r.text()).slice(0, 200); } catch (_) {}
+        console.warn("Gemini", model, r.status, d);
+        seen.push(r.status); continue;
       }
       const j = await r.json();
       const parts = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
-      return parts.map((p) => p.text || "").join(" ").trim();
-    } catch (e) { lastErr = e; }
+      const text = parts.map((p) => p.text || "").join(" ").trim();
+      if (!text) { seen.push(204); continue; }
+      geminiGoodModel = model;
+      return text;
+    } catch (e) { console.warn("Gemini", model, e); seen.push(0); }
   }
-  throw new Error("Gemini failed: " + lastErr);
+  const e = new Error("direct");
+  e.code = seen.includes(429) ? "quota" : seen.every((x) => x === 401 || x === 403 || x === 400) ? "bad_key" : seen.every((x) => x === 404) ? "no_model" : seen.every((x) => x === 0) ? "network" : "upstream";
+  throw e;
+}
+async function geminiViaFunction(b64) {
+  const { data, error } = await db.functions.invoke("read-plate", { body: { image: b64 } });
+  if (error) {
+    let code = "network";
+    try { const j = await error.context.json(); code = (j && j.error) || code; console.warn("read-plate:", j); } catch (_) {}
+    const e = new Error(code); e.code = code; throw e;
+  }
+  if (data && data.error) { const e = new Error(data.error); e.code = data.error; throw e; }
+  return (data && data.plate) || "NONE";
+}
+async function geminiReadPlate(dataUrl) {
+  const b64 = String(dataUrl).split(",")[1] || "";
+  try { return await geminiDirect(b64); }
+  catch (e1) {
+    try { return await geminiViaFunction(b64); }
+    catch (e2) { const e = new Error("ocr"); e.code = (e1 && e1.code) || (e2 && e2.code) || "network"; throw e; }
+  }
 }
 async function runPlateOCR(dataUrl) {
   if (svcMode === "order") return;
   ocrState = "reading"; svcOcrPlate = ""; renderOcr();
   try {
-    if (!GEMINI_KEY || GEMINI_KEY.indexOf("PASTE_") === 0) throw new Error("Gemini key missing");
+    ocrReason = "";
     const text = await geminiReadPlate(dataUrl);
     if (svcPhoto !== dataUrl) return;     // photo was changed/removed meanwhile
     const clean = String(text).toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim();
     let plate = clean === "NONE" ? "" : extractPlate(clean);
     if (!plate && clean && clean !== "NONE") { const c = clean.replace(/\s+/g, ""); if (c.length >= 2 && c.length <= 8) plate = c; }
+    plate = ukPlate(plate);
     svcOcrPlate = plate;
     ocrState = svcOcrPlate ? "found" : "fail";
-  } catch (e) { console.warn("OCR failed:", e); ocrState = "fail"; }
+  } catch (e) { console.warn("OCR failed:", e); ocrState = "fail"; ocrReason = (e && e.code) || ""; }
   renderOcr();
 }
 function renderOcr() {
@@ -3254,7 +3290,7 @@ function renderOcr() {
   if (!svcPhoto || !ocrState || svcMode === "order") { box.style.display = "none"; return; }
   box.style.display = "flex";
   if (ocrState === "reading") box.innerHTML = '<span class="grow muted">' + esc(t("ocrReading")) + "</span>";
-  else if (ocrState === "fail") box.innerHTML = '<span class="grow muted">' + esc(t("ocrFail")) + '</span><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
+  else if (ocrState === "fail") box.innerHTML = '<span class="grow muted">' + esc(t("ocrFail")) + (ocrReason ? ' <small dir="ltr">(' + esc(ocrReason) + ')</small>' : '') + '</span><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
   else box.innerHTML = '<span class="grow">' + esc(t("ocrSuggest")) + " <b>" + esc(svcOcrPlate) + '</b></span>' +
     '<button type="button" class="mini-btn pri" onclick="confirmOcr()">' + esc(t("confirm")) + '</button><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
 }
@@ -3331,7 +3367,7 @@ async function attachPhoto(txId, plate, notes, meta) {
   const { error } = await db.from("transactions").update({ photo_url: up.url, notes: packTransactionNotes(notes, next) }).eq("id", txId);
   return !error;
 }
-async function finishSave(msgKey, photoOk) {
+async function finishSave(msgKey, photoOk, shareId) {
   if ((msgKey === "orderSaved" || msgKey === "damagedSaved") && photoOk !== false) toastAction(t(msgKey), t("hubView"), () => hubGoto(msgKey === "damagedSaved" ? "damaged" : "orders"));   /* STEP 5 */
   else toast(t(photoOk === false ? "photoWarn" : msgKey));
   closeSmartForm(true);
@@ -3339,7 +3375,8 @@ async function finishSave(msgKey, photoOk) {
   document.getElementById("size-results").innerHTML = "";
   await loadInventoryCache();
   loadDashboard();
-  loadToday(true);   /* V2-STEP 4 */
+  const tdP = loadToday(true);   /* V2-STEP 4 */
+  if (shareId) { try { await tdP; } catch (_) {} autoShareService(shareId); }   /* open the share sheet right after saving */
 }
 
 /* ===== V2-STEP 5: Two Different Sizes (R2) ===== */
@@ -3517,7 +3554,7 @@ async function saveTwoSizes(plate, noteRaw) {
   }
   const ok = await attachPhoto(tx.id, plate, noteRaw, meta);
   const exFailed = await saveExtras(plate);
-  await finishSave("serviceSaved", svcPhoto ? ok : undefined);
+  await finishSave("serviceSaved", svcPhoto ? ok : undefined, tx.id);
   if (exFailed) setTimeout(() => toast(t("extraPartial", { n: exFailed })), 2200);
 }
 
@@ -3550,7 +3587,7 @@ async function saveSmartForm() {
         notes: packTransactionNotes(noteRaw, meta), operator: currentUser.username, photo_url: null, quantity: qty, brand: null }, positionFlags())).select().single();
       if (error || !tx) throw error || new Error(t("saveFailed"));
       const ok = await attachPhoto(tx.id, plate, noteRaw, meta);
-      await finishSave("serviceOnlySaved", svcPhoto ? ok : undefined);
+      await finishSave("serviceOnlySaved", svcPhoto ? ok : undefined, tx.id);
       return;
     }
     if (svcMode === "tyre" && svcExtraDraft) { toast(t("extraOpen")); return; }
@@ -3587,7 +3624,7 @@ async function saveSmartForm() {
     }
     const ok = await attachPhoto(tx.id, payloadPlate, note, meta);
     const exFailed = await saveExtras(payloadPlate);
-    await finishSave(damaged ? "damagedSaved" : "serviceSaved", svcPhoto ? ok : undefined);
+    await finishSave(damaged ? "damagedSaved" : "serviceSaved", svcPhoto ? ok : undefined, damaged ? null : tx.id);
     if (exFailed) setTimeout(() => toast(t("extraPartial", { n: exFailed })), 2200);
     const extra = res.plan.slice(1);
     if (extra.length && !manualWh) setTimeout(() => toast(t("autoFill", { value: res.plan.map((p) => (p.location || "—") + " ×" + p.take).join(", ") })), 2200);
@@ -3653,7 +3690,7 @@ Object.assign(I18N.en, {
   tdLoadFail: "Could not load today's services",
   tdDone: "Completed", tdDamaged: "Damaged", tdSvcOnly: "Service only",
   tdPositions: "Positions", tdNoPos: "No positions selected", tdTyres: "{n} tyre(s)",
-  tdShare: "Share", tdShareAgain: "Ready — tap Share again", tdShareTitle: "Quality Part X — service"
+  tdShare: "Share", tdShareAgain: "Ready — tap Share again", tdShareOffer: "Saved — share this service?", tdShareTitle: "Quality Part X — service"
 });
 Object.assign(I18N.ar, {
   tdTitle: "خدمات اليوم", tdSub: "الخدمات المنجزة اليوم مع المشاركة والحذف.",
@@ -3661,7 +3698,7 @@ Object.assign(I18N.ar, {
   tdLoadFail: "تعذر تحميل خدمات اليوم",
   tdDone: "مكتملة", tdDamaged: "تالف", tdSvcOnly: "خدمة فقط",
   tdPositions: "الأماكن", tdNoPos: "لم تُحدد الأماكن", tdTyres: "{n} إطار",
-  tdShare: "مشاركة", tdShareAgain: "جاهز — اضغط مشاركة مرة أخرى", tdShareTitle: "Quality Part X — خدمة"
+  tdShare: "مشاركة", tdShareAgain: "جاهز — اضغط مشاركة مرة أخرى", tdShareOffer: "تم الحفظ — مشاركة الخدمة؟", tdShareTitle: "Quality Part X — خدمة"
 });
 let todayData = null, todayLoading = false, tdSharing = false;
 const tdShareCache = new Map();
@@ -3782,43 +3819,82 @@ function tdShareLines(d) {
 function tdShareText(d) {
   return t("tdShareTitle") + " (" + d.stLabel + ")\n" + tdShareLines(d).map((r) => r[0] + ": " + r[1]).join("\n");
 }
-function tdMakeCardBlob(d) {
+function tdRoundRect(x, X, Y, w, h, r) {
+  x.beginPath(); x.moveTo(X + r, Y);
+  x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r);
+  x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath();
+}
+/* Share card = header + (service photo if any) + car diagram with the serviced tyres highlighted + details.
+   The same picture is what WhatsApp receives, so the car drawing travels with the message. */
+async function tdMakeCardBlob(d, photoBlob) {
+  const rtl = currentLang === "ar", W = 800, m = 24, mv = 6, font = "Tahoma, 'Segoe UI', 'Noto Sans Arabic', sans-serif";
+  const stColor = d.st === "err" ? "#ba1a1a" : d.st === "svc" ? "#565e74" : "#006c49";
+  let img = null;
+  if (photoBlob) { try { img = await createImageBitmap(photoBlob); } catch (e) { console.warn("[share] photo decode failed", e); } }
+  /* layout: [photo] then the info rectangle at the bottom (no header bar, no extra lines) */
+  const photoH = img ? Math.round(Math.min(480, Math.max(300, W * img.height / img.width))) : 0;
+  const panelH = 176, yPanel = (img ? photoH : 0) + mv;
+  const H = yPanel + panelH + mv;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  x.fillStyle = "#f8f9ff"; x.fillRect(0, 0, W, H);                       /* shared cards are always light */
+  x.textBaseline = "middle";
+  if (img) {                                                              /* photo, cropped to fill the band */
+    const sc = Math.max(W / img.width, photoH / img.height), dw = img.width * sc, dh = img.height * sc;
+    x.save(); x.beginPath(); x.rect(0, 0, W, photoH); x.clip();
+    x.drawImage(img, (W - dw) / 2, (photoH - dh) / 2, dw, dh); x.restore();
+  }
+  /* the rectangle */
+  const px = m, pw = W - m * 2;
+  x.fillStyle = "#ffffff"; tdRoundRect(x, px, yPanel, pw, panelH, 20); x.fill();
+  x.strokeStyle = "#dce2f0"; x.lineWidth = 2; x.stroke();
+  const carW = 108, carH = 152, cx = rtl ? px + 26 : px + pw - 26 - carW, cy = yPanel + (panelH - carH) / 2;
+  x.save(); x.direction = "ltr"; x.textAlign = "center";
+  x.setLineDash([6, 5]); x.lineWidth = 2; x.strokeStyle = "#bfc5d2"; x.fillStyle = "#eef2fa";
+  tdRoundRect(x, cx + 23, cy + 10, carW - 46, carH - 20, 20); x.fill(); x.stroke(); x.setLineDash([]);
+  x.fillStyle = "#8a92a3"; x.font = "bold 13px " + font;
+  x.fillText(String(t("carFront")).toUpperCase(), cx + carW / 2, cy + 30);
+  x.fillText(String(t("carRear")).toUpperCase(), cx + carW / 2, cy + carH - 30);
+  const tw = 29, th = 45, spots = { FL: [cx, cy + 18], FR: [cx + carW - tw, cy + 18], RL: [cx, cy + carH - 18 - th], RR: [cx + carW - tw, cy + carH - 18 - th] };
+  POSITIONS.forEach((pp) => {
+    const on = d.keys.includes(pp.key), pos = spots[pp.short];
+    x.fillStyle = on ? stColor : "#dce2f0"; x.strokeStyle = on ? stColor : "#bfc5d2"; x.lineWidth = 2;
+    tdRoundRect(x, pos[0], pos[1], tw, th, 7); x.fill(); x.stroke();
+    x.fillStyle = on ? "#ffffff" : "#4a5163"; x.font = "bold 15px " + font; x.fillText(pp.short, pos[0] + tw / 2, pos[1] + th / 2);
+  });
+  x.restore();
+  /* three lines beside the car: size / positions / count + date & time */
+  const xs = rtl ? px + pw - 30 : px + 30, xe = rtl ? px + 30 : px + pw - 30;      /* start edge, far edge of the text area */
+  const maxW = pw - carW - 26 - 60;
+  const dirOf = (txt) => /[\u0600-\u06FF]/.test(txt) ? "rtl" : "ltr";
+  const put = (txt, size, bold, color, atStart, limit) => {
+    let sz = size; do { x.font = (bold ? "bold " : "") + sz + "px " + font; sz -= 2; } while (x.measureText(txt).width > limit && sz > 12);
+    x.fillStyle = color; x.direction = dirOf(txt);
+    x.textAlign = (atStart ? rtl : !rtl) ? "right" : "left";
+    x.fillText(txt, atStart ? xs : xe, 0);
+  };
+  const posTxt = !d.keys.length ? t("tdNoPos") : d.group ? d.group + " (" + d.posList + ")" : d.posList;
+  const countTxt = d.qty ? t("tdTyres", { n: d.qty }) : "";
+  const yc = yPanel + panelH / 2, rh = 46;
+  const at = (fn, y) => { x.save(); x.translate(0, y); fn(); x.restore(); };
+  at(() => put(d.sizeText, 34, true, "#0b1c30", true, maxW), yc - rh);
+  at(() => put(posTxt, 28, true, stColor, true, maxW), yc);
+  if (countTxt) at(() => put(countTxt, 26, true, "#0b1c30", true, maxW), yc + rh);
   return new Promise((resolve, reject) => {
-    try {
-      const rtl = currentLang === "ar", W = 800, pad = 40, font = "Tahoma, 'Segoe UI', 'Noto Sans Arabic', sans-serif";
-      const lines = [];
-      const probe = document.createElement("canvas").getContext("2d");
-      probe.font = "30px " + font;
-      tdShareLines(d).forEach((r) => {
-        const words = (r[0] + ": " + r[1]).split(" "); let cur = "";
-        words.forEach((w) => { const nx = cur ? cur + " " + w : w; if (probe.measureText(nx).width > W - pad * 2 && cur) { lines.push(cur); cur = w; } else cur = nx; });
-        if (cur) lines.push(cur);
-      });
-      const H = 150 + lines.length * 48 + 50;
-      const c = document.createElement("canvas"); c.width = W; c.height = H;
-      const x = c.getContext("2d");
-      x.fillStyle = "#f8f9ff"; x.fillRect(0, 0, W, H);          /* shared cards are always light */
-      x.fillStyle = "#8d4b00"; x.fillRect(0, 0, W, 96);
-      x.direction = rtl ? "rtl" : "ltr"; x.textAlign = rtl ? "right" : "left"; x.textBaseline = "middle";
-      const ax = rtl ? W - pad : pad;
-      x.fillStyle = "#ffffff"; x.font = "bold 36px " + font; x.fillText("Quality Part X", ax, 48);
-      x.fillStyle = d.st === "err" ? "#ba1a1a" : d.st === "svc" ? "#565e74" : "#006c49";
-      x.font = "bold 30px " + font; x.fillText(d.stLabel, ax, 132);
-      x.fillStyle = "#0b1c30"; x.font = "30px " + font;
-      lines.forEach((ln, i) => x.fillText(ln, ax, 190 + i * 48));
-      c.toBlob((b) => b ? resolve(b) : reject(new Error("card")), "image/png");
-    } catch (e) { reject(e); }
+    c.toBlob((b) => b ? resolve(b) : reject(new Error("card")), img ? "image/jpeg" : "image/png", 0.9);
   });
 }
 async function tdPrepareShareFile(d) {
-  let blob = null;
-  if (d.tx.photo_url) { try { const r = await fetch(d.tx.photo_url); if (r.ok) blob = await r.blob(); } catch (e) { console.warn("[V2-4] photo fetch for share failed", e); } }
-  if (!blob) blob = await tdMakeCardBlob(d);
+  let photo = null, blob = null;
+  if (d.tx.photo_url) { try { const r = await fetch(d.tx.photo_url); if (r.ok) photo = await r.blob(); } catch (e) { console.warn("[V2-4] photo fetch for share failed", e); } }
+  try { blob = await tdMakeCardBlob(d, photo); } catch (e) { console.warn("[share] card with photo failed", e); }
+  if (!blob && photo) blob = photo;
+  if (!blob) blob = await tdMakeCardBlob(d, null);
   const type = blob.type && blob.type.indexOf("image/") === 0 ? blob.type : "image/png";
   const ext = type === "image/png" ? "png" : "jpg";
   return new File([blob], "service-" + String(d.tx.id).slice(0, 8) + "." + ext, { type });
 }
-async function shareService(id) {
+async function shareService(id, auto) {
   const tx = (todayData || []).find((x) => String(x.id) === String(id));
   if (!tx || tdSharing) return;
   tdSharing = true;
@@ -3826,18 +3902,39 @@ async function shareService(id) {
   try {
     let file = tdShareCache.get(tx.id); const fresh = !file;
     if (!file) { try { file = await tdPrepareShareFile(d); tdShareCache.set(tx.id, file); } catch (e) { console.warn("[V2-4] share card failed", e); } }
+    if (auto && !navigator.share) { shareOffer(id); return; }   /* desktop browsers: offer a Share button instead of opening WhatsApp by itself */
     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file], text }); return; }
       catch (e) {
         if (e && e.name === "AbortError") return;
+        if (auto && e && e.name === "NotAllowedError") { shareOffer(id); return; }   /* the phone wants a fresh tap: one tap on the button below */
         if (fresh && e && e.name === "NotAllowedError") { toast(t("tdShareAgain")); return; }
       }
     }
     if (navigator.share) {
-      try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+      try { await navigator.share({ text }); return; } catch (e) {
+        if (e && e.name === "AbortError") return;
+        if (auto && e && e.name === "NotAllowedError") { shareOffer(id); return; }
+      }
     }
     window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
   } finally { tdSharing = false; }
+}
+
+function shareOffer(id) {
+  toastAction(t("tdShareOffer"), t("tdShare"), () => shareService(id));
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => document.getElementById("toast").classList.remove("show", "act"), 15000);
+}
+async function autoShareService(id) {
+  try {
+    if (!(todayData || []).some((x) => String(x.id) === String(id))) {
+      const { data } = await db.from("transactions").select("*").eq("id", id).maybeSingle();
+      if (!data) return;
+      todayData = [data].concat(todayData || []);
+      renderToday();
+    }
+    await shareService(id, true);
+  } catch (e) { console.warn("[auto-share]", e); }
 }
 
 function renderServicePage() {
@@ -5882,6 +5979,7 @@ let camStream = null;
 let camHook = null;   /* INSPECTION: when set, the next photo from the live camera goes to the inspection form instead of the service form */
 function camFallback(msgKey) {
   if (msgKey) toast(t(msgKey));
+  if (camHook && camHook.scan) { camHook = null; const gi = document.getElementById("plate-scan-gallery"); if (gi) { gi.value = ""; gi.click(); return; } }   /* PLATE SEARCH */
   if (camHook) { camHook = null; const ii = document.getElementById("insp-file-cam"); if (ii) { ii.click(); return; } }   /* INSPECTION */
   const inp = document.getElementById("car-photo-camera"); if (inp) inp.click();
 }
@@ -5892,6 +5990,7 @@ async function openCamera() {
   } catch (e) { console.warn("[camera]", e); camFallback(e && e.name === "NotAllowedError" ? "camDenied" : "camUnavailable"); return; }
   const v = document.getElementById("cam-video");
   v.srcObject = camStream;
+  document.getElementById("cam-layer").classList.toggle("scan", !!(camHook && camHook.scan));   /* PLATE SEARCH: show the gallery button */
   document.getElementById("cam-layer").classList.add("open");
   try { await v.play(); } catch (_) { /* autoplay attribute covers it */ }
 }
@@ -5899,7 +5998,7 @@ function closeCamera() {
   camHook = null;   /* INSPECTION (snapCamera keeps its own copy before calling this) */
   if (camStream) { camStream.getTracks().forEach((tr) => tr.stop()); camStream = null; }
   const v = document.getElementById("cam-video"); if (v) v.srcObject = null;
-  document.getElementById("cam-layer").classList.remove("open");
+  document.getElementById("cam-layer").classList.remove("open", "scan");
 }
 async function snapCamera() {
   const inspHook = camHook;   /* INSPECTION */
@@ -5970,25 +6069,36 @@ let scanTarget = "home", scanBusy = false;
 function scanPlateStart(target) {
   if (scanBusy) return;
   scanTarget = target;
-  const inp = document.getElementById("plate-scan-input");
-  inp.value = ""; inp.click();
+  /* live camera with a shutter, plus an "upload from gallery" button inside it */
+  camHook = (canvas) => canvas.toBlob((b) => { if (b) scanPlateRun(new File([b], "plate.jpg", { type: "image/jpeg" })); }, "image/jpeg", 0.92);
+  camHook.scan = true;
+  openCamera();
+}
+function camPickGallery() {
+  closeCamera();
+  const gi = document.getElementById("plate-scan-gallery");
+  if (gi) { gi.value = ""; gi.click(); }
 }
 async function scanPlateFile(input) {
   const file = input.files && input.files[0];
+  if (!file) return;
+  await scanPlateRun(file);
+  try { input.value = ""; } catch (_) {}
+}
+async function scanPlateRun(file) {
   if (!file || scanBusy) return;
   scanBusy = true;
   const layer = document.getElementById("scan-layer");
   try {
     const dataUrl = await fileToJpegDataUrl(file);
-    input.value = "";
     document.getElementById("scan-img").src = dataUrl;
     document.getElementById("scan-txt").textContent = t("scanReading");
     layer.classList.add("open");
-    if (!GEMINI_KEY || GEMINI_KEY.indexOf("PASTE_") === 0) throw new Error("no_key");
     const text = await geminiReadPlate(dataUrl);
     const clean = String(text).toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim();
     let plate = clean === "NONE" ? "" : extractPlate(clean);
     if (!plate && clean && clean !== "NONE") { const c = clean.replace(/\s+/g, ""); if (c.length >= 2 && c.length <= 8) plate = c; }
+    plate = ukPlate(plate);
     if (!plate) { layer.classList.remove("open"); toast(t("scanFail")); return; }
     const home = scanTarget === "home";
     const el = document.getElementById(home ? "plate-search" : "sh-plate");
@@ -6000,7 +6110,7 @@ async function scanPlateFile(input) {
   } catch (e) {
     console.warn("Plate scan failed:", e);
     layer.classList.remove("open");
-    toast(String(e && e.message) === "no_key" ? t("scanNoKey") : t("scanFail"));
+    toast(t("scanFail") + (e && e.code ? " (" + e.code + ")" : ""));
   } finally { scanBusy = false; }
 }
 
