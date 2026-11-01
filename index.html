@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>Quality Part X</title>
 <meta name="theme-color" content="#f8f9ff" />
-<meta name="color-scheme" content="light dark" />
+<meta name="color-scheme" content="only light" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -20,6 +20,8 @@
     else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) th = "dark";
   } catch (e) {}
   document.documentElement.setAttribute("data-theme", th);
+  /* Tell the browser which single scheme is active so Android "force dark" / auto-dark features never re-darken the light theme */
+  try { var cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.setAttribute("content", th === "dark" ? "dark" : "only light"); } catch (e) {}
   /* V2-STEP 12: if a saved session exists, never flash the login screen (it is re-validated at boot) */
   try { if (localStorage.getItem("quality-part-x-session")) document.documentElement.classList.add("has-session"); } catch (e) {}
 })();
@@ -59,7 +61,7 @@
   --scrim-strong: rgba(11, 28, 48, 0.85);
   --focus-ring: rgba(141, 75, 0, 0.15);
   --shadow-fab: 0 4px 14px rgba(11, 28, 48, 0.28);
-  color-scheme: light;
+  color-scheme: only light;
 
   --radius-sm: 0.25rem;
   --radius: 0.5rem;
@@ -78,36 +80,37 @@
 
 /* ===== V2-STEP 1: Dark theme — same variable names, dark values (Industrial Precision, dark) ===== */
 :root[data-theme="dark"] {
-  --color-background: #000000;
-  --color-surface: #000000;
-  --color-surface-container-lowest: #1a1a1a;
-  --color-surface-container-low: #222222;
-  --color-surface-container: #2a2a2a;
-  --color-surface-container-high: #333333;
-  --color-surface-container-highest: #3d3d3d;
-  --color-on-surface: #e8e8ec;
-  --color-on-surface-variant: #c4c4ca;
-  --color-outline: #8a8a92;
-  --color-outline-variant: #3c3c42;
-  --color-primary: #dedee3;
-  --color-on-primary: #17171a;
-  --color-primary-container: #c4c4cb;
-  --color-on-primary-container: #17171a;
-  --color-secondary: #7bd0ff;
-  /* NOTE: tertiary = success green in this app (NOT the pinkish tertiary of the dark design file) */
-  --color-tertiary: #4edea3;
-  --color-tertiary-container: #00a572;
-  --color-on-tertiary: #003824;
+  /* Calm dark: warm graphite surfaces + soft off-white text + ONE muted steel-blue accent (success/error are desaturated) */
+  --color-background: #121417;
+  --color-surface: #121417;
+  --color-surface-container-lowest: #0d0f12;
+  --color-surface-container-low: #181b1f;
+  --color-surface-container: #1d2024;
+  --color-surface-container-high: #25282d;
+  --color-surface-container-highest: #2d3137;
+  --color-on-surface: #e3e6ea;
+  --color-on-surface-variant: #a3a9b2;
+  --color-outline: #6f7680;
+  --color-outline-variant: #343840;
+  --color-primary: #93abc9;
+  --color-on-primary: #0e1520;
+  --color-primary-container: #6f8bb0;
+  --color-on-primary-container: #0e1520;
+  --color-secondary: #a3a9b2;
+  /* NOTE: tertiary = success green in this app — here a muted sage */
+  --color-tertiary: #93b79d;
+  --color-tertiary-container: #5f8a6e;
+  --color-on-tertiary: #0f1a13;
   --color-on-tertiary-container: #ffffff;
-  --color-error: #ffb4ab;
-  --color-error-container: #93000a;
-  --color-success-container: #005236;
-  --color-warning: #ffc174;
-  --color-warning-container: #653e00;
-  --color-error-border: #b4443c;
+  --color-error: #d9a29a;
+  --color-error-container: #4b2d2a;
+  --color-success-container: #223229;
+  --color-warning: #cfae84;
+  --color-warning-container: #382f22;
+  --color-error-border: #7d4d47;
   --scrim: rgba(0, 0, 0, 0.6);
   --scrim-strong: rgba(0, 0, 0, 0.9);
-  --focus-ring: rgba(222, 222, 227, 0.28);
+  --focus-ring: rgba(147, 171, 201, 0.25);
   --shadow-fab: none;
   color-scheme: dark;
 
@@ -279,6 +282,9 @@ html:not(.ms-ready) .ms { visibility: hidden; }
   transition: opacity .2s, transform .2s;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* Top notice (used when a size is already in the orders list) */
+.toast.top { bottom:auto; top:calc(env(safe-area-inset-top, 0px) + 76px); transform:translateX(-50%) translateY(-20px); background:var(--color-error); color:var(--color-on-primary); font-weight:600; }
+.toast.top.show { transform:translateX(-50%) translateY(0); }
 
 [dir="rtl"] .brand, [dir="rtl"] .header-actions { direction: rtl; }
 
@@ -357,30 +363,10 @@ html:not(.ms-ready) .ms { visibility: hidden; }
 .search-box:focus-within { border-color:var(--color-primary); box-shadow:0 0 0 3px var(--focus-ring); }
 .search-box > svg { width:20px; height:20px; color:var(--color-outline); flex:none; }
 .search-box input { flex:1 1 auto; min-width:0; height:100%; border:none; outline:none; background:transparent; font:inherit; font-size:16px; color:var(--color-on-surface); }
+.kb-toggle { flex:none; height:34px; min-width:44px; padding:0 10px; border-radius:var(--radius); background:var(--color-surface-container-high); color:var(--color-on-surface-variant); font-size:13px; font-weight:700; letter-spacing:.02em; }
+.kb-toggle:active { background:var(--color-surface-container-highest); }
 .search-box .plate-field { direction:ltr; text-transform:uppercase; letter-spacing:.06em; }
 .search-box .go { flex:none; height:36px; padding:0 16px; border-radius:var(--radius); background:var(--color-primary); color:var(--color-on-primary); font-weight:600; font-size:14px; }
-/* ---- plate photo scan (camera button next to OK + analysing overlay) ---- */
-.search-box .cam-go { flex:none; width:40px; height:36px; display:grid; place-items:center; border-radius:var(--radius); background:var(--color-surface-container-lowest); color:var(--color-primary); border:1.5px solid var(--color-primary); }
-.search-box .cam-go:active { background:var(--color-surface-container); }
-.search-box .cam-go .ms { font-size:22px; }
-.scan-layer { position:fixed; inset:0; z-index:78; display:none; align-items:center; justify-content:center; flex-direction:column; gap:18px; padding:24px; background:rgba(0,0,0,.82); }
-.scan-layer.open { display:flex; }
-.scan-frame { position:relative; width:min(88vw,460px); max-height:60vh; border-radius:18px; overflow:hidden; background:#000; box-shadow:0 0 0 2px rgba(255,255,255,.25), 0 10px 40px rgba(0,0,0,.6); animation:scanPulse 1.6s ease-in-out infinite; }
-.scan-frame img { display:block; width:100%; max-height:60vh; object-fit:contain; }
-.scan-frame::before { content:""; position:absolute; inset:0; z-index:2; pointer-events:none; background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%); background-size:250% 100%; animation:scanShimmer 1.4s linear infinite; }
-.scan-line { position:absolute; left:0; right:0; top:0; height:4px; z-index:3; background:linear-gradient(90deg, transparent, #c9c9d0, #f2f2f5, #c9c9d0, transparent); box-shadow:0 0 18px 6px rgba(222,222,227,.7); animation:scanMove 1.8s ease-in-out infinite alternate; }
-.scan-corner { position:absolute; width:26px; height:26px; z-index:3; border:3px solid #f2f2f5; }
-.scan-corner.tl { top:10px; left:10px; border-right:0; border-bottom:0; border-top-left-radius:8px; }
-.scan-corner.tr { top:10px; right:10px; border-left:0; border-bottom:0; border-top-right-radius:8px; }
-.scan-corner.bl { bottom:10px; left:10px; border-right:0; border-top:0; border-bottom-left-radius:8px; }
-.scan-corner.br { bottom:10px; right:10px; border-left:0; border-top:0; border-bottom-right-radius:8px; }
-.scan-txt { color:#fff; font-size:15px; font-weight:600; text-align:center; }
-.scan-dots::after { content:""; animation:scanDots 1.2s steps(4,end) infinite; }
-@keyframes scanMove { from { top:0; } to { top:calc(100% - 4px); } }
-@keyframes scanShimmer { from { background-position:150% 0; } to { background-position:-100% 0; } }
-@keyframes scanPulse { 0%,100% { box-shadow:0 0 0 2px rgba(242,242,245,.35), 0 10px 40px rgba(0,0,0,.6); } 50% { box-shadow:0 0 0 4px rgba(242,242,245,.9), 0 10px 40px rgba(0,0,0,.6); } }
-@keyframes scanDots { 0% { content:""; } 25% { content:"."; } 50% { content:".."; } 75% { content:"..."; } }
-@media (prefers-reduced-motion: reduce) { .scan-line, .scan-frame, .scan-frame::before { animation:none; } }
 .btn-compact { align-self:center; display:inline-flex; align-items:center; justify-content:center; gap:8px; height:40px; padding:0 18px; border-radius:var(--radius-full); background:var(--color-surface-container-lowest); color:var(--color-primary); border:1.5px solid var(--color-primary); font-weight:600; font-size:14px; }
 .btn-compact svg { width:18px; height:18px; }
 .btn-compact:active { background:var(--color-surface-container-low); }
@@ -554,6 +540,23 @@ html:not(.ms-ready) .ms { visibility: hidden; }
 .rp-del { color:var(--color-error); border-color:var(--color-error-border); }
 .rp-del:disabled { opacity:.5; }
 .rp-sort-label { margin:16px 0 8px; font-size:13px; font-weight:600; color:var(--color-on-surface-variant); }
+/* Sort-by dropdown (uniform size, one tidy row per option) */
+.rp-sort { position:relative; }
+.rp-sort-head { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:48px; padding:0 14px; border-radius:var(--radius-md); border:1.5px solid var(--color-outline-variant); background:var(--color-surface-container-lowest); color:var(--color-on-surface); font-size:14px; font-weight:600; text-align:start; }
+.rp-sort.open .rp-sort-head { border-color:var(--color-primary); }
+.rp-sort-head .lbl { display:inline-flex; align-items:center; gap:10px; min-width:0; }
+.rp-sort-head .lbl span { overflow-wrap:anywhere; }
+.rp-sort-head svg { width:20px; height:20px; flex:none; }
+.rp-sort-head .lbl svg { color:var(--color-secondary); }
+.rp-sort-head .chev { color:var(--color-outline); transition:transform .15s; }
+.rp-sort.open .rp-sort-head .chev { transform:rotate(180deg); }
+.rp-sort-menu { display:none; flex-direction:column; gap:6px; margin-top:8px; padding:6px; border-radius:var(--radius-md); border:1px solid var(--color-surface-container-high); background:var(--color-surface-container-lowest); box-shadow:var(--shadow-card); }
+.rp-sort.open .rp-sort-menu { display:flex; }
+.rp-sort-item { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; min-height:44px; padding:6px 12px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; text-align:start; color:var(--color-on-surface); background:transparent; }
+.rp-sort-item:active { background:var(--color-surface-container-low); }
+.rp-sort-item.on { background:var(--color-primary-container); color:var(--color-on-primary-container); }
+.rp-sort-item svg { width:18px; height:18px; flex:none; visibility:hidden; }
+.rp-sort-item.on svg { visibility:visible; }
 .rp-px { margin-top:16px; }
 .rp-px-head { width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:48px; padding:0 14px; border-radius:var(--radius-md); background:var(--color-primary); color:var(--color-on-primary); font-size:15px; font-weight:600; }
 .rp-px-head .lbl { display:inline-flex; align-items:center; gap:8px; min-width:0; }
@@ -834,7 +837,9 @@ select.input { padding-inline-end:8px; }
 .inv-whwrap { position:relative; flex:1 1 150px; min-width:0; display:block; }
 .inv-whwrap .ms { position:absolute; inset-inline-start:10px; top:50%; transform:translateY(-50%); font-size:18px; color:var(--color-primary); pointer-events:none; }
 .inv-whwrap .inv-wh { padding-inline-start:34px; height:40px; font-size:14px; font-weight:600; }
-.inv-st { flex:none; display:inline-flex; align-items:center; }
+.inv-st { flex:none; display:inline-flex; align-items:center; justify-content:center; width:138px; white-space:nowrap; }   /* fixed badge width → every warehouse dropdown has the same width */
+.inv-row2 { flex-wrap:nowrap; }
+.inv-row2 .inv-whwrap { flex:1 1 0; }
 .inv-foot { text-align:center; font-size:13px; line-height:18px; color:var(--color-on-surface-variant); padding:4px 0 2px; }
 .im-body-del { margin-top:6px; }
 .im-size { font-size:20px; font-weight:700; height:48px; }
@@ -879,6 +884,30 @@ select.input { padding-inline-end:8px; }
 .hub-toggle .ms { font-size:22px; transition:transform .2s; }
 .hub-toggle[aria-expanded="true"] .ms { transform:rotate(180deg); }
 .hub-body { margin-top:10px; }
+/* Suggested order panel */
+.hub-sugg-btn { width:100%; flex:none; gap:8px; margin-bottom:10px; }
+.hub-sugg-btn .ms { font-size:20px; }
+.hub-sugg-btn:disabled { opacity:.6; }
+.hub-sugg { margin:0 0 12px; padding:12px; border-radius:var(--radius-lg); border:1px solid var(--color-surface-container-high); background:var(--color-surface-container-low); }
+.hs-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.hs-title { font-size:15px; font-weight:700; min-width:0; }
+.hs-info { margin:4px 0 10px; font-size:12px; line-height:18px; color:var(--color-on-surface-variant); }
+.hs-list { display:flex; flex-direction:column; gap:8px; }
+.hs-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius-md); background:var(--color-surface-container-lowest); border:1px solid var(--color-surface-container-high); }
+.hs-main { flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.hs-size { align-self:flex-start; font-size:16px; font-weight:700; line-height:22px; direction:ltr; unicode-bidi:embed; }
+.hs-sub { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; font-size:12px; color:var(--color-on-surface-variant); }
+.hs-qty { flex:none; min-width:52px; padding:6px 12px; border-radius:var(--radius-full); background:var(--color-primary); color:var(--color-on-primary); font-weight:700; font-size:15px; text-align:center; direction:ltr; }
+.hs-acts { display:flex; gap:10px; margin-top:12px; }
+.hs-acts .btn { gap:8px; }
+.hs-acts .btn:disabled { opacity:.6; }
+/* Previous orders */
+.hh-sum { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.hh-rows { display:flex; flex-direction:column; gap:6px; }
+.hh-row { display:flex; align-items:center; justify-content:space-between; gap:6px 8px; flex-wrap:wrap; padding:8px 10px; border-radius:var(--radius-md); background:var(--color-surface-container-low); }
+.hh-size { font-weight:700; direction:ltr; unicode-bidi:embed; }
+.hh-nums { flex:1 1 auto; min-width:0; font-size:12px; color:var(--color-on-surface-variant); }
+.hh-more { margin-top:0; min-height:36px; }
 .hub-tile:active { background:var(--color-surface-container-low); }
 .hub-tile .ms { font-size:22px; color:var(--color-primary); }
 .hub-tile.dmg .ms { color:var(--color-error); }
@@ -900,10 +929,6 @@ select.input { padding-inline-end:8px; }
 .cam-shutter { flex:none; width:72px; height:72px; border-radius:var(--radius-full); background:#fff; border:5px solid rgba(255,255,255,.45); background-clip:padding-box; }
 .cam-shutter:active { transform:scale(.94); }
 .cam-spacer { min-width:72px; }
-.cam-gallery { display:none; min-width:72px; max-width:110px; min-height:44px; padding:4px 8px; flex-direction:column; align-items:center; justify-content:center; gap:2px; border-radius:var(--radius-md); color:#fff; font-size:12px; font-weight:600; line-height:14px; text-align:center; }
-.cam-gallery .ms { font-size:24px; }
-.cam-layer.scan .cam-gallery { display:flex; }
-.cam-layer.scan .cam-spacer { display:none; }
 
 /* ===== Service page refinements (owner feedback, Oct 17) ===== */
 .wh-chips { display:flex; flex-wrap:wrap; gap:6px; }
@@ -1308,16 +1333,6 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
         <button type="button" class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="showAddEmployee()"><span class="ms" aria-hidden="true">person_add</span><span data-i18n="addEmployee">Add Employee</span></button>
         <div id="emp-list"></div>
       </div>
-
-      <!-- V2-STEP 2: Storage management (R6) — admin only -->
-      <div class="card" id="storage-card" style="display:none">
-        <div class="card-head">
-          <div class="headline-md ttl"><span class="ms" aria-hidden="true">database</span><span data-i18n="storageTitle">Storage management</span></div>
-          <span class="badge admin"><span class="ms" aria-hidden="true">verified_user</span><span data-i18n="adminOnly">Admin only</span></span>
-        </div>
-        <div class="storage-sub" data-i18n="storageSub">Delete all service photos from storage. This cannot be undone.</div>
-        <button type="button" class="btn btn-danger btn-block" id="delete-photos-btn" onclick="deleteAllServicePhotos()" data-i18n="storageDelete">Delete all service photos</button>
-      </div>
     </div>
   </section>
 
@@ -1359,7 +1374,7 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
           <!-- V2-STEP 3: form mode selector (tyre mode only; Two Sizes / Other Warehouse are added by V2-5 / V2-6) -->
           <div class="field" data-modes="tyre"><div class="mode-sel" id="mode-sel" role="group"></div></div>
 
-          <div class="field" data-modes="tyre service damaged">
+          <div class="field" data-modes="tyre service">
             <label for="svc-plate"><span data-i18n="plateNumber">Plate number</span> <span class="req" id="plate-req">*</span><span class="opt" id="plate-opt" style="display:none" data-i18n="optional">(optional)</span></label>
             <input class="input plate-input" id="svc-plate" lang="en" dir="ltr" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text" enterkeyhint="done" writingsuggestions="false" data-plate-input onfocus="plateFocus(this)" oninput="plateKeys(this)" />
             <div class="ocr-box" id="ocr-box" style="display:none"></div>
@@ -1395,7 +1410,7 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
             <div class="acc" id="repair-acc"></div>
           </div>
 
-          <div class="field" data-modes="tyre service damaged">
+          <div class="field" data-modes="tyre service">
             <div class="field-label"><span data-i18n="position">Position</span> <span class="opt" data-i18n="optional">(optional)</span> <span class="pos-count" id="pos-count"></span></div>
             <div class="car-wrap" id="pos-grid"></div>
           </div>
@@ -1448,7 +1463,6 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
         </div>
         <div class="search-box">
           <input class="plate-field" id="plate-search" lang="en" dir="ltr" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" data-i18n-ph="plateSearchPh" inputmode="text" enterkeyhint="done" writingsuggestions="false" data-plate-input onfocus="plateFocus(this)" oninput="plateKeys(this)" onkeydown="if(event.key==='Enter')searchPlate()" />
-          <button type="button" class="cam-go" onclick="scanPlateStart('home')" aria-label="Scan plate"><span class="ms" aria-hidden="true">photo_camera</span></button>
           <button type="button" class="go" onclick="searchPlate()" data-i18n="ok">OK</button>
         </div>
         <div class="stack" id="plate-results"></div>
@@ -1507,7 +1521,8 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
 
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="inv-search" autocomplete="off" data-i18n-ph="invSearchPh" oninput="renderInventoryPage()" />
+        <input id="inv-search" inputmode="numeric" autocomplete="off" data-i18n-ph="invSearchPh" oninput="onInvSearchInput(this)" />
+        <button type="button" class="kb-toggle" id="inv-kb-toggle" onclick="toggleInvKeyboard()" aria-label="Keyboard">Aa</button>
         <button type="button" class="icon-btn" id="inv-search-clear" style="display:none" onclick="clearInvSearch()" aria-label="Clear">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -1566,8 +1581,18 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
           </div>
         </div>
         <div class="rp-sort-label" data-i18n="rpSortLabel" style="margin-top:0">Sort by</div>
-        <div class="chips" id="rp-sort"></div>
+        <div class="rp-sort" id="rp-sort"></div>
         <div class="rp-px" id="rp-px"></div>
+      </div>
+
+      <!-- V2-STEP 2: Storage management (R6) — admin only -->
+      <div class="card" id="storage-card" style="display:none">
+        <div class="card-head">
+          <div class="headline-md ttl"><span class="ms" aria-hidden="true">database</span><span data-i18n="storageTitle">Storage management</span></div>
+          <span class="badge admin"><span class="ms" aria-hidden="true">verified_user</span><span data-i18n="adminOnly">Admin only</span></span>
+        </div>
+        <div class="storage-sub" data-i18n="storageSub">Delete all service photos from storage. This cannot be undone.</div>
+        <button type="button" class="btn btn-danger btn-block" id="delete-photos-btn" onclick="deleteAllServicePhotos()" data-i18n="storageDelete">Delete all service photos</button>
       </div>
     </div>
   </section>
@@ -1640,7 +1665,6 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
     <button type="button" class="cam-cancel" onclick="closeCamera()" data-i18n="cancel">Cancel</button>
     <button type="button" class="cam-shutter" id="cam-shutter" onclick="snapCamera()" aria-label="Take photo"></button>
     <span class="cam-spacer"></span>
-    <button type="button" class="cam-gallery" onclick="camPickGallery()"><span class="ms" aria-hidden="true">image</span><span data-i18n="uploadGallery">Upload from gallery</span></button>
   </div>
 </div>
 
@@ -1963,18 +1987,10 @@ html.has-session .lg-layer:not(.leaving) { display:none; }
     <div class="search-box">
       <span class="ms" aria-hidden="true" style="font-size:22px;color:var(--color-on-surface-variant)">badge</span>
       <input class="plate-field" id="sh-plate" lang="en" dir="ltr" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" data-i18n-ph="plateSearchPh" inputmode="text" enterkeyhint="done" writingsuggestions="false" data-plate-input onfocus="plateFocus(this)" oninput="plateKeys(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();shSearchPlate();}" />
-      <button type="button" class="cam-go" onclick="scanPlateStart('sheet')" aria-label="Scan plate"><span class="ms" aria-hidden="true">photo_camera</span></button>
       <button type="button" class="go" onclick="shSearchPlate()" data-i18n="ok">OK</button>
     </div>
     <div class="sh-list" id="sh-list"><div class="sh-sec" id="sh-size-results"></div><div class="sh-sec" id="sh-plate-results"></div></div>
   </div>
-</div>
-
-<input type="file" id="plate-scan-input" accept="image/*" capture="environment" style="display:none" onchange="scanPlateFile(this)" />
-<input type="file" id="plate-scan-gallery" accept="image/*" style="display:none" onchange="scanPlateFile(this)" />
-<div class="scan-layer" id="scan-layer" aria-live="polite">
-  <div class="scan-frame"><img id="scan-img" alt="" /><div class="scan-line"></div><span class="scan-corner tl"></span><span class="scan-corner tr"></span><span class="scan-corner bl"></span><span class="scan-corner br"></span></div>
-  <div class="scan-txt"><span id="scan-txt">Reading plate</span><span class="scan-dots"></span></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2184,10 +2200,11 @@ function updateThemeButton() {
   if (lic) lic.textContent = dark ? "light_mode" : "dark_mode";
   if (lbtn) { const l = t(dark ? "themeToLight" : "themeToDark"); lbtn.setAttribute("aria-label", l); lbtn.setAttribute("title", l); }
   const m = document.querySelector('meta[name="theme-color"]');
-  if (m) m.setAttribute("content", dark ? "#000000" : "#f8f9ff");
+  if (m) m.setAttribute("content", dark ? "#121417" : "#f8f9ff");
 }
 function setTheme(theme, persist) {
   document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+  try { const cs = document.querySelector('meta[name="color-scheme"]'); if (cs) cs.setAttribute("content", theme === "dark" ? "dark" : "only light"); } catch (e) { /* ignore */ }
   if (persist) { try { localStorage.setItem(APP_THEME_KEY, theme === "dark" ? "dark" : "light"); } catch (e) { /* ignore */ } }
   updateThemeButton();
 }
@@ -2257,11 +2274,19 @@ function showPage(name) {
 let toastTimer = null;
 function toast(msg) {
   const el = document.getElementById("toast");
-  el.classList.remove("act");                              /* STEP 5: a plain toast has no button */
+  el.classList.remove("act", "top");                       /* STEP 5: a plain toast has no button */
   el.textContent = msg;
   el.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+/* Notice at the TOP of the screen (red) — for "already exists" style messages */
+function toastTop(msg) {
+  toast(msg);
+  const el = document.getElementById("toast");
+  el.classList.add("top");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3600);
 }
 /* STEP 5: toast with one tappable action (used by the Service page to link to the Orders & Damaged hub) */
 function toastAction(msg, label, fn) {
@@ -2831,9 +2856,21 @@ function stockByWarehouse(g) {
     const q = Number(r.quantity) || 0;
     if (q <= 0) return;
     const name = String(r.location || "").trim() || t("noLocation");
+    if (g.whOnly && name !== g.whName) return;   /* a per-warehouse card shows only its own warehouse */
     m.set(name, (m.get(name) || 0) + q);
   });
   return [...m].map(([name, qty]) => ({ name, qty })).sort((a, b) => b.qty - a.qty || a.name.localeCompare(b.name));
+}
+/* One card per warehouse that holds this size (quantity >= 1), so the person can pick the exact warehouse he took the tyres from. */
+let svcCards = [];
+function cardsForGroup(g) {
+  const list = stockByWarehouse(g);
+  if (!list.length) return [g];                       /* out of stock: a single red card as before */
+  return list.map((w) => {
+    const inWh = g.rows.filter((r) => (Number(r.quantity) || 0) > 0 && (String(r.location || "").trim() || t("noLocation")) === w.name)
+      .sort((a, b) => (Number(b.quantity) || 0) - (Number(a.quantity) || 0));
+    return Object.assign({}, g, { qty: w.qty, whOnly: true, whName: w.name, totalQty: g.qty, whCount: list.length, preferredId: inWh[0] ? inWh[0].id : g.preferredId });
+  });
 }
 function whChipsHtml(g) {
   const list = stockByWarehouse(g);
@@ -2842,7 +2879,7 @@ function whChipsHtml(g) {
     '</span><b class="wh-chip-q" dir="ltr">' + w.qty + "</b></span>").join("") + "</div>";
 }
 function selHeroHtml(g) {   /* same markup as a search-result card, minus the action buttons */
-  const out = g.qty <= 0, low = !out && g.qty <= 4;
+  const out = g.qty <= 0, low = !out && (g.totalQty != null ? g.totalQty : g.qty) <= 4;
   const total = '<span class="tyre-total' + (out ? " out" : "") + '">' + esc(out ? t("outOfStock") : t("inStockCount", { qty: g.qty })) +
     (low ? ' <small class="tyre-low">(' + esc(t("lowStock")) + ")</small>" : "") + "</span>";
   return '<div class="tyre-card' + (out ? " out" : "") + '"><div class="tyre-top"><div class="tyre-size">' + esc(g.size) + "</div>" + total + "</div>" + cardWhHtml(g) + "</div>";
@@ -2861,15 +2898,16 @@ function cardWhHtml(g) {
   return '<div class="tyre-wh"><span class="ms" aria-hidden="true">location_on</span><div class="tyre-wh-list">' +
     list.map((w) => '<span class="whi"><span class="whi-n">' + esc(w.name) + '</span><b class="whi-q" dir="ltr">' + w.qty + "</b></span>").join("") + "</div></div>";
 }
-function sizeCardHtml(g) {
-  const out = g.qty <= 0, low = !out && g.qty <= 4;   /* legacy "low" rule: <= 4 */
+function sizeCardHtml(g, idx) {
+  const out = g.qty <= 0, low = !out && (g.totalQty != null ? g.totalQty : g.qty) <= 4;   /* legacy "low" rule: <= 4 (on the size total) */
+  const ref = idx == null ? "\'" + g.key + "\'" : String(idx);   /* card index (per-warehouse cards) or size key (search sheet) */
   const ms = (n) => '<span class="ms" aria-hidden="true">' + n + "</span>";
   const acts = out
-    ? '<button type="button" onclick="orderSize(\'' + g.key + '\')">' + ms("local_shipping") + esc(t("order")) + '</button>' +
-      '<button type="button" class="dmg" onclick="damagedSize(\'' + g.key + '\')">' + ms("warning") + esc(t("damaged")) + "</button>"
-    : '<button type="button" class="pri" onclick="selectSize(\'' + g.key + '\')">' + ms("check") + esc(t("select")) + "</button>" +
-      '<button type="button" onclick="orderSize(\'' + g.key + '\')">' + ms("local_shipping") + esc(t("order")) + "</button>" +
-      '<button type="button" class="dmg" onclick="damagedSize(\'' + g.key + '\')">' + ms("warning") + esc(t("damaged")) + "</button>";
+    ? '<button type="button" onclick="orderSize(' + ref + ')">' + ms("local_shipping") + esc(t("order")) + '</button>' +
+      '<button type="button" class="dmg" onclick="damagedSize(' + ref + ')">' + ms("warning") + esc(t("damaged")) + "</button>"
+    : '<button type="button" class="pri" onclick="selectSize(' + ref + ')">' + ms("check") + esc(t("select")) + "</button>" +
+      '<button type="button" onclick="orderSize(' + ref + ')">' + ms("local_shipping") + esc(t("order")) + "</button>" +
+      '<button type="button" class="dmg" onclick="damagedSize(' + ref + ')">' + ms("warning") + esc(t("damaged")) + "</button>";
   const total = '<span class="tyre-total' + (out ? " out" : "") + '">' + esc(out ? t("outOfStock") : t("inStockCount", { qty: g.qty })) +
     (low ? ' <small class="tyre-low">(' + esc(t("lowStock")) + ")</small>" : "") + "</span>";
   return '<div class="tyre-card' + (out ? " out" : "") + '">' +
@@ -2893,12 +2931,24 @@ function renderSizeResults() {
     const pa = qKey && a.key.startsWith(qKey) ? 0 : 1, pb = qKey && b.key.startsWith(qKey) ? 0 : 1;
     return pa - pb || a.key.localeCompare(b.key);
   });
-  box.innerHTML = groups.length ? '<div class="found-note">' + esc(t("sizesFound", { n: groups.length })) + "</div>" + groups.map(sizeCardHtml).join("") : '<div class="empty-note">' + esc(t("noTyres")) + "</div>";
+  svcCards = [].concat(...groups.map(cardsForGroup));
+  box.innerHTML = groups.length ? '<div class="found-note">' + esc(t("sizesFound", { n: groups.length })) + "</div>" + svcCards.map((c, i) => sizeCardHtml(c, i)).join("") : '<div class="empty-note">' + esc(t("noTyres")) + "</div>";
 }
 function groupByKey(key) { return aggregateBySize(svcInv).find((g) => g.key === key); }
-function selectSize(key) { const g = groupByKey(key); if (g) openSmartForm("tyre", g); }
-function orderSize(key)  { const g = groupByKey(key); if (g) openSmartForm("order", g); }
-function damagedSize(key){ const g = groupByKey(key); if (g) openSmartForm("damaged", g); }
+function cardRef(k) { return typeof k === "number" ? svcCards[k] : groupByKey(k); }
+function selectSize(k) { const g = cardRef(k); if (g) openSmartForm("tyre", g); }
+/* A size can be in the orders list only once: a second add is refused with a notice at the top of the screen. */
+function hubOrderExists(size) {
+  const key = normalizeTyreKey(size);
+  return key ? ((typeof hubOrders !== "undefined" && hubOrders) || []).find((o) => normalizeTyreKey(o.size) === key) || null : null;
+}
+function orderSize(k)  {
+  const g = cardRef(k); if (!g) return;
+  const ex = hubOrderExists(g.size);
+  if (ex) { toastTop(t("orderExists", { qty: Number(ex.quantity) || 1 })); return; }
+  openSmartForm("order", g);
+}
+function damagedSize(k){ const g = cardRef(k); if (g) openSmartForm("damaged", g); }
 function openServiceOnly() { openSmartForm("service", null); }
 
 /* ===== STEP 2: Smart adaptive service form (one component) ===== */
@@ -3199,10 +3249,14 @@ async function handlePhoto(input) {
   renderPhotoArea();
   runPlateOCR(svcPhoto);
 }
-/* UK style: first 4 characters, a space, then the rest (AB12 CDE) */
-function ukPlate(p) {
-  const c = String(p || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-  return c.length > 4 ? c.slice(0, 4) + " " + c.slice(4) : c;
+function loadTesseract() {
+  return new Promise((resolve, reject) => {
+    if (window.Tesseract) return resolve(window.Tesseract);
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    s.onload = () => resolve(window.Tesseract); s.onerror = reject;
+    document.head.appendChild(s);
+  });
 }
 function extractPlate(text) {
   const cleaned = String(text || "").toUpperCase().replace(/[^A-Z0-9]/g, " ");
@@ -3214,83 +3268,24 @@ function extractPlate(text) {
   return tok || "";
 }
 let ocrState = "";   // '', 'reading', 'found', 'fail'
-/* ---- Plate reader (Google Gemini). 1) straight from the browser with the key below, 2) if that fails, through the Supabase function "read-plate".
-       NOTE: a key written in the page can be seen by anyone who views the page source - keep this key on the FREE plan (no billing). ---- */
-const GEMINI_KEY = "AQ.Ab8RN6JGGH5VHNC50f9Fj3j-1OYGNWpZvKSvvznnMnlQMzjFWQ";
-const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.7-flash"];
-const GEMINI_PROMPT = "You read UK vehicle number plates. Look at the photo and find the vehicle registration plate. " +
-  "Return ONLY the plate characters in capital letters and digits, with no spaces or punctuation. " +
-  "If several plates are visible, return the one on the vehicle closest to the camera. " +
-  "If there is no readable plate, return the single word NONE.";
-let ocrReason = "", geminiGoodModel = "";
-async function geminiDirect(b64) {
-  const body = JSON.stringify({
-    contents: [{ parts: [{ text: GEMINI_PROMPT }, { inline_data: { mime_type: "image/jpeg", data: b64 } }] }],
-    generationConfig: { temperature: 0, maxOutputTokens: 1024 }   /* "thinking" tokens count here: a small limit gave empty answers */
-  });
-  const models = geminiGoodModel ? [geminiGoodModel].concat(GEMINI_MODELS.filter((m) => m !== geminiGoodModel)) : GEMINI_MODELS;
-  const seen = [];
-  for (const model of models) {
-    try {
-      const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent",
-        { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY }, body });
-      if (!r.ok) {
-        let d = ""; try { d = (await r.text()).slice(0, 200); } catch (_) {}
-        console.warn("Gemini", model, r.status, d);
-        seen.push(r.status); continue;
-      }
-      const j = await r.json();
-      const parts = (j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [];
-      const text = parts.map((p) => p.text || "").join(" ").trim();
-      if (!text) { seen.push(204); continue; }
-      geminiGoodModel = model;
-      return text;
-    } catch (e) { console.warn("Gemini", model, e); seen.push(0); }
-  }
-  const e = new Error("direct");
-  e.code = seen.includes(429) ? "quota" : seen.every((x) => x === 401 || x === 403 || x === 400) ? "bad_key" : seen.every((x) => x === 404) ? "no_model" : seen.every((x) => x === 0) ? "network" : "upstream";
-  throw e;
-}
-async function geminiViaFunction(b64) {
-  const { data, error } = await db.functions.invoke("read-plate", { body: { image: b64 } });
-  if (error) {
-    let code = "network";
-    try { const j = await error.context.json(); code = (j && j.error) || code; console.warn("read-plate:", j); } catch (_) {}
-    const e = new Error(code); e.code = code; throw e;
-  }
-  if (data && data.error) { const e = new Error(data.error); e.code = data.error; throw e; }
-  return (data && data.plate) || "NONE";
-}
-async function geminiReadPlate(dataUrl) {
-  const b64 = String(dataUrl).split(",")[1] || "";
-  try { return await geminiDirect(b64); }
-  catch (e1) {
-    try { return await geminiViaFunction(b64); }
-    catch (e2) { const e = new Error("ocr"); e.code = (e1 && e1.code) || (e2 && e2.code) || "network"; throw e; }
-  }
-}
 async function runPlateOCR(dataUrl) {
-  if (svcMode === "order") return;
+  if (svcMode === "order" || svcMode === "damaged") return;
   ocrState = "reading"; svcOcrPlate = ""; renderOcr();
   try {
-    ocrReason = "";
-    const text = await geminiReadPlate(dataUrl);
+    const T = await loadTesseract();
+    const res = await T.recognize(dataUrl, "eng");
     if (svcPhoto !== dataUrl) return;     // photo was changed/removed meanwhile
-    const clean = String(text).toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim();
-    let plate = clean === "NONE" ? "" : extractPlate(clean);
-    if (!plate && clean && clean !== "NONE") { const c = clean.replace(/\s+/g, ""); if (c.length >= 2 && c.length <= 8) plate = c; }
-    plate = ukPlate(plate);
-    svcOcrPlate = plate;
+    svcOcrPlate = extractPlate(res && res.data && res.data.text);
     ocrState = svcOcrPlate ? "found" : "fail";
-  } catch (e) { console.warn("OCR failed:", e); ocrState = "fail"; ocrReason = (e && e.code) || ""; }
+  } catch (e) { console.warn("OCR failed:", e); ocrState = "fail"; }
   renderOcr();
 }
 function renderOcr() {
   const box = document.getElementById("ocr-box");
-  if (!svcPhoto || !ocrState || svcMode === "order") { box.style.display = "none"; return; }
+  if (!svcPhoto || !ocrState || svcMode === "order" || svcMode === "damaged") { box.style.display = "none"; return; }
   box.style.display = "flex";
   if (ocrState === "reading") box.innerHTML = '<span class="grow muted">' + esc(t("ocrReading")) + "</span>";
-  else if (ocrState === "fail") box.innerHTML = '<span class="grow muted">' + esc(t("ocrFail")) + (ocrReason ? ' <small dir="ltr">(' + esc(ocrReason) + ')</small>' : '') + '</span><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
+  else if (ocrState === "fail") box.innerHTML = '<span class="grow muted">' + esc(t("ocrFail")) + '</span><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
   else box.innerHTML = '<span class="grow">' + esc(t("ocrSuggest")) + " <b>" + esc(svcOcrPlate) + '</b></span>' +
     '<button type="button" class="mini-btn pri" onclick="confirmOcr()">' + esc(t("confirm")) + '</button><button type="button" class="mini-btn" onclick="dismissOcr()">' + esc(t("dismiss")) + "</button>";
 }
@@ -3328,8 +3323,11 @@ async function fetchInventoryForSize(key) {
 }
 /* Same fulfillment idea as the live app: preferred row first, then the largest rows, across warehouses. */
 function planFulfillment(rows, key, qty, preferredId) {
+  const pref = rows.find((r) => String(r.id) === String(preferredId));
+  const prefLoc = pref ? String(pref.location || "").trim() : null;
+  const rank = (r) => String(r.id) === String(preferredId) ? 0 : (prefLoc !== null && String(r.location || "").trim() === prefLoc ? 1 : 2);   /* chosen row, then same warehouse, then the rest */
   const matches = rows.filter((r) => normalizeTyreKey(r.size) === key && Number(r.quantity) > 0)
-    .sort((a, b) => a.id === preferredId ? -1 : b.id === preferredId ? 1 : Number(b.quantity) - Number(a.quantity));
+    .sort((a, b) => rank(a) - rank(b) || Number(b.quantity) - Number(a.quantity));
   let remaining = qty; const plan = [];
   for (const r of matches) {
     if (remaining <= 0) break;
@@ -3367,7 +3365,7 @@ async function attachPhoto(txId, plate, notes, meta) {
   const { error } = await db.from("transactions").update({ photo_url: up.url, notes: packTransactionNotes(notes, next) }).eq("id", txId);
   return !error;
 }
-async function finishSave(msgKey, photoOk, shareId) {
+async function finishSave(msgKey, photoOk) {
   if ((msgKey === "orderSaved" || msgKey === "damagedSaved") && photoOk !== false) toastAction(t(msgKey), t("hubView"), () => hubGoto(msgKey === "damagedSaved" ? "damaged" : "orders"));   /* STEP 5 */
   else toast(t(photoOk === false ? "photoWarn" : msgKey));
   closeSmartForm(true);
@@ -3375,8 +3373,7 @@ async function finishSave(msgKey, photoOk, shareId) {
   document.getElementById("size-results").innerHTML = "";
   await loadInventoryCache();
   loadDashboard();
-  const tdP = loadToday(true);   /* V2-STEP 4 */
-  if (shareId) { try { await tdP; } catch (_) {} autoShareService(shareId); }   /* open the share sheet right after saving */
+  loadToday(true);   /* V2-STEP 4 */
 }
 
 /* ===== V2-STEP 5: Two Different Sizes (R2) ===== */
@@ -3554,7 +3551,7 @@ async function saveTwoSizes(plate, noteRaw) {
   }
   const ok = await attachPhoto(tx.id, plate, noteRaw, meta);
   const exFailed = await saveExtras(plate);
-  await finishSave("serviceSaved", svcPhoto ? ok : undefined, tx.id);
+  await finishSave("serviceSaved", svcPhoto ? ok : undefined);
   if (exFailed) setTimeout(() => toast(t("extraPartial", { n: exFailed })), 2200);
 }
 
@@ -3567,12 +3564,12 @@ async function saveSmartForm() {
     if (svcMode === "order") {
       if (!svcSel) return;
       setSaving(true);
-      /* order_requests: one row per size (size = primary key) -> add to the existing row instead of inserting a duplicate */
-      const { data: oldRow, error: selErr } = await db.from("order_requests").select("size,quantity,notes").eq("size", svcSel.size).maybeSingle();
+      /* order_requests: one row per size (size = primary key). A size that is already listed is NOT added again. */
+      const { data: oldRow, error: selErr } = await db.from("order_requests").select("size,quantity").eq("size", svcSel.size).maybeSingle();
       if (selErr) throw selErr;
-      const { error } = oldRow
-        ? await db.from("order_requests").update({ quantity: (Number(oldRow.quantity) || 0) + qty, notes: noteRaw || oldRow.notes || null, status: "pending", operator: currentUser.username }).eq("size", svcSel.size)
-        : await db.from("order_requests").insert({ size: svcSel.size, quantity: qty, notes: noteRaw || null, status: "pending", operator: currentUser.username });
+      const dup = oldRow || hubOrderExists(svcSel.size);
+      if (dup) { toastTop(t("orderExists", { qty: Number(dup.quantity) || 1 })); return; }
+      const { error } = await db.from("order_requests").insert({ size: svcSel.size, quantity: qty, notes: noteRaw || null, status: "pending", operator: currentUser.username });
       if (error) throw error;
       await finishSave("orderSaved");
       return;
@@ -3587,7 +3584,7 @@ async function saveSmartForm() {
         notes: packTransactionNotes(noteRaw, meta), operator: currentUser.username, photo_url: null, quantity: qty, brand: null }, positionFlags())).select().single();
       if (error || !tx) throw error || new Error(t("saveFailed"));
       const ok = await attachPhoto(tx.id, plate, noteRaw, meta);
-      await finishSave("serviceOnlySaved", svcPhoto ? ok : undefined, tx.id);
+      await finishSave("serviceOnlySaved", svcPhoto ? ok : undefined);
       return;
     }
     if (svcMode === "tyre" && svcExtraDraft) { toast(t("extraOpen")); return; }
@@ -3624,7 +3621,7 @@ async function saveSmartForm() {
     }
     const ok = await attachPhoto(tx.id, payloadPlate, note, meta);
     const exFailed = await saveExtras(payloadPlate);
-    await finishSave(damaged ? "damagedSaved" : "serviceSaved", svcPhoto ? ok : undefined, damaged ? null : tx.id);
+    await finishSave(damaged ? "damagedSaved" : "serviceSaved", svcPhoto ? ok : undefined);
     if (exFailed) setTimeout(() => toast(t("extraPartial", { n: exFailed })), 2200);
     const extra = res.plan.slice(1);
     if (extra.length && !manualWh) setTimeout(() => toast(t("autoFill", { value: res.plan.map((p) => (p.location || "—") + " ×" + p.take).join(", ") })), 2200);
@@ -3658,6 +3655,11 @@ function renderPlateResults() {
   if (!plateMatches.length) { box.innerHTML = '<div class="empty-note">' + esc(t("plateNoResult")) + "</div>"; return; }
   box.innerHTML = '<div class="match-count">' + esc(t("plateMatches", { count: plateMatches.length })) + "</div>" + plateMatches.map(recordCardHtml).join("");
 }
+function txPhotoUrl(tx, meta) {   /* photo_url, or rebuild the public link from the stored storage path */
+  if (tx && tx.photo_url) return tx.photo_url;
+  try { const pp = meta && meta.photoPath; if (pp) { const { data } = db.storage.from("service-photos").getPublicUrl(pp); return (data && data.publicUrl) || ""; } } catch (e) { /* ignore */ }
+  return "";
+}
 function recordCardHtml(tx) {
   const { meta, note } = unpackTransactionPayload(tx);
   const loc = currentLang === "ar" ? "ar" : "en-US";
@@ -3671,9 +3673,11 @@ function recordCardHtml(tx) {
   const when = tx.created_at ? new Date(tx.created_at).toLocaleString(loc, { dateStyle: "medium", timeStyle: "short" }) : "—";
   const kv = (k, v) => '<div class="kv"><span class="k">' + esc(k) + ':</span><span class="v">' + esc(v) + "</span></div>";
   const thumbIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
-  const thumb = tx.photo_url
-    ? '<button type="button" class="rec-thumb" data-src="' + esc(tx.photo_url) + '" onclick="openLightbox(this.dataset.src)">' + thumbIcon + '<img src="' + esc(tx.photo_url) + '" alt="" loading="lazy" onerror="this.remove()" /></button>'
-    : '<div class="rec-thumb">' + thumbIcon + "</div>";
+  /* Photo only when it still exists: no photo (deleted / never taken) → info only; a broken link removes the thumbnail */
+  const pUrl = txPhotoUrl(tx, meta);
+  const thumb = pUrl
+    ? '<button type="button" class="rec-thumb" data-src="' + esc(pUrl) + '" onclick="openLightbox(this.dataset.src)">' + thumbIcon + '<img src="' + esc(pUrl) + '" alt="" decoding="async" onerror="var b=this.closest(\'.rec-thumb\');if(b)b.remove()" /></button>'
+    : "";
   return '<div class="rec-card">' + thumb + '<div class="rec-body">' +
     '<div class="rec-top"><div class="rec-size">' + esc(headline) + '</div><span class="badge neutral">' + esc(when) + "</span></div>" +
     kv(t("lAction"), action) + kv(t("lType"), cond) + kv(t("lQty"), qty) + kv(t("lPos"), pos) +
@@ -3690,7 +3694,7 @@ Object.assign(I18N.en, {
   tdLoadFail: "Could not load today's services",
   tdDone: "Completed", tdDamaged: "Damaged", tdSvcOnly: "Service only",
   tdPositions: "Positions", tdNoPos: "No positions selected", tdTyres: "{n} tyre(s)",
-  tdShare: "Share", tdShareAgain: "Ready — tap Share again", tdShareOffer: "Saved — share this service?", tdShareTitle: "Quality Part X — service"
+  tdShare: "Share", tdShareAgain: "Ready — tap Share again", tdShareTitle: "Quality Part X — service"
 });
 Object.assign(I18N.ar, {
   tdTitle: "خدمات اليوم", tdSub: "الخدمات المنجزة اليوم مع المشاركة والحذف.",
@@ -3698,7 +3702,7 @@ Object.assign(I18N.ar, {
   tdLoadFail: "تعذر تحميل خدمات اليوم",
   tdDone: "مكتملة", tdDamaged: "تالف", tdSvcOnly: "خدمة فقط",
   tdPositions: "الأماكن", tdNoPos: "لم تُحدد الأماكن", tdTyres: "{n} إطار",
-  tdShare: "مشاركة", tdShareAgain: "جاهز — اضغط مشاركة مرة أخرى", tdShareOffer: "تم الحفظ — مشاركة الخدمة؟", tdShareTitle: "Quality Part X — خدمة"
+  tdShare: "مشاركة", tdShareAgain: "جاهز — اضغط مشاركة مرة أخرى", tdShareTitle: "Quality Part X — خدمة"
 });
 let todayData = null, todayLoading = false, tdSharing = false;
 const tdShareCache = new Map();
@@ -3819,82 +3823,43 @@ function tdShareLines(d) {
 function tdShareText(d) {
   return t("tdShareTitle") + " (" + d.stLabel + ")\n" + tdShareLines(d).map((r) => r[0] + ": " + r[1]).join("\n");
 }
-function tdRoundRect(x, X, Y, w, h, r) {
-  x.beginPath(); x.moveTo(X + r, Y);
-  x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r);
-  x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath();
-}
-/* Share card = header + (service photo if any) + car diagram with the serviced tyres highlighted + details.
-   The same picture is what WhatsApp receives, so the car drawing travels with the message. */
-async function tdMakeCardBlob(d, photoBlob) {
-  const rtl = currentLang === "ar", W = 800, m = 24, mv = 6, font = "Tahoma, 'Segoe UI', 'Noto Sans Arabic', sans-serif";
-  const stColor = d.st === "err" ? "#ba1a1a" : d.st === "svc" ? "#565e74" : "#006c49";
-  let img = null;
-  if (photoBlob) { try { img = await createImageBitmap(photoBlob); } catch (e) { console.warn("[share] photo decode failed", e); } }
-  /* layout: [photo] then the info rectangle at the bottom (no header bar, no extra lines) */
-  const photoH = img ? Math.round(Math.min(480, Math.max(300, W * img.height / img.width))) : 0;
-  const panelH = 176, yPanel = (img ? photoH : 0) + mv;
-  const H = yPanel + panelH + mv;
-  const c = document.createElement("canvas"); c.width = W; c.height = H;
-  const x = c.getContext("2d");
-  x.fillStyle = "#f8f9ff"; x.fillRect(0, 0, W, H);                       /* shared cards are always light */
-  x.textBaseline = "middle";
-  if (img) {                                                              /* photo, cropped to fill the band */
-    const sc = Math.max(W / img.width, photoH / img.height), dw = img.width * sc, dh = img.height * sc;
-    x.save(); x.beginPath(); x.rect(0, 0, W, photoH); x.clip();
-    x.drawImage(img, (W - dw) / 2, (photoH - dh) / 2, dw, dh); x.restore();
-  }
-  /* the rectangle */
-  const px = m, pw = W - m * 2;
-  x.fillStyle = "#ffffff"; tdRoundRect(x, px, yPanel, pw, panelH, 20); x.fill();
-  x.strokeStyle = "#dce2f0"; x.lineWidth = 2; x.stroke();
-  const carW = 108, carH = 152, cx = rtl ? px + 26 : px + pw - 26 - carW, cy = yPanel + (panelH - carH) / 2;
-  x.save(); x.direction = "ltr"; x.textAlign = "center";
-  x.setLineDash([6, 5]); x.lineWidth = 2; x.strokeStyle = "#bfc5d2"; x.fillStyle = "#eef2fa";
-  tdRoundRect(x, cx + 23, cy + 10, carW - 46, carH - 20, 20); x.fill(); x.stroke(); x.setLineDash([]);
-  x.fillStyle = "#8a92a3"; x.font = "bold 13px " + font;
-  x.fillText(String(t("carFront")).toUpperCase(), cx + carW / 2, cy + 30);
-  x.fillText(String(t("carRear")).toUpperCase(), cx + carW / 2, cy + carH - 30);
-  const tw = 29, th = 45, spots = { FL: [cx, cy + 18], FR: [cx + carW - tw, cy + 18], RL: [cx, cy + carH - 18 - th], RR: [cx + carW - tw, cy + carH - 18 - th] };
-  POSITIONS.forEach((pp) => {
-    const on = d.keys.includes(pp.key), pos = spots[pp.short];
-    x.fillStyle = on ? stColor : "#dce2f0"; x.strokeStyle = on ? stColor : "#bfc5d2"; x.lineWidth = 2;
-    tdRoundRect(x, pos[0], pos[1], tw, th, 7); x.fill(); x.stroke();
-    x.fillStyle = on ? "#ffffff" : "#4a5163"; x.font = "bold 15px " + font; x.fillText(pp.short, pos[0] + tw / 2, pos[1] + th / 2);
-  });
-  x.restore();
-  /* three lines beside the car: size / positions / count + date & time */
-  const xs = rtl ? px + pw - 30 : px + 30, xe = rtl ? px + 30 : px + pw - 30;      /* start edge, far edge of the text area */
-  const maxW = pw - carW - 26 - 60;
-  const dirOf = (txt) => /[\u0600-\u06FF]/.test(txt) ? "rtl" : "ltr";
-  const put = (txt, size, bold, color, atStart, limit) => {
-    let sz = size; do { x.font = (bold ? "bold " : "") + sz + "px " + font; sz -= 2; } while (x.measureText(txt).width > limit && sz > 12);
-    x.fillStyle = color; x.direction = dirOf(txt);
-    x.textAlign = (atStart ? rtl : !rtl) ? "right" : "left";
-    x.fillText(txt, atStart ? xs : xe, 0);
-  };
-  const posTxt = !d.keys.length ? t("tdNoPos") : d.group ? d.group + " (" + d.posList + ")" : d.posList;
-  const countTxt = d.qty ? t("tdTyres", { n: d.qty }) : "";
-  const yc = yPanel + panelH / 2, rh = 46;
-  const at = (fn, y) => { x.save(); x.translate(0, y); fn(); x.restore(); };
-  at(() => put(d.sizeText, 34, true, "#0b1c30", true, maxW), yc - rh);
-  at(() => put(posTxt, 28, true, stColor, true, maxW), yc);
-  if (countTxt) at(() => put(countTxt, 26, true, "#0b1c30", true, maxW), yc + rh);
+function tdMakeCardBlob(d) {
   return new Promise((resolve, reject) => {
-    c.toBlob((b) => b ? resolve(b) : reject(new Error("card")), img ? "image/jpeg" : "image/png", 0.9);
+    try {
+      const rtl = currentLang === "ar", W = 800, pad = 40, font = "Tahoma, 'Segoe UI', 'Noto Sans Arabic', sans-serif";
+      const lines = [];
+      const probe = document.createElement("canvas").getContext("2d");
+      probe.font = "30px " + font;
+      tdShareLines(d).forEach((r) => {
+        const words = (r[0] + ": " + r[1]).split(" "); let cur = "";
+        words.forEach((w) => { const nx = cur ? cur + " " + w : w; if (probe.measureText(nx).width > W - pad * 2 && cur) { lines.push(cur); cur = w; } else cur = nx; });
+        if (cur) lines.push(cur);
+      });
+      const H = 150 + lines.length * 48 + 50;
+      const c = document.createElement("canvas"); c.width = W; c.height = H;
+      const x = c.getContext("2d");
+      x.fillStyle = "#f8f9ff"; x.fillRect(0, 0, W, H);          /* shared cards are always light */
+      x.fillStyle = "#8d4b00"; x.fillRect(0, 0, W, 96);
+      x.direction = rtl ? "rtl" : "ltr"; x.textAlign = rtl ? "right" : "left"; x.textBaseline = "middle";
+      const ax = rtl ? W - pad : pad;
+      x.fillStyle = "#ffffff"; x.font = "bold 36px " + font; x.fillText("Quality Part X", ax, 48);
+      x.fillStyle = d.st === "err" ? "#ba1a1a" : d.st === "svc" ? "#565e74" : "#006c49";
+      x.font = "bold 30px " + font; x.fillText(d.stLabel, ax, 132);
+      x.fillStyle = "#0b1c30"; x.font = "30px " + font;
+      lines.forEach((ln, i) => x.fillText(ln, ax, 190 + i * 48));
+      c.toBlob((b) => b ? resolve(b) : reject(new Error("card")), "image/png");
+    } catch (e) { reject(e); }
   });
 }
 async function tdPrepareShareFile(d) {
-  let photo = null, blob = null;
-  if (d.tx.photo_url) { try { const r = await fetch(d.tx.photo_url); if (r.ok) photo = await r.blob(); } catch (e) { console.warn("[V2-4] photo fetch for share failed", e); } }
-  try { blob = await tdMakeCardBlob(d, photo); } catch (e) { console.warn("[share] card with photo failed", e); }
-  if (!blob && photo) blob = photo;
-  if (!blob) blob = await tdMakeCardBlob(d, null);
+  let blob = null;
+  if (d.tx.photo_url) { try { const r = await fetch(d.tx.photo_url); if (r.ok) blob = await r.blob(); } catch (e) { console.warn("[V2-4] photo fetch for share failed", e); } }
+  if (!blob) blob = await tdMakeCardBlob(d);
   const type = blob.type && blob.type.indexOf("image/") === 0 ? blob.type : "image/png";
   const ext = type === "image/png" ? "png" : "jpg";
   return new File([blob], "service-" + String(d.tx.id).slice(0, 8) + "." + ext, { type });
 }
-async function shareService(id, auto) {
+async function shareService(id) {
   const tx = (todayData || []).find((x) => String(x.id) === String(id));
   if (!tx || tdSharing) return;
   tdSharing = true;
@@ -3902,39 +3867,18 @@ async function shareService(id, auto) {
   try {
     let file = tdShareCache.get(tx.id); const fresh = !file;
     if (!file) { try { file = await tdPrepareShareFile(d); tdShareCache.set(tx.id, file); } catch (e) { console.warn("[V2-4] share card failed", e); } }
-    if (auto && !navigator.share) { shareOffer(id); return; }   /* desktop browsers: offer a Share button instead of opening WhatsApp by itself */
     if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
       try { await navigator.share({ files: [file], text }); return; }
       catch (e) {
         if (e && e.name === "AbortError") return;
-        if (auto && e && e.name === "NotAllowedError") { shareOffer(id); return; }   /* the phone wants a fresh tap: one tap on the button below */
         if (fresh && e && e.name === "NotAllowedError") { toast(t("tdShareAgain")); return; }
       }
     }
     if (navigator.share) {
-      try { await navigator.share({ text }); return; } catch (e) {
-        if (e && e.name === "AbortError") return;
-        if (auto && e && e.name === "NotAllowedError") { shareOffer(id); return; }
-      }
+      try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === "AbortError") return; }
     }
     window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener");
   } finally { tdSharing = false; }
-}
-
-function shareOffer(id) {
-  toastAction(t("tdShareOffer"), t("tdShare"), () => shareService(id));
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => document.getElementById("toast").classList.remove("show", "act"), 15000);
-}
-async function autoShareService(id) {
-  try {
-    if (!(todayData || []).some((x) => String(x.id) === String(id))) {
-      const { data } = await db.from("transactions").select("*").eq("id", id).maybeSingle();
-      if (!data) return;
-      todayData = [data].concat(todayData || []);
-      renderToday();
-    }
-    await shareService(id, true);
-  } catch (e) { console.warn("[auto-share]", e); }
 }
 
 function renderServicePage() {
@@ -4009,6 +3953,19 @@ async function createStockLog(meta) {
 function onInventoryShown() {
   if (currentUser) { renderInventoryPage(); loadInventoryCache(); }
 }
+/* Inventory search: numeric keypad + automatic dashes (205/55/16) like the Service page; "Aa" switches to the letters keyboard for warehouse names */
+function onInvSearchInput(el) {
+  const raw = String(el.value || "");
+  if (!/[A-Za-z\u0600-\u06FF]/.test(raw)) el.value = formatTyreSizeValue(raw) || raw.replace(/[^\d/]/g, "").slice(0, 9);
+  renderInventoryPage();
+}
+function toggleInvKeyboard() {
+  const el = document.getElementById("inv-search"), b = document.getElementById("inv-kb-toggle");
+  const toText = el.getAttribute("inputmode") === "numeric";
+  el.setAttribute("inputmode", toText ? "text" : "numeric");
+  b.textContent = toText ? "123" : "Aa";
+  el.blur(); setTimeout(() => el.focus(), 30);   /* re-open the keyboard in the new layout */
+}
 function clearInvSearch() { document.getElementById("inv-search").value = ""; renderInventoryPage(); }
 function invFilteredRows() {
   const raw = String(document.getElementById("inv-search").value || "").trim().toLowerCase();
@@ -4021,8 +3978,17 @@ function invFilteredRows() {
       return (qKey && normalizeTyreKey(size).includes(qKey)) || size.includes(raw) || loc.includes(raw);
     });
   }
+  /* Zero-quantity rows: ONE card per size (the others are hidden, not deleted — the next one shows up once this card gets a quantity) */
+  const zeroSeen = new Set();
+  rows = rows.filter((r) => {
+    if ((Number(r.quantity) || 0) > 0) return true;
+    const k = normalizeTyreKey(r.size);
+    if (zeroSeen.has(k)) return false;
+    zeroSeen.add(k); return true;
+  });
   return rows.sort((a, b) =>
     normalizeTyreKey(a.size).localeCompare(normalizeTyreKey(b.size)) ||
+    (Number(b.quantity) || 0) - (Number(a.quantity) || 0) ||   /* same size: biggest quantity first */
     String(a.location || "").localeCompare(String(b.location || "")));
 }
 function whOptionsHtml(selected, locs) {
@@ -4505,6 +4471,38 @@ Object.assign(I18N.ar, {
   rpExportCsv: "مكتبة Excel غير متاحة، تم التنزيل بصيغة CSV بدلاً من ذلك"
 });
 
+/* ===== Suggested order + previous orders ===== */
+Object.assign(I18N.en, {
+  orderExists: "This size is already in the orders list (qty {qty}). Change its quantity from the Orders list.",
+  hubSuggest: "Suggest an order", hubSuggestTitle: "Suggested order", hubSuggestBusy: "Calculating the suggestion…",
+  hubSuggestInfo: "Based on tyre usage over the last {d} days and your previous orders.",
+  hubSuggestNone: "Nothing needs ordering right now.", hubSuggestSkipped: "{n} size(s) already in the orders list were left out.",
+  hubSuggestStock: "In stock: {n}", hubSuggestLow: "Low stock", hubSuggestOut: "Out of stock", hubSuggestShort: "Short from last order ({n})",
+  hubSuggestAdd: "Add to orders", hubSuggestClose: "Close", hubSuggestAdded: "{n} size(s) added to the orders list",
+  hubColOrder: "Order qty", hubColStock: "In stock", hubSuggestFail: "Could not build the suggestion", hubSuggestNote: "Suggested", hubDocSuggest: "Suggested order", hubSuggestFoot: "Sizes: {n}  |  Tyres: {q}",
+  hubHistTitle: "Previous orders", hubHistSub: "{n} saved order(s)", hubHistEmpty: "No previous orders yet. A copy is saved each time you clear the orders list.",
+  hubHistShow: "Show previous orders", hubHistHide: "Hide previous orders", hubHistLines: "{n} sizes · {q} tyres",
+  hubHistShortN: "Short {n}", hubHistOrdered: "Ordered", hubHistReceived: "Received", hubHistDetails: "Details", hubHistLess: "Hide details",
+  hubHistDelConfirm: "Delete this saved order?", hubHistDeleted: "Saved order deleted", hubHistDelFail: "Could not delete the saved order",
+  hubHistMissing: "Previous orders are not available yet — run the SQL file once in the database.",
+  hubHistSaveFail: "A copy of this list could not be saved (the previous-orders table may not exist yet). Clear the list anyway, without a copy?"
+});
+Object.assign(I18N.ar, {
+  orderExists: "هذا المقاس موجود مسبقاً في قائمة الطلبيات (الكمية {qty}). عدّل كميته من قائمة الطلبات.",
+  hubSuggest: "اقتراح طلبية", hubSuggestTitle: "الطلبية المقترحة", hubSuggestBusy: "جارٍ حساب الاقتراح…",
+  hubSuggestInfo: "حسب استخدام الإطارات خلال آخر {d} يوماً والطلبيات السابقة.",
+  hubSuggestNone: "لا يوجد ما يحتاج للطلب حالياً.", hubSuggestSkipped: "تم استبعاد {n} مقاس لأنها موجودة في قائمة الطلبات.",
+  hubSuggestStock: "المتوفر: {n}", hubSuggestLow: "المخزون منخفض", hubSuggestOut: "نفد من المخزون", hubSuggestShort: "نقص من الطلبية السابقة ({n})",
+  hubSuggestAdd: "إضافة للطلبات", hubSuggestClose: "إغلاق", hubSuggestAdded: "تمت إضافة {n} مقاس إلى قائمة الطلبات",
+  hubColOrder: "كمية الطلب", hubColStock: "المتوفر", hubSuggestFail: "تعذر إنشاء الاقتراح", hubSuggestNote: "مقترح", hubDocSuggest: "الطلبية المقترحة", hubSuggestFoot: "المقاسات: {n}  |  الإطارات: {q}",
+  hubHistTitle: "الطلبيات السابقة", hubHistSub: "{n} طلبية محفوظة", hubHistEmpty: "لا توجد طلبيات سابقة بعد. تُحفظ نسخة في كل مرة تمسح فيها قائمة الطلبات.",
+  hubHistShow: "إظهار الطلبيات السابقة", hubHistHide: "إخفاء الطلبيات السابقة", hubHistLines: "{n} مقاس · {q} إطار",
+  hubHistShortN: "نقص {n}", hubHistOrdered: "المطلوب", hubHistReceived: "الواصل", hubHistDetails: "التفاصيل", hubHistLess: "إخفاء التفاصيل",
+  hubHistDelConfirm: "حذف هذه الطلبية المحفوظة؟", hubHistDeleted: "تم حذف الطلبية المحفوظة", hubHistDelFail: "تعذر حذف الطلبية المحفوظة",
+  hubHistMissing: "الطلبيات السابقة غير متاحة بعد — شغّل ملف SQL مرة واحدة في قاعدة البيانات.",
+  hubHistSaveFail: "تعذر حفظ نسخة من هذه القائمة (ربما لم يُنشأ جدول الطلبيات السابقة بعد). هل تريد مسح القائمة بدون نسخة؟"
+});
+
 /* ===== STEP 4: Reports page — state ===== */
 const RP_SORTS = [
   { v: "qty_desc", k: "rpSortQtyDesc" }, { v: "qty_asc", k: "rpSortQtyAsc" },
@@ -4533,6 +4531,7 @@ let rpType = "service";     // V2-STEP 9 (R8): "service" | "addition" | "transfe
 let rpRange = { from: "", to: "" };
 let rpSort = "size_asc";
 let rpMenuOpen = false;
+let rpSortOpen = false;
 let rpLoading = false;      // service list is loading
 let rpBusy = false;         // a delete / print / export is running
 
@@ -4958,14 +4957,21 @@ async function exportStockExcel() {
 }
 
 /* ===== STEP 4: Stock card — sort chips + the single Print & Export dropdown ===== */
-function setReportSort(v) { rpSort = v; renderReportsPage(); }
+function setReportSort(v) { rpSort = v; rpSortOpen = false; renderReportsPage(); }
+function toggleReportSort(force) { rpSortOpen = typeof force === "boolean" ? force : !rpSortOpen; renderReportsPage(); }
+document.addEventListener("click", (e) => { if (rpSortOpen && e.target.isConnected && !e.target.closest("#rp-sort")) { rpSortOpen = false; renderReportsPage(); } });
 function toggleReportMenu(force) { rpMenuOpen = typeof force === "boolean" ? force : !rpMenuOpen; renderReportsPage(); }
 function runReportAction(id) { const a = RP_ACTIONS.find((x) => x.id === id); if (a && !rpBusy) a.run(); }
 function renderReportsPage() {
   const chips = document.getElementById("rp-sort"), px = document.getElementById("rp-px");
   if (!chips || !px) return;
   renderReportType();   /* V2-STEP 9 */
-  chips.innerHTML = RP_SORTS.map((s) => '<button type="button" class="chip' + (rpSort === s.v ? " on" : "") + '" onclick="setReportSort(\'' + s.v + '\')">' + esc(t(s.k)) + "</button>").join("");
+  const curSort = RP_SORTS.find((x) => x.v === rpSort) || RP_SORTS[2];
+  chips.classList.toggle("open", rpSortOpen);
+  chips.innerHTML =
+    '<button type="button" class="rp-sort-head" aria-haspopup="listbox" aria-expanded="' + rpSortOpen + '" onclick="toggleReportSort()"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="15" y2="12"/><line x1="4" y1="18" x2="10" y2="18"/></svg><span>' + esc(t(curSort.k)) + '</span></span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>' +
+    '<div class="rp-sort-menu" role="listbox">' + RP_SORTS.map((x) =>
+      '<button type="button" role="option" aria-selected="' + (rpSort === x.v) + '" class="rp-sort-item' + (rpSort === x.v ? " on" : "") + '" onclick="setReportSort(\'' + x.v + '\')"><span>' + esc(t(x.k)) + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>').join("") + "</div>";
   px.classList.toggle("open", rpMenuOpen);
   px.innerHTML =
     '<button type="button" class="rp-px-head" aria-expanded="' + rpMenuOpen + '" onclick="toggleReportMenu()"><span class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + RP_ICON.print + "</svg>" + esc(t(rpBusy ? "rpPreparing" : "rpPxBtn")) + '</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>' +
@@ -5034,6 +5040,12 @@ async function hubLoadNow() {
   const msg = (e) => String((e && (e.message || e.details || e.code)) || t("hubLoadFail"));
   if (ro.ok) hubOrders = ro.v.filter((r) => !ao.has(r.id)); else hubErrO = msg(ro.e);
   if (rd.ok) hubDamaged = rd.v.filter((r) => !String(r.notes || "").startsWith(STOCK_LOG_PREFIX) && !ad.has(r.id)); else hubErrD = msg(rd.e);
+  /* previous orders (saved copies) — one quiet attempt; a missing table just shows a hint */
+  try {
+    const { data, error } = await db.from("order_history").select("*").order("created_at", { ascending: false }).limit(60);
+    if (error) throw error;
+    hubHistory = data || []; hubErrH = "";
+  } catch (e) { console.warn("[Orders] order_history not available:", e); hubHistory = null; hubErrH = msg(e); }
   hubLoading = false;
   renderHub();
 }
@@ -5043,7 +5055,7 @@ function loadHub() {
 }
 function onHubShown() { loadHub(); }                       // refreshes every time the hub opens (old lists stay visible meanwhile)
 function hubBack() { showPage(hubFrom && hubFrom !== "hub" ? hubFrom : "service"); }
-const hubOpen = { orders: false, damaged: false };      // sizes list is collapsed by default
+const hubOpen = { orders: false, damaged: false, history: false };      // sizes list is collapsed by default
 function hubToggle(kind) { hubOpen[kind] = !hubOpen[kind]; renderHub(); }
 function refreshHome() {                                  // dashboard numbers first, THEN the two lists (never at the same time)
   return loadDashboard();                                  // loadDashboard() now loads the two lists right after its own numbers
@@ -5116,6 +5128,8 @@ function hubSectionHtml(kind) {
       '<div class="rp-head-main"><div class="hub-headrow"><span class="hub-sec-title">' + esc(t(isO ? "hubOrdersTitle" : "hubDamagedTitle")) + "</span>" +
       '<span class="badge ' + (isO ? "neutral" : "err") + '">' + (list === null ? "…" : st.lines) + "</span></div>" +
       '<div class="rp-head-sub">' + esc(list === null ? "" : t("hubSummary", { n: st.lines, q: st.qty })) + "</div></div></div>" +
+    (isO ? '<button type="button" class="btn btn-primary hub-sugg-btn"' + ((hubBusy || (hubSugg && hubSugg.busy)) ? " disabled" : "") + ' onclick="hubSuggest()"><span class="ms">auto_awesome</span><span>' + esc(t("hubSuggest")) + "</span></button>" : "") +
+    (isO && hubSugg ? hubSuggHtml() : "") +
     '<div class="btn-row hub-actions">' +
       '<button type="button" class="btn btn-ghost"' + dis + ' onclick="printHub(\'' + kind + '\')">' + hubIco(HUB_ICO.print) + "<span>" + esc(t("hubPrint")) + "</span></button>" +
       '<button type="button" class="btn btn-ghost rp-del"' + dis + ' onclick="hubClear(\'' + kind + '\')"><span class="ms">delete_sweep</span>' + "<span>" + esc(t("hubClear")) + "</span></button></div>" +
@@ -5131,7 +5145,7 @@ function renderHub() {
   document.getElementById("hub-jump").innerHTML =
     '<button type="button" class="hub-tile" onclick="hubJump(\'orders\')"><span class="ms">shopping_cart</span><span class="hub-tile-t">' + esc(t("hubTileOrders")) + '</span><span class="badge neutral">' + n(hubOrders) + "</span></button>" +
     '<button type="button" class="hub-tile dmg" onclick="hubJump(\'damaged\')"><span class="ms">warning</span><span class="hub-tile-t">' + esc(t("hubTileDamaged")) + '</span><span class="badge err">' + n(hubDamaged) + "</span></button>";
-  box.innerHTML = hubSectionHtml("orders") + hubSectionHtml("damaged");
+  box.innerHTML = hubSectionHtml("orders") + hubSectionHtml("damaged") + hubHistorySectionHtml();
 }
 
 /* ===== STEP 5: Orders & Damaged hub — edit quantity, delete, clear ===== */
@@ -5190,9 +5204,205 @@ async function hubClear(kind) {
   if (!confirm(t(kind === "orders" ? "hubClearOrdersConfirm" : "hubClearDamagedConfirm", { n: list.length }))) return;
   hubBusy = true; renderHub();
   try {
+    if (kind === "orders") {   /* keep a copy of the list (ordered vs received) before it is deleted */
+      const saved = await hubArchiveOrders(list.slice());
+      if (!saved && !confirm(t("hubHistSaveFail"))) { hubBusy = false; renderHub(); return; }
+    }
     const left = await hubRemoveRows(kind, list.slice());
     toast(left ? t("hubClearPartial", { n: left }) : t(kind === "orders" ? "hubOrdersCleared" : "hubDamagedCleared"));
   } catch (e) { console.error("[Step 5] clear failed:", e); toast((e && e.message) || t("hubDelFail")); await loadHub(); }
+  hubBusy = false; renderHub();
+}
+
+/* ===== Suggested order + previous orders — logic ===== */
+/* Everything here is automatic. The numbers below are the only settings (change them here if the distributor's timing changes). */
+const HUB_SUGG = {
+  days: 90,       // look-back window for tyre usage (days)
+  lead: 7,        // days an order takes to arrive
+  safety: 7,      // extra safety days
+  cycle: 21,      // days between your orders
+  rare: 2,        // used this many tyres (or fewer) in the window = rarely used size
+  heavy: 12,      // used this many tyres (or more) in the window = fast-moving size
+  minQty: 2       // smallest quantity suggested for one size
+};
+/* Lowest stock before a size is suggested ("rop"), and the stock to build back up to ("target"), by how much the size is used */
+const HUB_FLOOR = { rare: { rop: 2, target: 4 }, mid: { rop: 4, target: 8 }, heavy: { rop: 6, target: 12 } };
+let hubHistory = null, hubErrH = "", hubSugg = null;
+const hubHistOpen = new Set();
+
+async function hubFetchRecentTxns(sinceISO) {
+  const out = [];
+  for (let off = 0; ; off += 1000) {
+    const { data, error } = await db.from("transactions").select("tyre_size,quantity,notes,created_at").gte("created_at", sinceISO)
+      .order("created_at", { ascending: false }).order("id").range(off, off + 999);
+    if (error) throw error;
+    out.push(...(data || []));
+    if (!data || data.length < 1000) break;
+  }
+  return out;
+}
+/* restock log rows -> [{ key, qty, time }] (additions only, transfers between warehouses do not count) */
+function hubAdditionsOf(txns) {
+  return txns.map(rpLogDecode).filter((x) => x && x.meta.type === "addition").map((x) => ({
+    key: normalizeTyreKey(x.meta.size || x.tx.tyre_size), qty: Number(x.meta.quantity) || Number(x.tx.quantity) || 0,
+    time: x.tx.created_at ? new Date(x.tx.created_at).getTime() : 0
+  }));
+}
+function hubReceivedSince(adds, key, ts) { return adds.reduce((a, x) => a + (x.key === key && x.time >= ts ? x.qty : 0), 0); }
+
+/* Save a copy of the orders list: for every size, what was ordered and how much was added to stock since it was listed. */
+async function hubArchiveOrders(list) {
+  try {
+    const stamps = list.map((o) => (o.created_at ? new Date(o.created_at).getTime() : 0)).filter(Boolean);
+    const adds = stamps.length ? hubAdditionsOf(await hubFetchRecentTxns(new Date(Math.min.apply(null, stamps)).toISOString())) : [];
+    const items = list.map((o) => {
+      const qty = Number(o.quantity) || 0, ts = o.created_at ? new Date(o.created_at).getTime() : 0;
+      const received = Math.min(qty, hubReceivedSince(adds, normalizeTyreKey(o.size), ts));
+      return { size: hubSizeText(o.size), qty, received, short: Math.max(0, qty - received) };
+    });
+    const row = {
+      operator: (currentUser && currentUser.username) || null, items,
+      total_lines: items.length, total_qty: items.reduce((a, x) => a + x.qty, 0), total_short: items.reduce((a, x) => a + x.short, 0)
+    };
+    const { error } = await db.from("order_history").insert(row);
+    if (error) throw error;
+    return true;
+  } catch (e) { console.warn("[Orders] could not save a copy of the list:", e); return false; }
+}
+
+/* The suggestion: usage in the last 90 days + previous orders + what the distributor did not deliver last time. */
+async function hubBuildSuggestion() {
+  const C = HUB_SUGG, now = Date.now(), since = new Date(now - C.days * 86400000).toISOString();
+  const [inv, txns, ord] = await Promise.all([fetchAllRows("inventory", "*"), hubFetchRecentTxns(since), hubFetchAll("order_requests")]);
+  let hist = [];
+  try { const { data, error } = await db.from("order_history").select("*").gte("created_at", since).order("created_at", { ascending: false }); if (!error) hist = data || []; } catch (_) { /* no history yet */ }
+  const oldest = txns.reduce((m, x) => { const v = x.created_at ? new Date(x.created_at).getTime() : now; return v < m ? v : m; }, now);
+  const W = Math.max(30, Math.min(C.days, Math.ceil((now - oldest) / 86400000) || C.days));
+  const usage = rpUsageMap(txns), groups = rpGroupBySize(inv, {}), adds = hubAdditionsOf(txns);
+  const inOrders = new Set(ord.map((o) => normalizeTyreKey(o.size)));
+  /* previous orders: what actually arrived counts as demand; what did not arrive is carried to this order */
+  const histQty = {}, carry = {};
+  hist.forEach((h) => (Array.isArray(h.items) ? h.items : []).forEach((it) => {
+    const k = normalizeTyreKey(it.size); if (!k) return;
+    histQty[k] = (histQty[k] || 0) + Math.max(0, (Number(it.qty) || 0) - (Number(it.short) || 0));
+  }));
+  if (hist[0]) {
+    const ts = new Date(hist[0].created_at).getTime();
+    (Array.isArray(hist[0].items) ? hist[0].items : []).forEach((it) => {
+      const k = normalizeTyreKey(it.size); if (!k || !(Number(it.short) > 0)) return;
+      carry[k] = Math.max(0, Number(it.short) - hubReceivedSince(adds, k, ts));
+    });
+  }
+  const keys = new Set([].concat(Array.from(groups.keys()), Object.keys(usage), Object.keys(histQty), Object.keys(carry)));
+  const items = []; let skipped = 0;
+  keys.forEach((k) => {
+    const g = groups.get(k), stock = g ? g.quantity : 0, used = usage[k] || 0, c = carry[k] || 0;
+    const demand = Math.max(used, histQty[k] || 0);
+    if (demand <= 0 && c <= 0) return;
+    const rate = demand / W;
+    const fl = demand >= C.heavy ? HUB_FLOOR.heavy : demand <= C.rare ? HUB_FLOOR.rare : HUB_FLOOR.mid;
+    const rop = Math.max(fl.rop, Math.ceil(rate * (C.lead + C.safety)));
+    const target = Math.max(fl.target, rop + 1, Math.ceil(rate * (C.cycle + C.lead)));
+    const low = demand > 0 && stock <= rop;
+    if (!low && c <= 0) return;
+    if (inOrders.has(k)) { skipped++; return; }
+    const qty = Math.min(99, Math.max(low ? Math.max(C.minQty, target - stock) : 0, c));
+    if (qty <= 0) return;
+    items.push({ key: k, size: (g && g.size) || formatTyreSizeValue(k) || k, stock, qty, low, out: stock <= 0, carry: c, ratio: stock / Math.max(1, rop) });
+  });
+  items.sort((a, b) => (b.out - a.out) || (a.ratio - b.ratio) || a.size.localeCompare(b.size));
+  return { items, skipped, days: W };
+}
+async function hubSuggest() {
+  if (hubBusy || (hubSugg && hubSugg.busy)) return;
+  hubSugg = { busy: true }; renderHub();
+  try { hubSugg = await hubBuildSuggestion(); }
+  catch (e) { console.error("[Orders] suggestion failed:", e); hubSugg = null; toast(t("hubSuggestFail")); }
+  renderHub();
+}
+function hubSuggestClose() { hubSugg = null; renderHub(); }
+function hubSuggHtml() {
+  const s = hubSugg, ic = '<span class="ms">';
+  if (s.busy) return '<div class="hub-sugg"><div class="empty-note">' + esc(t("hubSuggestBusy")) + "</div></div>";
+  const q = s.items.reduce((a, x) => a + x.qty, 0);
+  const head = '<div class="hs-head"><span class="hs-title">' + esc(t("hubSuggestTitle")) + ' <span class="badge neutral">' + s.items.length + '</span></span>' +
+    '<button type="button" class="icon-btn" onclick="hubSuggestClose()" aria-label="' + esc(t("hubSuggestClose")) + '">' + ic + "close</span></button></div>" +
+    '<div class="hs-info">' + esc(t("hubSuggestInfo", { d: s.days })) + (s.skipped ? " " + esc(t("hubSuggestSkipped", { n: s.skipped })) : "") + "</div>";
+  if (!s.items.length) return '<div class="hub-sugg">' + head + '<div class="empty-note">' + esc(t("hubSuggestNone")) + "</div></div>";
+  const rows = s.items.map((x) => '<div class="hs-row"><div class="hs-main"><div class="hs-size">' + esc(x.size) + "</div>" +
+    '<div class="hs-sub"><span>' + esc(t("hubSuggestStock", { n: x.stock })) + "</span>" +
+    (x.out ? '<span class="badge err">' + esc(t("hubSuggestOut")) + "</span>" : x.low ? '<span class="badge neutral">' + esc(t("hubSuggestLow")) + "</span>" : "") +
+    (x.carry > 0 ? '<span class="badge warn">' + esc(t("hubSuggestShort", { n: x.carry })) + "</span>" : "") +
+    '</div></div><span class="hs-qty">×' + x.qty + "</span></div>").join("");
+  return '<div class="hub-sugg">' + head + '<div class="hs-list">' + rows + "</div>" +
+    '<div class="hs-acts"><button type="button" class="btn btn-primary"' + (hubBusy ? " disabled" : "") + ' onclick="hubSuggestAddAll()">' + ic + "playlist_add</span><span>" + esc(t("hubSuggestAdd")) + "</span></button>" +
+    '<button type="button" class="btn btn-ghost" onclick="hubSuggestPrint()">' + hubIco(HUB_ICO.print) + "<span>" + esc(t("hubPrint")) + "</span></button></div>" +
+    '<div class="hs-info" style="margin:8px 0 0">' + esc(t("hubSuggestFoot", { n: s.items.length, q })) + "</div></div>";
+}
+async function hubSuggestAddAll() {
+  const s = hubSugg;
+  if (!s || s.busy || !s.items || !s.items.length || hubBusy) return;
+  hubBusy = true; renderHub();
+  try {
+    const rows = s.items.map((x) => ({ size: x.size, quantity: x.qty, notes: t("hubSuggestNote"), status: "pending", operator: (currentUser && currentUser.username) || null }));
+    const { error } = await db.from("order_requests").upsert(rows, { onConflict: "size", ignoreDuplicates: true });   /* a size already listed is never overwritten */
+    if (error) throw error;
+    toast(t("hubSuggestAdded", { n: rows.length }));
+    hubSugg = null; hubOpen.orders = true;
+    await refreshHome();
+  } catch (e) { console.error("[Orders] add suggestion failed:", e); toast((e && e.message) || t("hubSuggestFail")); }
+  hubBusy = false; renderHub();
+}
+function hubSuggestPrint() {
+  const s = hubSugg;
+  if (!s || !s.items || !s.items.length) { toast(t("hubPrintNone")); return; }
+  const win = openPrintShell(t("hubDocSuggest"));
+  if (!win) return;
+  const rows = s.items.map((x) => '<tr><td class="ltr"><b>' + esc(x.size) + "</b></td><td>" + x.qty + "</td><td>" + x.stock + "</td></tr>");
+  finishPrintShell(win, buildPrintDoc({
+    title: t("hubDocSuggest"), metaLines: [printStamp()],
+    head: [t("rpColSize"), t("hubColOrder"), t("hubColStock")], rows,
+    footer: t("hubSuggestFoot", { n: s.items.length, q: s.items.reduce((a, x) => a + x.qty, 0) })
+  }));
+}
+
+/* ----- Previous orders card ----- */
+function hubHistItemHtml(h) {
+  const items = (Array.isArray(h.items) ? h.items : []).slice().sort((a, b) => (Number(b.short) || 0) - (Number(a.short) || 0));
+  const id = String(h.id), open = hubHistOpen.has(id), short = Number(h.total_short) || 0;
+  const rows = open ? '<div class="hh-rows">' + items.map((it) => '<div class="hh-row"><span class="hh-size">' + esc(hubSizeText(it.size)) + "</span>" +
+    '<span class="hh-nums">' + esc(t("hubHistOrdered")) + " " + (Number(it.qty) || 0) + " · " + esc(t("hubHistReceived")) + " " + (Number(it.received) || 0) + "</span>" +
+    (Number(it.short) > 0 ? '<span class="badge err">' + esc(t("hubHistShortN", { n: it.short })) + "</span>" : '<span class="badge ok"><span class="ms">check</span></span>') + "</div>").join("") + "</div>" : "";
+  return '<div class="hub-item"><div class="hub-top"><div class="hh-sum"><span class="badge neutral">' + esc(hubWhen(h.created_at)) + "</span>" +
+    '<span class="badge neutral">' + esc(t("hubHistLines", { n: Number(h.total_lines) || items.length, q: Number(h.total_qty) || 0 })) + "</span>" +
+    (short > 0 ? '<span class="badge err">' + esc(t("hubHistShortN", { n: short })) + "</span>" : "") + "</div></div>" + rows +
+    '<div class="hub-foot"><span class="hub-by">' + esc(t("rpColOperator")) + ": " + esc(h.operator || "—") + "</span>" +
+    '<div class="hub-acts"><button type="button" class="hub-toggle hh-more" style="width:auto;padding:0 12px" aria-expanded="' + open + '" data-id="' + esc(id) + '" onclick="hubHistToggle(this.dataset.id)"><span class="ms" aria-hidden="true">expand_more</span><span>' + esc(t(open ? "hubHistLess" : "hubHistDetails")) + "</span></button>" +
+    '<button type="button" class="icon-btn danger" data-id="' + esc(id) + '" onclick="hubHistDelete(this.dataset.id)" aria-label="' + esc(t("hubDelete")) + '">' + hubIco(HUB_ICO.trash) + "</button></div></div></div>";
+}
+function hubHistorySectionHtml() {
+  const list = hubHistory, has = !!(list && list.length), open = !!hubOpen.history;
+  let body;
+  if (list === null) body = hubErrH ? '<div class="banner-err">' + esc(t("hubHistMissing")) + "</div>" : '<div class="empty-note">' + esc(t("hubLoading")) + "</div>";
+  else if (!has) body = '<div class="empty-note">' + esc(t("hubHistEmpty")) + "</div>";
+  else body = '<div class="stack">' + list.map(hubHistItemHtml).join("") + "</div>";
+  const toggle = has ? '<button type="button" class="hub-toggle" aria-expanded="' + open + '" aria-controls="hub-body-history" onclick="hubToggle(\'history\')"><span class="ms" aria-hidden="true">expand_more</span><span>' + esc(t(open ? "hubHistHide" : "hubHistShow")) + "</span></button>" : "";
+  return '<div class="card" id="hub-sec-history"><div class="rp-head"><span class="rp-head-ico"><span class="ms">history</span></span>' +
+    '<div class="rp-head-main"><div class="hub-headrow"><span class="hub-sec-title">' + esc(t("hubHistTitle")) + '</span><span class="badge neutral">' + (list === null ? "…" : list.length) + "</span></div>" +
+    '<div class="rp-head-sub">' + esc(list === null ? "" : t("hubHistSub", { n: list.length })) + "</div></div></div>" +
+    (has ? toggle + (open ? '<div class="hub-body" id="hub-body-history">' + body + "</div>" : "") : body) + "</div>";
+}
+function hubHistToggle(id) { id = String(id); if (hubHistOpen.has(id)) hubHistOpen.delete(id); else hubHistOpen.add(id); renderHub(); }
+async function hubHistDelete(id) {
+  if (hubBusy) return;
+  if (!confirm(t("hubHistDelConfirm"))) return;
+  hubBusy = true; renderHub();
+  try {
+    const { error } = await db.from("order_history").delete().eq("id", id);
+    if (error) throw error;
+    hubHistory = (hubHistory || []).filter((h) => String(h.id) !== String(id)); hubHistOpen.delete(String(id));
+    toast(t("hubHistDeleted"));
+  } catch (e) { console.error("[Orders] delete saved order failed:", e); toast(t("hubHistDelFail")); await loadHub(); }
   hubBusy = false; renderHub();
 }
 
@@ -5979,7 +6189,6 @@ let camStream = null;
 let camHook = null;   /* INSPECTION: when set, the next photo from the live camera goes to the inspection form instead of the service form */
 function camFallback(msgKey) {
   if (msgKey) toast(t(msgKey));
-  if (camHook && camHook.scan) { camHook = null; const gi = document.getElementById("plate-scan-gallery"); if (gi) { gi.value = ""; gi.click(); return; } }   /* PLATE SEARCH */
   if (camHook) { camHook = null; const ii = document.getElementById("insp-file-cam"); if (ii) { ii.click(); return; } }   /* INSPECTION */
   const inp = document.getElementById("car-photo-camera"); if (inp) inp.click();
 }
@@ -5990,7 +6199,6 @@ async function openCamera() {
   } catch (e) { console.warn("[camera]", e); camFallback(e && e.name === "NotAllowedError" ? "camDenied" : "camUnavailable"); return; }
   const v = document.getElementById("cam-video");
   v.srcObject = camStream;
-  document.getElementById("cam-layer").classList.toggle("scan", !!(camHook && camHook.scan));   /* PLATE SEARCH: show the gallery button */
   document.getElementById("cam-layer").classList.add("open");
   try { await v.play(); } catch (_) { /* autoplay attribute covers it */ }
 }
@@ -5998,7 +6206,7 @@ function closeCamera() {
   camHook = null;   /* INSPECTION (snapCamera keeps its own copy before calling this) */
   if (camStream) { camStream.getTracks().forEach((tr) => tr.stop()); camStream = null; }
   const v = document.getElementById("cam-video"); if (v) v.srcObject = null;
-  document.getElementById("cam-layer").classList.remove("open", "scan");
+  document.getElementById("cam-layer").classList.remove("open");
 }
 async function snapCamera() {
   const inspHook = camHook;   /* INSPECTION */
@@ -6049,69 +6257,7 @@ function plateKeys(el) {
 function plateFocus(el) {
   el.setAttribute("lang", "en"); el.setAttribute("dir", "ltr");
   el.setAttribute("autocapitalize", "characters"); el.setAttribute("autocorrect", "off");
-  el.setAttribute("spellcheck", "false"); el.setAttribute("autocomplete", "off"); el.inputMode = "text";
-}
-/* Re-apply the English / capitals hints BEFORE the keyboard opens (pointerdown/touchstart come before focus), and on every plate field. */
-document.addEventListener("pointerdown", (e) => { const el = e.target && e.target.closest ? e.target.closest("[data-plate-input]") : null; if (el) plateFocus(el); }, true);
-document.addEventListener("touchstart", (e) => { const el = e.target && e.target.closest ? e.target.closest("[data-plate-input]") : null; if (el) plateFocus(el); }, { capture: true, passive: true });
-/* A web page cannot force the phone's keyboard language. If the Arabic keyboard still opens, tell the person once that the letters are being converted. */
-let arKbdHinted = false;
-document.addEventListener("input", (e) => {
-  const el = e.target;
-  if (arKbdHinted || !el || !el.hasAttribute || !el.hasAttribute("data-plate-input")) return;
-  if (/[\u0600-\u06FF]/.test(String(e.data || ""))) { arKbdHinted = true; toast(currentLang === "ar" ? "لوحة المفاتيح عربية — يتم تحويل الحروف تلقائياً إلى الإنجليزية الكبيرة" : "Arabic keyboard detected — letters are converted to English capitals automatically"); }
-}, true);
-
-/* ===== Plate search by photo: camera button → analysing animation over the photo → service records shown directly ===== */
-Object.assign(I18N.en, { scanReading: "Reading plate", scanFail: "Couldn't read the plate — try again or type it.", scanNoKey: "Gemini key is missing" });
-Object.assign(I18N.ar, { scanReading: "جارٍ قراءة اللوحة", scanFail: "تعذرت قراءة اللوحة — أعد التصوير أو اكتبها يدوياً.", scanNoKey: "مفتاح Gemini غير موجود" });
-let scanTarget = "home", scanBusy = false;
-function scanPlateStart(target) {
-  if (scanBusy) return;
-  scanTarget = target;
-  /* live camera with a shutter, plus an "upload from gallery" button inside it */
-  camHook = (canvas) => canvas.toBlob((b) => { if (b) scanPlateRun(new File([b], "plate.jpg", { type: "image/jpeg" })); }, "image/jpeg", 0.92);
-  camHook.scan = true;
-  openCamera();
-}
-function camPickGallery() {
-  closeCamera();
-  const gi = document.getElementById("plate-scan-gallery");
-  if (gi) { gi.value = ""; gi.click(); }
-}
-async function scanPlateFile(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  await scanPlateRun(file);
-  try { input.value = ""; } catch (_) {}
-}
-async function scanPlateRun(file) {
-  if (!file || scanBusy) return;
-  scanBusy = true;
-  const layer = document.getElementById("scan-layer");
-  try {
-    const dataUrl = await fileToJpegDataUrl(file);
-    document.getElementById("scan-img").src = dataUrl;
-    document.getElementById("scan-txt").textContent = t("scanReading");
-    layer.classList.add("open");
-    const text = await geminiReadPlate(dataUrl);
-    const clean = String(text).toUpperCase().replace(/[^A-Z0-9 ]/g, "").trim();
-    let plate = clean === "NONE" ? "" : extractPlate(clean);
-    if (!plate && clean && clean !== "NONE") { const c = clean.replace(/\s+/g, ""); if (c.length >= 2 && c.length <= 8) plate = c; }
-    plate = ukPlate(plate);
-    if (!plate) { layer.classList.remove("open"); toast(t("scanFail")); return; }
-    const home = scanTarget === "home";
-    const el = document.getElementById(home ? "plate-search" : "sh-plate");
-    el.value = plate;
-    if (home) await searchPlate(); else await shSearchPlate();
-    layer.classList.remove("open");
-    const res = document.getElementById(home ? "plate-results" : "sh-plate-results");
-    if (res && res.scrollIntoView) res.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  } catch (e) {
-    console.warn("Plate scan failed:", e);
-    layer.classList.remove("open");
-    toast(t("scanFail") + (e && e.code ? " (" + e.code + ")" : ""));
-  } finally { scanBusy = false; }
+  el.setAttribute("spellcheck", "false"); el.inputMode = "text";
 }
 
 /* ===== INSPECTION: texts (added on top of the existing dictionaries) ===== */
