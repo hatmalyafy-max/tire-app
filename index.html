@@ -4427,7 +4427,7 @@ Object.assign(I18N.en, {
   rpFilterAvail: "Available stock only", rpFilterOut: "Out-of-stock only", rpFilterAll: "All stock",
   rpSortedBy: "Sorted by", rpPeriod: "Period", rpGenerated: "Generated", rpOperator: "Operator",
   rpColTime: "Date & Time", rpColSize: "Size", rpColPlate: "Plate", rpColCond: "Condition",
-  rpColPos: "Position", rpColNote: "Note", rpColRepair: "Repair", rpColOperator: "Operator",
+  rpColPos: "Position", rpColNote: "Note", rpColRepair: "Repair", rpColTyres: "Tyres", rpColOperator: "Operator",
   rpColQty: "Qty", rpColWh: "Warehouse", rpColWhCount: "Warehouses", rpColUsed: "Used", rpColNotes: "Notes",
   rpTotalServices: "Total services", rpTotalQty: "Total tyres", rpRows: "Rows", rpSizes: "Sizes",
   rpPopup: "Allow pop-ups to print", rpPreparing: "Preparing…",
@@ -4462,7 +4462,7 @@ Object.assign(I18N.ar, {
   rpFilterAvail: "المتوفر فقط", rpFilterOut: "المنتهي فقط", rpFilterAll: "كل المخزون",
   rpSortedBy: "الترتيب", rpPeriod: "الفترة", rpGenerated: "تاريخ الإصدار", rpOperator: "الموظف",
   rpColTime: "التاريخ والوقت", rpColSize: "المقاس", rpColPlate: "اللوحة", rpColCond: "الحالة",
-  rpColPos: "المكان", rpColNote: "الملاحظة", rpColRepair: "الإصلاح", rpColOperator: "الموظف",
+  rpColPos: "المكان", rpColNote: "الملاحظة", rpColRepair: "الإصلاح", rpColTyres: "عدد الإطارات", rpColOperator: "الموظف",
   rpColQty: "الكمية", rpColWh: "المخزن", rpColWhCount: "عدد المخازن", rpColUsed: "المستخدم", rpColNotes: "ملاحظات",
   rpTotalServices: "إجمالي الخدمات", rpTotalQty: "إجمالي الإطارات", rpRows: "عدد الصفوف", rpSizes: "عدد المقاسات",
   rpPopup: "اسمح بالنوافذ المنبثقة للطباعة", rpPreparing: "جارٍ التحضير…",
@@ -4670,6 +4670,13 @@ function rpDescribe(tx) {
     qty: isService ? 0 : (txTyreCount(tx) || Number(tx.quantity) || 1)
   };
 }
+/* Tyres worked on in one service (printed report): tyres fitted from stock, otherwise the number of ticked positions
+   (service-only jobs such as balancing / sensor valve use no stock, so their positions are the count). */
+function rpTyreCount(tx) {
+  const n = txTyreCount(tx);
+  if (n > 0) return n;
+  return POSITIONS.filter((p) => tx[p.key]).length;
+}
 function rpRowHtml(tx) {
   const d = rpDescribe(tx);
   const loc = currentLang === "ar" ? "ar" : "en-US";
@@ -4819,13 +4826,13 @@ function printServiceReport() {
   const rows = rpData.map((tx) => {
     const d = rpDescribe(tx);
     return "<tr><td>" + esc(tx.created_at ? new Date(tx.created_at).toLocaleString(loc) : "—") + "</td><td><b>" + esc(d.headline) + "</b></td><td class=\"ltr\">" + esc(d.plate || "—") + "</td><td>" +
-      esc(d.cond || "—") + "</td><td>" + (d.pos ? '<span class="pos">' + esc(d.pos) + "</span>" : "—") + "</td><td>" + esc(d.note || "—") + "</td><td>" + esc(tx.repair_type || "—") + "</td><td>" + esc(tx.operator || "—") + "</td></tr>";
+      esc(d.cond || "—") + "</td><td>" + (d.pos ? '<span class="pos">' + esc(d.pos) + "</span>" : "—") + "</td><td>" + esc(d.note || "—") + "</td><td>" + (rpTyreCount(tx) || "—") + "</td><td>" + esc(tx.operator || "—") + "</td></tr>";
   });
   finishPrintShell(win, buildPrintDoc({
     title: t("rpDocService"),
     metaLines: [t("rpPeriod") + ": " + rpRange.from + " → " + rpRange.to, printStamp()],
-    head: [t("rpColTime"), t("rpColSize"), t("rpColPlate"), t("rpColCond"), t("rpColPos"), t("rpColNote"), t("rpColRepair"), t("rpColOperator")],
-    rows, footer: t("rpTotalServices") + ": " + rpData.length
+    head: [t("rpColTime"), t("rpColSize"), t("rpColPlate"), t("rpColCond"), t("rpColPos"), t("rpColNote"), t("rpColTyres"), t("rpColOperator")],
+    rows, footer: t("rpTotalServices") + ": " + rpData.length + "  |  " + t("rpTotalQty") + ": " + rpData.reduce((a, tx) => a + rpTyreCount(tx), 0)
   }));
 }
 
