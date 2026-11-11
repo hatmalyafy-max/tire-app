@@ -3972,18 +3972,15 @@ async function tdMakeCardBlob(d, photoBlob) {
   let img = null;
   if (photoBlob) { try { img = await createImageBitmap(photoBlob); } catch (e) { console.warn("[share] photo decode failed", e); } }
   /* layout: [photo] then the info rectangle at the bottom (no header bar, no extra lines) */
-  const photoH = img ? Math.round(Math.min(480, Math.max(300, W * img.height / img.width))) : 0;
+  /* the whole photo is shown at its own proportions: nothing is cropped, so the plate and the car badge never get cut off */
+  const photoH = img ? Math.round(W * img.height / img.width) : 0;
   const panelH = 176, yPanel = (img ? photoH : 0) + mv;
   const H = yPanel + panelH + mv;
   const c = document.createElement("canvas"); c.width = W; c.height = H;
   const x = c.getContext("2d");
   x.fillStyle = "#f8f9ff"; x.fillRect(0, 0, W, H);                       /* shared cards are always light */
   x.textBaseline = "middle";
-  if (img) {                                                              /* photo, cropped to fill the band */
-    const sc = Math.max(W / img.width, photoH / img.height), dw = img.width * sc, dh = img.height * sc;
-    x.save(); x.beginPath(); x.rect(0, 0, W, photoH); x.clip();
-    x.drawImage(img, (W - dw) / 2, (photoH - dh) / 2, dw, dh); x.restore();
-  }
+  if (img) x.drawImage(img, 0, 0, W, photoH);                             /* full photo, uncropped; the info panel sits BELOW it */
   /* the rectangle */
   const px = m, pw = W - m * 2;
   x.fillStyle = "#ffffff"; tdRoundRect(x, px, yPanel, pw, panelH, 20); x.fill();
